@@ -1,0 +1,48 @@
+<mat-form-field
+  class="full-width"
+  [appearance]="appearance"
+  [subscriptSizing]="subscriptSizing"
+>
+  <mat-label>
+    {{ label }}
+
+    @if (isRequired) {
+      <span class="required-star">*</span>
+    }
+  </mat-label>
+
+  @if (prefixIcon) {
+    <mat-icon matPrefix class="prefix-icon">
+      {{ prefixIcon }}
+    </mat-icon>
+  }
+
+  <textarea
+    matInput
+    [rows]="rows"
+    [placeholder]="placeholder"
+    [readonly]="readonly"
+    [disabled]="disabled"
+    [maxLength]="maxlength"
+    [value]="value"
+    (input)="handleInput($event)"
+    (blur)="onTouched(); markTouched()"
+  >
+  </textarea>
+
+  @if (hint) {
+    <mat-hint>
+      {{ hint }}
+    </mat-hint>
+  }
+
+  @if (maxlength) {
+    <mat-hint align="end">
+      {{ value.length }}/{{ maxlength }}
+    </mat-hint>
+  }
+
+  <mat-error>
+    {{ errorMessage }}
+  </mat-error>
+</mat-form-field>

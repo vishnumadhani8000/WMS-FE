@@ -1,0 +1,87 @@
+@if (variant === 'raised') {
+    <button
+      mat-raised-button
+      [color]="color === 'default' ? null : color"
+      [disabled]="isDisabled"
+      [class]="hostClass"
+      [attr.aria-label]="ariaLabel || label"
+      (click)="handleClick($event)">
+  
+      <ng-container *ngTemplateOutlet="btnContent" />
+  
+    </button>
+  }
+  
+  @if (variant === 'flat') {
+    <button
+      mat-flat-button
+      [color]="color === 'default' ? null : color"
+      [disabled]="isDisabled"
+      [class]="hostClass"
+      [attr.aria-label]="ariaLabel || label"
+      (click)="handleClick($event)">
+  
+      <ng-container *ngTemplateOutlet="btnContent" />
+  
+    </button>
+  }
+  
+  @if (variant === 'stroked') {
+    <button
+      mat-stroked-button
+      [color]="color === 'default' ? null : color"
+      [disabled]="isDisabled"
+      [class]="hostClass"
+      [attr.aria-label]="ariaLabel || label"
+      (click)="handleClick($event)">
+  
+      <ng-container *ngTemplateOutlet="btnContent" />
+  
+    </button>
+  }
+  
+  <ng-template #btnContent>
+  
+    @if (loading) {
+  
+      <mat-spinner
+        class="btn-spinner"
+        [diameter]="20">
+      </mat-spinner>
+  
+    } @else {
+  
+      <span class="btn-content">
+  
+        @if (iconPath) {
+          <img
+            class="btn-img-icon"
+            [src]="iconPath"
+            width="18"
+            height="18"
+            alt="icon" />
+        }
+  
+        @else if (prefixIcon) {
+          <mat-icon class="btn-icon">
+            {{ prefixIcon }}
+          </mat-icon>
+        }
+  
+        @if (label) {
+          <span class="btn-label">
+            {{ label }}
+          </span>
+        }
+  
+        @if (suffixIcon) {
+          <mat-icon class="btn-icon">
+            {{ suffixIcon }}
+          </mat-icon>
+        }
+  
+      </span>
+  
+    }
+  
+  </ng-template>
