@@ -1,0 +1,84 @@
+<!-- input-field.html -->
+
+<mat-form-field
+  class="full-width"
+  [appearance]="appearance"
+  [subscriptSizing]="subscriptSizing"
+>
+  <mat-label>
+    {{ label }}
+
+    @if (isRequired) {
+      <span class="required-star">*</span>
+    }
+  </mat-label>
+
+  @if (prefixIcon) {
+    <mat-icon matPrefix class="prefix-icon">
+      {{ prefixIcon }}
+    </mat-icon>
+  }
+
+  <input
+    matInput
+    [type]="inputType"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [readonly]="readonly"
+    [value]="value"
+    [attr.minlength]="minlength"
+    [attr.maxlength]="maxlength"
+    [attr.min]="min"
+    [attr.max]="max"
+    [attr.step]="step"
+    [attr.pattern]="pattern"
+    autocomplete="new-password"
+    (input)="handleInputEvent($event)"
+    (blur)="onTouched(); markTouched()"
+  />
+
+  @if (type === 'password') {
+    <button
+      mat-icon-button
+      matSuffix
+      type="button"
+      (click)="togglePassword()"
+      [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+      tabindex="-1"
+    >
+      <mat-icon>
+        {{ showPassword ? 'visibility_off' : 'visibility' }}
+      </mat-icon>
+    </button>
+  }
+
+  @if ((iconPath || icon) && type !== 'password') {
+    <span matSuffix>
+      <button
+        mat-icon-button
+        type="button"
+        (click)="handleIconClick()"
+      >
+        @if (iconPath) {
+          <img
+            [src]="iconPath"
+            width="22"
+            height="22"
+            alt="icon"
+          />
+        }
+        @else if (icon) {
+          <mat-icon>{{ icon }}</mat-icon>
+        }
+      </button>
+    </span>
+  }
+
+  @if (hint) {
+    <mat-hint>{{ hint }}</mat-hint>
+  }
+
+  <mat-error>
+    {{ errorMessage }}
+  </mat-error>
+</mat-form-field>
