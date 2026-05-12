@@ -1,0 +1,45 @@
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f5f6fa;
+    position: relative;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 90;
+  }
+  
+ 
+  .main-container {
+    flex: 1;
+    margin-left: 260px;
+    transition: all 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-container.sidebar-close {
+    margin-left: 0;
+  }
+
+  .page-wrapper {
+    padding: 24px;
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+  
+    .main-container,
+    .main-container.sidebar-close {
+      margin-left: 0;
+    }
+  
+    .page-wrapper {
+      padding: 16px;
+    }
+  }
