@@ -1,20 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
-import {
-  catchError,
-  finalize,
-  Observable,
-  tap,
-  throwError,
-} from 'rxjs';
-
-import {
-  LoginRequest,
-  LoginResponse,
-  SignUpRequest,
-  SignUpResponse,
-} from '../models/auth.models';
-
+import {computed,inject,  Injectable,signal,} from '@angular/core';
+import {catchError,finalize,Observable,tap,throwError} from 'rxjs';
+import {LoginRequest,LoginResponse,SignUpRequest,SignUpResponse} from '../models/auth.models';
 import { ApiResponse } from '../../../core/models/api-responce.model';
 import { environment } from '../../../../environments/environment';
 
@@ -24,12 +11,26 @@ const BASE = `${environment.baseUrl}/auth`;
   providedIn: 'root',
 })
 export class AuthService {
+
   private http = inject(HttpClient);
   isInitialized = signal(false);
   private accessToken = signal<string | null>(null);
-  isLoggedIn = computed(() => this.accessToken() !== null);
   private userRole = signal<string | null>(null);
   private userName = signal<string | null>(null);
+  isLoggedIn = computed(() => !!this.accessToken());
+
+  private setSession( data: LoginResponse,): void {
+    this.accessToken.set(data.accessToken);
+    this.userRole.set(data.role);
+    this.userName.set(data.name);
+  }
+
+  private clearSession(): void {
+    this.accessToken.set(null);
+    this.userRole.set(null);
+    this.userName.set(null);
+  }
+
 
   login(
     payload: LoginRequest,
@@ -39,15 +40,15 @@ export class AuthService {
       .post<ApiResponse<LoginResponse>>(
         `${BASE}/login`,
         payload,
-        { withCredentials: true },
+        {
+          withCredentials: true,
+        },
       )
-      .pipe(
-        tap((res) => {
-          if (!res.isSuccess || !res.data) return;
-
-          this.accessToken.set(res.data.accessToken);
-          this.userRole.set(res.data.role);
-          this.userName.set(res.data.name);
+      .pipe(tap((res) => {
+          if (!res.isSuccess || !res.data) {
+            return;
+          }
+          this.setSession(res.data);
         }),
 
         catchError((err) =>
@@ -55,6 +56,7 @@ export class AuthService {
         ),
       );
   }
+
 
   signUp(
     payload: SignUpRequest,
@@ -62,70 +64,77 @@ export class AuthService {
 
     return this.http.post<
       ApiResponse<SignUpResponse>
-    >(`${BASE}/signup`, payload);
+    >(
+      `${BASE}/signup`,
+      payload,
+    );
   }
+
 
   refresh(): Observable<ApiResponse<LoginResponse>> {
 
     return this.http
       .post<ApiResponse<LoginResponse>>(
-        `${BASE}/refresh`,
-        {},
-        { withCredentials: true },
+        `${BASE}/refresh`,{},
+        {
+          withCredentials: true,
+        },
       )
-      .pipe(
-        tap((res) => {
+      .pipe(tap((res) => {
+          if (!res.isSuccess || !res.data) {
+            return;
+          }
+          this.setSession(res.data);
+        }),
 
-          if (!res.isSuccess || !res.data) return;
-
-          this.accessToken.set(res.data.accessToken);
-          this.userRole.set(res.data.role);
-          this.userName.set(res.data.name);
+        catchError((err) => {
+          this.clearSession();
+          return throwError(() => err);
         }),
 
         finalize(() =>
           this.isInitialized.set(true),
         ),
-
-        catchError((err) =>
-          throwError(() => err),
-        ),
       );
   }
+
+
 
   logout(): Observable<ApiResponse<null>> {
 
     return this.http
       .post<ApiResponse<null>>(
         `${BASE}/logout`,
-        {},
-        { withCredentials: true },
+        {},{
+          withCredentials: true,
+        },
       )
       .pipe(
         tap(() => {
-          this.accessToken.set(null);
-          this.userRole.set(null);
-          this.userName.set(null);
+          this.clearSession();
         }),
-
         catchError((err) => {
-          this.accessToken.set(null);
-          this.userRole.set(null);
-          this.userName.set(null);
+
+          this.clearSession();
 
           return throwError(() => err);
         }),
       );
   }
+
+
   getAccessToken(): string | null {
     return this.accessToken();
   }
+
   getUserRole(): string | null {
     return this.userRole();
   }
+
   getUserName(): string | null {
     return this.userName();
   }
+
   isAdmin(): boolean {
     return this.userRole() === 'Admin';
   }
