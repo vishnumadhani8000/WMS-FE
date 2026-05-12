@@ -131,7 +131,7 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
   }
 
   handleInput(value: string): void {
-    let processed: InputValue = value;
+    let processed: InputValue = typeof value === 'string' ? value.trimStart(): value;
     if (this.type === 'number' && value !== '') {
       const num = parseFloat(value);
 
@@ -223,6 +223,11 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
       return `Maximum value is ${e['max'].max}.`;
     }
     if (e['pattern']) {
+
+      if (this.type === 'password') {
+        return 'Use uppercase, lowercase, number & special character.';
+      }
+    
       return `Invalid ${this.label.toLowerCase() || 'format'}.`;
     }
     const firstKey = Object.keys(e)[0];

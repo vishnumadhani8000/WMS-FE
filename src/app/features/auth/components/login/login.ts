@@ -44,8 +44,18 @@ export class Login {
   isSubmitting = false;
 
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    email: ['', [Validators.required, Validators.email,Validators.maxLength(50)]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(25),
+        Validators.pattern(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
+        ),
+      ],
+    ],
   });
 
   submit(): void {
@@ -70,7 +80,7 @@ export class Login {
 
         this.router.navigate([
           role === 'Admin'
-            ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.DRIVER_MANAGEMENT}`
+            ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT}`
             : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.HOME}`,
         ]);
       },

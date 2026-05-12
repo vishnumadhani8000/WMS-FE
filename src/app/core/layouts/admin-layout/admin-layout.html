@@ -1,29 +1,37 @@
 <div class="admin-layout">
 
     <!-- Mobile Overlay -->
-    <div
-      class="overlay"
-      *ngIf="sidebarOpen && isMobile"
-      (click)="closeSidebar()">
-    </div>
+  
+    @if (sidebarOpen && isMobile) {
+  
+      <div
+        class="overlay"
+        (click)="closeSidebar()">
+      </div>
+  
+    }
   
     <!-- Sidebar -->
+  
     <app-admin-sidebar
       [isOpen]="sidebarOpen"
       [isMobile]="isMobile">
     </app-admin-sidebar>
   
     <!-- Main -->
+  
     <div
       class="main-container"
       [class.sidebar-close]="!sidebarOpen">
   
-      <!-- Header -->
+    
+  
       <app-admin-header
         (toggleSidebar)="toggleSidebar()">
       </app-admin-header>
   
-      <!-- Page -->
+
+  
       <div class="page-wrapper">
         <router-outlet></router-outlet>
       </div>

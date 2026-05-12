@@ -8,48 +8,71 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-/// Login 
-  {
-    path: APP_ROUTES.AUTH.LOGIN,
-    loadComponent: () =>
-      import('./features/auth/components/login/login')
-        .then((m) => m.Login),
-  },
+    /// Login 
+    //   {
+    //     path: APP_ROUTES.AUTH.LOGIN,
+    //     loadComponent: () =>
+    //       import('./features/auth/components/login/login')
+    //         .then((m) => m.Login),
+    //   },
 
-/// Admin 
-  {
-    path: APP_ROUTES.ADMIN.ROOT,
-    component: AdminLayout,
-    canActivate: [authGuard,roleGuard],
-    data: {
-      role: 'Admin',
+    /// Admin 
+    {
+        path: APP_ROUTES.ADMIN.ROOT,
+        component: AdminLayout,
+        canActivate: [authGuard, roleGuard],
+        data: {
+            role: 'Admin',
+        },
+        children: [
+            {
+                path: '',
+                redirectTo: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
+                pathMatch: 'full',
+            },
+
+            {
+                path: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/product-management/product-management.js')
+                        .then((m) => m.ProductManagement),
+            },
+
+            {
+                path: '**',
+                redirectTo: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
+            },
+
+
+        ],
     },
-    children: [
-      {
-        path: '',
-        redirectTo: APP_ROUTES.ADMIN.DRIVER_MANAGEMENT,
-        pathMatch: 'full',
-      },
 
-      {
-        path: APP_ROUTES.ADMIN.DRIVER_MANAGEMENT,
+
+    // Login Route
+    
+    
+    {
+        path: APP_ROUTES.AUTH.LOGIN,
+
+        canActivate: [authGuard],
+
+        data: {
+            guestOnly: true,
+        },
         loadComponent: () =>
-          import('./features/auth/components/login/login')
-            .then((m) => m.Login),
-      },
+            import('./features/auth/components/login/login')
+                .then((m) => m.Login),
+    },
 
-    ],
-  },
+    // 
+    {
+        path: '',
+        redirectTo: APP_ROUTES.AUTH.LOGIN,
+        pathMatch: 'full',
+    },
 
-
-  {
-    path: '',
-    redirectTo: APP_ROUTES.AUTH.LOGIN,
-    pathMatch: 'full',
-  },
-
-  {
-    path: '**',
-    redirectTo: APP_ROUTES.AUTH.LOGIN,
-  },
+    {
+        path: '**',
+        redirectTo: APP_ROUTES.AUTH.LOGIN,
+    },
 ];

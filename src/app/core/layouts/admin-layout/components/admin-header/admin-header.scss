@@ -74,3 +74,14 @@
       display: flex;
     }
   }
+  ::ng-deep .profile-menu {
+
+    .mat-mdc-menu-content {
+      padding: 8px;
+    }
+  
+    .mat-mdc-menu-item {
+      border-radius: 10px;
+      margin-bottom: 4px;
+    }
+  }
