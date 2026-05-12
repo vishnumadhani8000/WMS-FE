@@ -1,0 +1,37 @@
+<aside
+  class="sidebar"
+  [class.closed]="!isOpen">
+
+  <div class="sidebar-logo">
+
+    <div class="logo-circle">
+      <mat-icon>warehouse</mat-icon>
+    </div>
+
+    <div
+      class="logo-text"
+      *ngIf="isOpen">
+      WMS
+    </div>
+
+  </div>
+
+  <div class="menu-list">
+
+    <a
+      *ngFor="let menu of menus"
+      [routerLink]="menu.route"
+      routerLinkActive="active-menu"
+      class="menu-item">
+
+      <mat-icon>{{ menu.icon }}</mat-icon>
+
+      <span *ngIf="isOpen">
+        {{ menu.title }}
+      </span>
+
+    </a>
+
+  </div>
+
+</aside>
