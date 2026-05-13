@@ -8,15 +8,9 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-    /// Login 
-    //   {
-    //     path: APP_ROUTES.AUTH.LOGIN,
-    //     loadComponent: () =>
-    //       import('./features/auth/components/login/login')
-    //         .then((m) => m.Login),
-    //   },
 
-    /// Admin 
+
+    /// ------------------------------- Admin 
     {
         path: APP_ROUTES.ADMIN.ROOT,
         component: AdminLayout,
@@ -48,7 +42,7 @@ export const routes: Routes = [
     },
 
 
-    // Login Route
+    //----------------------------- Login Route
     
     
     {
@@ -64,7 +58,6 @@ export const routes: Routes = [
                 .then((m) => m.Login),
     },
 
-    // 
     {
         path: '',
         redirectTo: APP_ROUTES.AUTH.LOGIN,

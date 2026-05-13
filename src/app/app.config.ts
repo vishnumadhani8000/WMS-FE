@@ -33,6 +33,11 @@ export const appConfig: ApplicationConfig = {
       progressBar: true,
       timeOut: 2000,
     }),
+    {
+    provide: APP_INITIALIZER,
+    multi: true,
+    useFactory: initializeAuth,
+  },
 
   ],
 };

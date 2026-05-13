@@ -1,27 +1,9 @@
 import { CommonModule } from '@angular/common';
 
-import {
-  Component,
-  Input,
-  Optional,
-  Self,
-  ViewChild,
-  AfterViewInit
-} from '@angular/core';
-
-import {
-  ControlValueAccessor,
-  NgControl,
-  ReactiveFormsModule
-} from '@angular/forms';
-
+import { Component, Input, Optional, Self, ViewChild, AfterViewInit } from '@angular/core';
+import { ControlValueAccessor, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
-
-import {
-  MatSelect,
-  MatSelectModule
-} from '@angular/material/select';
-
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 
 type SelectValue = string | number | null;
@@ -46,29 +28,28 @@ interface SelectOption {
 })
 
 export class SelectField
-implements ControlValueAccessor, AfterViewInit {
-  
-  @Input()label = '';
-  @Input()hint = '';
-  @Input()prefixIcon = '';
-  @Input()appearance: 'outline' | 'fill' = 'outline';
-  @Input()subscriptSizing: 'fixed' | 'dynamic' = 'fixed';
-  @Input()options: SelectOption[] = [];
+  implements ControlValueAccessor, AfterViewInit {
 
-  @ViewChild(MatSelect)matSelect!: MatSelect;
+  @Input() label = '';
+  @Input() hint = '';
+  @Input() prefixIcon = '';
+  @Input() appearance: 'outline' | 'fill' = 'outline';
+  @Input() subscriptSizing: 'fixed' | 'dynamic' = 'fixed';
+  @Input() options: SelectOption[] = [];
+
+  @ViewChild(MatSelect) matSelect!: MatSelect;
 
   value: SelectValue = null;
 
   disabled = false;
-  onChange: (value: SelectValue) => void = () => {};
+  onChange: (value: SelectValue) => void = () => { };
 
-  onTouched: () => void = () => {};
+  onTouched: () => void = () => { };
 
   constructor(
     @Optional()
     @Self()
-    public ngControl: NgControl
-  ) {
+    public ngControl: NgControl) {
 
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
@@ -77,18 +58,11 @@ implements ControlValueAccessor, AfterViewInit {
 
 
   ngAfterViewInit(): void {
-
     Object.defineProperty(this.matSelect, 'errorState', {
-
       get: () => {
 
         const control = this.ngControl?.control;
-
-        return !!(
-          control &&
-          control.invalid &&
-          (control.touched || control.dirty)
-        );
+        return !!(control && control.invalid && (control.touched || control.dirty));
       }
     });
   }
@@ -100,12 +74,10 @@ implements ControlValueAccessor, AfterViewInit {
     this.onChange(value);
 
     if (this.ngControl?.control) {
-
       this.ngControl.control.markAsDirty();
-
       this.ngControl.control.updateValueAndValidity();
     }
-  } 
+  }
   markTouched(): void {
 
     if (this.ngControl?.control) {
@@ -116,10 +88,8 @@ implements ControlValueAccessor, AfterViewInit {
 
 
   get errorMessage(): string {
-
     const control = this.ngControl?.control;
-
-    if (!control ||!control.errors ||!(control.touched || control.dirty)) {
+    if (!control || !control.errors || !(control.touched || control.dirty)) {
       return '';
     }
 
@@ -138,7 +108,7 @@ implements ControlValueAccessor, AfterViewInit {
 
   registerOnChange(fn: any): void {
     this.onChange = fn;
-  } 
+  }
 
   registerOnTouched(fn: any): void {
     this.onTouched = fn;

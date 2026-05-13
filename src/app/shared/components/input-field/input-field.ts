@@ -1,19 +1,28 @@
-// input-field.ts
-
-import { Component, Input, Output, EventEmitter, Optional, Self, ViewChild, AfterViewInit, OnDestroy, DoCheck, inject, } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  Optional,
+  Self,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+  DoCheck,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NgControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInput, MatInputModule, } from '@angular/material/input';
+import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject, Subscription } from 'rxjs';
 
 type InputValue = string | number | null;
 
-type MatInputWithStateChanges =
-  MatInput & { stateChanges?: Subject<void> };
+type MatInputWithStateChanges = MatInput & { stateChanges?: Subject<void> };
 
 @Component({
   selector: 'app-common-input',
@@ -31,9 +40,7 @@ type MatInputWithStateChanges =
   templateUrl: './input-field.html',
   styleUrl: './input-field.scss',
 })
-
 export class InputField implements ControlValueAccessor, AfterViewInit, OnDestroy, DoCheck {
-
   @Input() label = '';
   @Input() type: 'text' | 'password' | 'email' | 'number' = 'text';
   @Input() placeholder = '';
@@ -49,6 +56,7 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
   @Input() prefixIcon?: string;
   @Input() hint?: string;
   @Input() readonly = false;
+  @Input() trimStart = false;
   @Input() subscriptSizing: 'fixed' | 'dynamic' = 'fixed';
   @Input() customErrorMessage?: string;
   @Output() iconClick = new EventEmitter<void>();
@@ -61,10 +69,10 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
   private subscription = new Subscription();
   private wasTouched = false;
 
-  onChange: (val: InputValue) => void = () => { };
-  onTouched: () => void = () => { };
+  onChange: (val: InputValue) => void = () => {};
+  onTouched: () => void = () => {};
 
-  readonly ngControl = inject(NgControl, { optional: true, self: true, });
+  readonly ngControl = inject(NgControl, { optional: true, self: true });
 
   constructor() {
     if (this.ngControl) {
@@ -76,18 +84,13 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
     return !!this.ngControl?.control?.hasValidator?.(Validators.required);
   }
 
-
   get inputType(): string {
-    return this.type === 'password'
-      ? this.showPassword ? 'text' : 'password'
-      : this.type;
+    return this.type === 'password' ? (this.showPassword ? 'text' : 'password') : this.type;
   }
-
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
-
 
   ngDoCheck(): void {
     const isTouched = !!this.ngControl?.control?.touched;
@@ -97,20 +100,17 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
     }
   }
 
-
   ngAfterViewInit(): void {
     if (!this.ngControl?.control || !this.matInput) {
       return;
     }
     this.subscription.add(
       this.ngControl.control.statusChanges.subscribe(() => {
-
         (this.matInput as MatInputWithStateChanges)?.stateChanges?.next();
       })
     );
 
     Object.defineProperty(this.matInput, 'errorState', {
-
       get: () => {
         const control = this.ngControl?.control;
         const isInteracted = !!(control?.touched || control?.dirty);
@@ -127,23 +127,34 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
 
   handleInputEvent(event: Event): void {
     const target = event.target as HTMLInputElement | null;
-    this.handleInput(target?.value ?? '');
+
+    if (!target) {
+      return;
+    }
+
+    let value = target.value;
+
+    if (this.trimStart) {
+      value = value.trimStart();
+
+      // IMPORTANT
+      target.value = value;
+    }
+
+    this.handleInput(value);
   }
 
   handleInput(value: string): void {
-    let processed: InputValue = typeof value === 'string' ? value.trimStart(): value;
+    let processed: InputValue = value;
+
     if (this.type === 'number' && value !== '') {
       const num = parseFloat(value);
 
       if (!isNaN(num)) {
-
-        processed = this.step !== undefined
-          ? parseFloat(
-            num.toFixed(
-              (this.step.toString().split('.')[1] ?? '').length
-            )
-          )
-          : num;
+        processed =
+          this.step !== undefined
+            ? parseFloat(num.toFixed((this.step.toString().split('.')[1] ?? '').length))
+            : num;
       }
     }
 
@@ -153,13 +164,13 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
     if (!this.ngControl?.control) {
       return;
     }
+
     this.ngControl.control.markAsDirty();
     this.ngControl.control.updateValueAndValidity();
+
     (this.matInput as MatInputWithStateChanges)?.stateChanges?.next();
   }
-
   markTouched(): void {
-
     if (!this.ngControl?.control) {
       return;
     }
@@ -223,11 +234,10 @@ export class InputField implements ControlValueAccessor, AfterViewInit, OnDestro
       return `Maximum value is ${e['max'].max}.`;
     }
     if (e['pattern']) {
-
       if (this.type === 'password') {
         return 'Use uppercase, lowercase, number & special character.';
       }
-    
+
       return `Invalid ${this.label.toLowerCase() || 'format'}.`;
     }
     const firstKey = Object.keys(e)[0];

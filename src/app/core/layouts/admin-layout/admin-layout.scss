@@ -1,45 +1,88 @@
 .admin-layout {
-    display: flex;
-    min-height: 100vh;
-    background: #f5f6fa;
-    position: relative;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #f5f6fa;
+  position: relative;
+}
+
+// ───────────────── Sidebar
+app-admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  z-index: 1000;
+  transition: left 0.3s ease;
+}
+
+// Desktop close
+.main-container.sidebar-close + app-admin-sidebar {
+  left: -260px;
+}
+
+// ───────────────── Main Area
+.main-container {
+  margin-left: 260px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+.main-container.sidebar-close {
+  margin-left: 0;
+}
+
+// ───────────────── Header
+app-admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+
+  flex-shrink: 0;
+}
+
+// ───────────────── Content Scroll
+.page-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+// ───────────────── Overlay
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+// ───────────────── Mobile
+@media (max-width: 768px) {
+  app-admin-sidebar {
+    left: -260px;
   }
 
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-    z-index: 90;
-  }
-  
- 
-  .main-container {
-    flex: 1;
-    margin-left: 260px;
-    transition: all 0.3s ease;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  app-admin-sidebar.sidebar-open {
+    left: 0;
   }
 
+  .main-container,
   .main-container.sidebar-close {
     margin-left: 0;
   }
 
   .page-wrapper {
-    padding: 24px;
-    flex: 1;
+    padding: 16px;
   }
-
-  @media (max-width: 768px) {
-  
-    .main-container,
-    .main-container.sidebar-close {
-      margin-left: 0;
-    }
-  
-    .page-wrapper {
-      padding: 16px;
-    }
-  }
+}
