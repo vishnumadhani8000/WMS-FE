@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -9,10 +10,7 @@ import {
 import { Router } from '@angular/router';
 
 import { MatIconModule } from '@angular/material/icon';
-import {
-  MatSnackBar,
-  MatSnackBarModule,
-} from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Button } from '../../../../shared/components/button/button';
 import { InputField } from '../../../../shared/components/input-field/input-field';
@@ -44,8 +42,24 @@ export class Login {
   isSubmitting = false;
 
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    email: [
+      '',
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(50),
+        Validators.pattern(/^\S+@\S+\.\S+$/),
+      ],
+    ],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(25),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/),
+      ],
+    ],
   });
 
   submit(): void {
@@ -56,9 +70,13 @@ export class Login {
 
     this.isSubmitting = true;
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
+    const payload = {
+      ...this.loginForm.value,
+      email: this.loginForm.value.email.trim().toLowerCase(),
+    };
 
+    this.authService.login(payload).subscribe({
+      next: (res) => {
         if (!res.isSuccess || !res.data) {
           this.toast.error('Login failed');
           return;
@@ -70,14 +88,13 @@ export class Login {
 
         this.router.navigate([
           role === 'Admin'
-            ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.DRIVER_MANAGEMENT}`
+            ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT}`
             : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.HOME}`,
         ]);
       },
 
       error: (err) => {
-        const message =
-          err?.error?.message || 'Invalid email or password';
+        const message = err?.error?.message || 'Invalid email or password';
 
         this.toast.error(message);
 
@@ -86,5 +103,12 @@ export class Login {
 
       complete: () => (this.isSubmitting = false),
     });
+  }
+  trimEmail(): void {
+    const control = this.loginForm.get('email');
+  
+    if (control?.value) {
+      control.setValue(control.value.trim().toLowerCase());
+    }
   }
 }

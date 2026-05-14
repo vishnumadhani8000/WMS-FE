@@ -11,7 +11,7 @@
   
       <!-- HEADER -->
       <div class="login-header">
-        <h1 class="login-title">Welcome Back</h1>
+        <h1 class="login-title">Welcome</h1>
         <p class="login-subtitle">Sign in to your WMS account</p>
       </div>
   
@@ -30,6 +30,7 @@
           placeholder="Enter your email"
           prefixIcon="email"
           formControlName="email"
+          [trimStart]="true"
         />
   
         <!-- PASSWORD -->
@@ -39,6 +40,7 @@
           placeholder="Enter your password"
           prefixIcon="lock"
           formControlName="password"
+          [trimStart]="true"
         />
   
         <!-- FORGOT PASSWORD -->

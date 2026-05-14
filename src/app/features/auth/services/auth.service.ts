@@ -74,9 +74,7 @@ export class AuthService {
   refresh(): Observable<ApiResponse<LoginResponse>> {
 
     return this.http
-      .post<ApiResponse<LoginResponse>>(
-        `${BASE}/refresh`,{},
-        {
+      .post<ApiResponse<LoginResponse>>(`${BASE}/refresh`,{},{
           withCredentials: true,
         },
       )
@@ -103,9 +101,7 @@ export class AuthService {
   logout(): Observable<ApiResponse<null>> {
 
     return this.http
-      .post<ApiResponse<null>>(
-        `${BASE}/logout`,
-        {},{
+      .post<ApiResponse<null>>(`${BASE}/logout`,{},{
           withCredentials: true,
         },
       )
@@ -114,9 +110,7 @@ export class AuthService {
           this.clearSession();
         }),
         catchError((err) => {
-
           this.clearSession();
-
           return throwError(() => err);
         }),
       );

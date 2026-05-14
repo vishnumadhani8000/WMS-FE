@@ -28,12 +28,16 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideAnimations(),
-    provideToastr(),
+    provideToastr({
+      closeButton: true,
+      progressBar: true,
+      timeOut: 2000,
+    }),
     {
-      provide: APP_INITIALIZER,
-      multi: true,
-      useFactory: initializeAuth,
-    },
+    provide: APP_INITIALIZER,
+    multi: true,
+    useFactory: initializeAuth,
+  },
 
   ],
 };

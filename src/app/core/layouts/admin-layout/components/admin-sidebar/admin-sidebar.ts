@@ -23,12 +23,12 @@ export class AdminSidebar {
     {
       title: 'Driver Management',
       icon: 'local_shipping',
-      route: '/Admin/driver-management'
+      route: '/admin/driver-management'
     },
     {
       title: 'Product Management',
       icon: 'inventory_2', 
-      route: '/product-management'
+      route: '/admin/product-management'
     },
     {
       title: 'Vehicle Management',
