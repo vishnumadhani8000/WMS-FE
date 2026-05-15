@@ -25,22 +25,14 @@
   
         <!-- EMAIL -->
         <app-common-input
-          label="Email"
-          type="email"
-          placeholder="Enter your email"
-          prefixIcon="email"
+          [config]="emailConfig"
           formControlName="email"
-          [trimStart]="true"
         />
   
         <!-- PASSWORD -->
         <app-common-input
-          label="Password"
-          type="password"
-          placeholder="Enter your password"
-          prefixIcon="lock"
+          [config]="passwordConfig"
           formControlName="password"
-          [trimStart]="true"
         />
   
         <!-- FORGOT PASSWORD -->

@@ -17,7 +17,8 @@ import { ProductService } from '../../services/product.service';
 import { ProductDialogData } from '../../models/product.model';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
-
+import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-dialog',
@@ -40,7 +41,46 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
   private dialogRef = inject(MatDialogRef<ProductDialogComponent>);
-  private destroy$ = new Subject<void>();
+  private destroy = new Subject<void>();
+  private toastr = inject(ToastrService);
+
+  productNameConfig : InputFieldConfig = {
+    label : 'Product Name',
+    type  : 'text',
+    placeholder:"e.g. Wireless Keyboard",
+    maxlength:100,
+    subscriptSizing:"dynamic",
+    trimStart : true
+  } 
+  name :string ;
+  weightConfig : InputFieldConfig = {
+    reruired : true,
+    label : 'Weight (kg)',
+    type  : 'number',
+    placeholder:"e.g. 0.850",
+    min:0.001,
+    max:9999,
+    step: 0.001,
+    subscriptSizing:"dynamic",
+    // trimStart : true
+  }
+  stockConfig : InputFieldConfig = {
+    label : 'Stock Quantity',
+    type  : 'number',
+    placeholder:"e.g. 100",
+    min:0,
+    max:1000000,
+    step: 1,
+    subscriptSizing:"dynamic",  
+  }
+  descriptionConfig : InputFieldConfig = {
+    label : 'Description',
+    type  : 'text',
+    placeholder:"Optional short product description...",
+    maxlength:500,
+    subscriptSizing:"dynamic",
+    trimStart : true
+  }
 
   form!: FormGroup;
 
@@ -66,7 +106,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       name: [product?.name ?? '', [Validators.required, Validators.maxLength(100)]],
 
       weightKg: [
-        product?.weightKg ?? null,
+        // product?.weightKg ?? 0,
         [Validators.required, Validators.min(0.001), Validators.max(9999)],
       ],
 
@@ -80,8 +120,8 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.destroy.next();
+    this.destroy.complete();
   }
 
   submit(): void {
@@ -95,10 +135,10 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     const value = this.form.getRawValue();
 
     const request$ = this.isEdit
-      ? this.productService.updateProduct(this.data.product!.id, value)
+      ? this.productService.updateProduct(this.data.product.id, value)
       : this.productService.createProduct(value);
 
-    request$.pipe(takeUntil(this.destroy$)).subscribe({
+    request$.pipe(takeUntil(this.destroy)).subscribe({
       next: (product) => {
         this.saving = false;
 
@@ -110,6 +150,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
 
       error: () => {
         this.saving = false;
+        this.toastr.error('somethidg went wrong ');
       },
     });
   }

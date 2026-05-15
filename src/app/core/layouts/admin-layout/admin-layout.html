@@ -15,7 +15,8 @@
   
     <app-admin-sidebar
       [isOpen]="sidebarOpen"
-      [isMobile]="isMobile">
+      [isMobile]="isMobile"
+      (sidebarClose)="closeSidebar()">
     </app-admin-sidebar>
   
     <!-- Main -->

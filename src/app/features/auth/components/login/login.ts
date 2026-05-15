@@ -17,6 +17,7 @@ import { InputField } from '../../../../shared/components/input-field/input-fiel
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { APP_ROUTES } from '../../../../shared/constants/app-routes.constants';
+import { InputFieldConfig } from '../../../../shared/components/input-field/input-field.config';
 
 @Component({
   selector: 'app-login',
@@ -38,6 +39,26 @@ export class Login {
   private authService = inject(AuthService);
   private snackBar = inject(MatSnackBar);
   private toast = inject(ToastrService);
+
+
+  emailConfig: InputFieldConfig = {
+    label: 'Email',
+    type : 'email',
+    placeholder:"Enter your email",
+    prefixIcon:"email",
+    maxlength:50,
+    subscriptSizing:"dynamic",
+    trimStart:true
+  }
+  passwordConfig: InputFieldConfig = {
+    label: 'Password',
+    type : 'password',
+    placeholder:"Enter your password",
+    prefixIcon:"lock",
+    maxlength:50,
+    subscriptSizing:"dynamic",
+    trimStart:true
+  }
 
   isSubmitting = false;
 

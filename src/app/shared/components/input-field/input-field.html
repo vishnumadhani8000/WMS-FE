@@ -2,42 +2,42 @@
 
 <mat-form-field
   class="full-width"
-  [appearance]="appearance"
-  [subscriptSizing]="subscriptSizing"
+  [appearance]="this.config.appearance || 'outline'"
+  [subscriptSizing]="this.config.subscriptSizing || 'dynamic'"
 >
   <mat-label>
-    {{ label }}
+    {{ this.config.label }}
 
     @if (isRequired) {
       <span class="required-star">*</span>
     }
   </mat-label>
 
-  @if (prefixIcon) {
+  @if (this.config.prefixIcon) {
     <mat-icon matPrefix class="prefix-icon">
-      {{ prefixIcon }}
+      {{this.config.prefixIcon }}
     </mat-icon>
   }
 
   <input
     matInput
     [type]="inputType"
-    [placeholder]="placeholder"
+    [placeholder]="this.config.placeholder||'' "
     [disabled]="disabled"
-    [readonly]="readonly"
+    [readonly]="this.config.readonly" 
     [value]="value"
-    [attr.minlength]="minlength"
-    [attr.maxlength]="maxlength"
-    [attr.min]="min"
-    [attr.max]="max"
-    [attr.step]="step"
-    [attr.pattern]="pattern"
+    [attr.minlength]="this.config.minlength"
+    [attr.maxlength]="this.config.maxlength"
+    [attr.min]="this.config.min"
+    [attr.max]="this.config.max"
+    [attr.step]="this.config.step"
+    [attr.pattern]="this.config.pattern"
     autocomplete="new-password"
     (input)="handleInputEvent($event)"
     (blur)="onTouched(); markTouched()"
   />
 
-  @if (type === 'password') {
+  @if (this.config.type === 'password') {
     <button
       mat-icon-button
       matSuffix
@@ -52,30 +52,30 @@
     </button>
   }
 
-  @if ((iconPath || icon) && type !== 'password') {
+  @if ((this.config.iconPath || this.config.icon) && this.config.type !== 'password') {
     <span matSuffix>
       <button
         mat-icon-button
         type="button"
         (click)="handleIconClick()"
       >
-        @if (iconPath) {
+        @if (this.config.iconPath) {
           <img
-            [src]="iconPath"
+            [src]="this.config.iconPath"
             width="22"
             height="22"
             alt="icon"
           />
         }
-        @else if (icon) {
-          <mat-icon>{{ icon }}</mat-icon>
+        @else if (this.config.icon) {
+          <mat-icon>{{ this.config.icon }}</mat-icon>
         }
       </button>
     </span>
   }
 
-  @if (hint) {
-    <mat-hint>{{ hint }}</mat-hint>
+  @if (this.config.hint) {
+    <mat-hint>{{ this.config.hint }}</mat-hint>
   }
 
   <mat-error>

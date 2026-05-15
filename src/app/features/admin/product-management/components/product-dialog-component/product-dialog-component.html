@@ -27,12 +27,8 @@
   <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
     <div class="field-group">
       <app-common-input
-        label="Product Name"
-        placeholder="e.g. Wireless Keyboard"
+       [config]="productNameConfig"
         formControlName="name"
-        [maxlength]="100"
-        subscriptSizing="dynamic"
-        [trimStart]="true"
       >
       </app-common-input>
     </div>
@@ -41,14 +37,8 @@
       <!-- Weight -->
       <div class="field-group">
         <app-common-input
-          label="Weight (kg)"
-          type="number"
-          placeholder="e.g. 0.850"
+          [config]="weightConfig"
           formControlName="weightKg"
-          [min]="0.001"
-          [max]="9999"
-          [step]="0.001"
-          subscriptSizing="dynamic"
         >
         </app-common-input>
       </div>
@@ -56,14 +46,8 @@
       <!-- Stock -->
       <div class="field-group">
         <app-common-input
-          label="Stock Quantity"
-          type="number"
-          placeholder="e.g. 100"
+          [config]="stockConfig"
           formControlName="stock"
-          [min]="0"
-          [max]="1000000"
-          [step]="1"
-          subscriptSizing="dynamic"
         >
         </app-common-input>
       </div>
@@ -71,12 +55,9 @@
 
     <div class="field-group">
       <app-common-input
-        label="Description"
-        placeholder="Optional short product description..."
+        [config]="descriptionConfig"
         formControlName="description"
-        [maxlength]="500"
-        subscriptSizing="dynamic"
-      >
+        >
       </app-common-input>
     </div>
   </form>

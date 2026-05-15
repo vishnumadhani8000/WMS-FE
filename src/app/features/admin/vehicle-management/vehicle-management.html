@@ -1,31 +1,33 @@
-  <div class="pm-page">
-    <header class="pm-header">
-      <div class="pm-header__title-group">
-        <h1 class="pm-header__title">Product Management</h1>
+<div class="vm-page">
+    <header class="vm-header">
+      <div class="vm-header__title-group">
+        <h1 class="vm-header__title">Vehicle Management</h1>
       </div>
-
-      <div class="pm-header__meta">
-        <span class="pm-header__count-badge">
-          <mat-icon class="badge-icon"> inventory_2 </mat-icon>
-
+  
+      <div class="vm-header__meta">
+        <span class="vm-header__count-badge">
+          <mat-icon class="badge-icon"> local_shipping </mat-icon>
+  
           {{ totalCount() }}
-          {{ totalCount() === 1 ? 'Product' : 'Products' }}
+          {{ totalCount() === 1 ? 'Vehicle' : 'Vehicles' }}
         </span>
       </div>
     </header>
-
-    <section class="pm-toolbar">
-      <div class="pm-toolbar__search">
+  
+    <section class="vm-toolbar">
+      <div class="vm-toolbar__search">
+        
         <app-common-input
-          [config]="searchInputConfig"
+          [config]="searchInputConfig" 
           [formControl]="searchControl"
           (iconClick)="clearSearch()"
         >
+
         </app-common-input>
       </div>
-
-      <app-common-button
-        label="Add Product"
+  
+      <app-common-button []
+        label="Add Vehicle"
         variant="flat"
         color="primary"
         prefixIcon="add"
@@ -33,34 +35,34 @@
       >
       </app-common-button>
     </section>
-
-    <div class="pm-card">
+  
+    <div class="vm-card">
+  
       <!-- Loading -->
       @if (loading()) {
-
-      <mat-progress-bar mode="indeterminate" class="pm-progress"> </mat-progress-bar>
-
+      <mat-progress-bar mode="indeterminate" class="vm-progress"> </mat-progress-bar>
       }
-
-      <div class="pm-table-wrap">
+  
+      <div class="vm-table-wrap">
         <table
           mat-table
           [dataSource]="dataSource()"
-          class="pm-table"
+          class="vm-table"
           matSort
           (matSortChange)="onSortChange($event)"
         >
+  
+          <!-- Index -->
           <ng-container matColumnDef="index">
             <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
-
             <td mat-cell *matCellDef="let row; let i = index" class="col-index">
               {{ rowIndex(i) }}
             </td>
           </ng-container>
-
+  
+          <!-- Name -->
           <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Product Name</th>
-
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Vehicle Name</th>
             <td mat-cell *matCellDef="let row">
               <span
                 class="cell-text cell-name"
@@ -72,106 +74,100 @@
               </span>
             </td>
           </ng-container>
-
-          <ng-container matColumnDef="weightKg">
-            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="weight">Weight</th>
-
-            <td mat-cell *matCellDef="let row" class="col-num">
-              <span class="cell-chip"> {{ row.weightKg | number : '1.3-3' }} kg </span>
+  
+          <!-- Plate Number -->
+          <ng-container matColumnDef="plateNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="plateNumber">Plate Number</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="cell-chip cell-plate">
+                {{ row.plateNumber }}
+              </span>
             </td>
           </ng-container>
-
-          <ng-container matColumnDef="stock">
-            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="stock">Stock</th>
-
+  
+          <!-- Capacity -->
+          <ng-container matColumnDef="capacityKg">
+            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="capacityKg">
+              Capacity
+            </th>
+            <td mat-cell *matCellDef="let row" class="col-num">
+              <span class="cell-chip">
+                {{ row.capacityKg | number : '1.2-2' }} kg
+              </span>
+            </td>
+          </ng-container>
+  
+          <!-- Availability -->
+          <ng-container matColumnDef="isAvailable">
+            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="isAvailable">
+              Status
+            </th>
             <td mat-cell *matCellDef="let row" class="col-num">
               <span
                 class="cell-chip"
                 [ngClass]="{
-                  'stock-low': row.stock <= 10,
-                  'stock-ok': row.stock > 10 && row.stock <= 50,
-                  'stock-high': row.stock > 50
+                  'status-available': row.isAvailable,
+                  'status-unavailable': !row.isAvailable
                 }"
               >
-                {{ row.stock }}
+                {{ row.isAvailable ? 'Available' : 'Unavailable' }}
               </span>
             </td>
           </ng-container>
-
-          <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>Description</th>
-
-            <td mat-cell *matCellDef="let row">
-              <span
-                class="cell-text cell-description"
-                [matTooltip]="row.description"
-                [matTooltipDisabled]="!row.description || row.description.length <= 40"
-                matTooltipPosition="above"
-              >
-                {{ row.description || '—' | truncate : 40 }}
-              </span>
-            </td>
-          </ng-container>
-
+  
+          <!-- Actions -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
-
             <td mat-cell *matCellDef="let row" class="col-actions">
               <button mat-icon-button class="action-btn" [matMenuTriggerFor]="actionMenu">
                 <mat-icon> more_vert </mat-icon>
               </button>
-
-              <!-- Action Menu -->
-
-              <mat-menu #actionMenu="matMenu" class="pm-action-menu">
+  
+              <mat-menu #actionMenu="matMenu" class="vm-action-menu">
+  
                 <!-- Edit -->
-
                 <button mat-menu-item (click)="openEditDialog(row)">
                   <mat-icon> edit </mat-icon>
-
                   <span> Edit </span>
                 </button>
-
+  
                 <!-- Delete -->
-
-                <button mat-menu-item class="delete-item" (click)="deleteProduct(row)">
+                <button mat-menu-item class="delete-item" (click)="deleteVehicle(row)">
                   <mat-icon> delete_outline </mat-icon>
-
                   <span> Delete </span>
                 </button>
+  
               </mat-menu>
             </td>
           </ng-container>
-
+  
           <tr
             mat-header-row
             *matHeaderRowDef="displayedColumns; sticky: true"
-            class="pm-header-row"
+            class="vm-header-row"
           ></tr>
-
-          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="pm-row"></tr>
-
+  
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="vm-row"></tr>
+  
           <tr class="mat-mdc-row" *matNoDataRow>
-            <td class="mat-mdc-cell pm-no-data" [attr.colspan]="displayedColumns.length">
+            <td class="mat-mdc-cell vm-no-data" [attr.colspan]="displayedColumns.length">
               @if (!loading()) {
-
-              <div class="pm-empty-inline">
-                <mat-icon> inventory_2 </mat-icon>
-
-                <span> No products found </span>
+              <div class="vm-empty-inline">
+                <mat-icon> local_shipping </mat-icon>
+                <span> No vehicles found </span>
               </div>
-
               }
             </td>
           </tr>
+  
         </table>
       </div>
-
-      <mat-divider> </mat-divider>
-
+  
+      <mat-divider></mat-divider>
+  
       <mat-paginator
         #paginator
-        class="pm-paginator"
+        class="vm-paginator"
         [length]="totalCount()"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
@@ -180,5 +176,6 @@
         (page)="onPageChange($event)"
       >
       </mat-paginator>
+  
     </div>
   </div>
