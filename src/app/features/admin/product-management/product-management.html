@@ -1,184 +1,172 @@
-  <div class="pm-page">
-    <header class="pm-header">
-      <div class="pm-header__title-group">
-        <h1 class="pm-header__title">Product Management</h1>
-      </div>
+<div class="pm-page">
+  <header class="pm-header">
+    <div class="pm-header__title-group">
+      <h1 class="pm-header__title">Product Management</h1>
+    </div>
 
-      <div class="pm-header__meta">
-        <span class="pm-header__count-badge">
-          <mat-icon class="badge-icon"> inventory_2 </mat-icon>
+    <div class="pm-header__meta">
+      <span class="pm-header__count-badge">
+        <mat-icon class="badge-icon"> inventory_2 </mat-icon>
 
-          {{ totalCount() }}
-          {{ totalCount() === 1 ? 'Product' : 'Products' }}
-        </span>
-      </div>
-    </header>
+        {{ totalCount() }}
+        {{ totalCount() === 1 ? 'Product' : 'Products' }}
+      </span>
+    </div>
+  </header>
 
-    <section class="pm-toolbar">
-      <div class="pm-toolbar__search">
-        <app-common-input
-          [config]="searchInputConfig"
-          [formControl]="searchControl"
-          (iconClick)="clearSearch()"
-        >
-        </app-common-input>
-      </div>
+  <section class="pm-toolbar">
+    <div class="pm-toolbar__search">
+      <app-common-input [config]="searchInputConfig" />
+    </div>
 
-      <app-common-button
-        label="Add Product"
-        variant="flat"
-        color="primary"
-        prefixIcon="add"
-        (clicked)="openAddDialog()"
+    <app-common-button [config]="addProductButtonConfig"> </app-common-button>
+  </section>
+
+  <div class="pm-card">
+    <!-- Loading -->
+    @if (loading()) {
+
+    <mat-progress-bar mode="indeterminate" class="pm-progress"> </mat-progress-bar>
+
+    }
+
+    <div class="pm-table-wrap">
+      <table
+        mat-table
+        [dataSource]="dataSource()"
+        class="pm-table"
+        matSort
+        (matSortChange)="onSortChange($event)"
       >
-      </app-common-button>
-    </section>
+        <ng-container matColumnDef="index">
+          <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
 
-    <div class="pm-card">
-      <!-- Loading -->
-      @if (loading()) {
+          <td mat-cell *matCellDef="let row; let i = index" class="col-index">
+            {{ rowIndex(i) }}
+          </td>
+        </ng-container>
 
-      <mat-progress-bar mode="indeterminate" class="pm-progress"> </mat-progress-bar>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Product Name</th>
 
-      }
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="cell-text cell-name"
+              [matTooltip]="row.name"
+              [matTooltipDisabled]="row.name.length <= 30"
+              matTooltipPosition="above"
+            >
+              {{ row.name | truncate : 30 }}
+            </span>
+          </td>
+        </ng-container>
 
-      <div class="pm-table-wrap">
-        <table
-          mat-table
-          [dataSource]="dataSource()"
-          class="pm-table"
-          matSort
-          (matSortChange)="onSortChange($event)"
-        >
-          <ng-container matColumnDef="index">
-            <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
+        <ng-container matColumnDef="weightKg">
+          <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="weight">Weight</th>
 
-            <td mat-cell *matCellDef="let row; let i = index" class="col-index">
-              {{ rowIndex(i) }}
-            </td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span class="cell-chip"> {{ row.weightKg | number : '1.3-3' }} kg </span>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Product Name</th>
+        <ng-container matColumnDef="stock">
+          <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="stock">Stock</th>
 
-            <td mat-cell *matCellDef="let row">
-              <span
-                class="cell-text cell-name"
-                [matTooltip]="row.name"
-                [matTooltipDisabled]="row.name.length <= 30"
-                matTooltipPosition="above"
-              >
-                {{ row.name | truncate : 30 }}
-              </span>
-            </td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span
+              class="cell-chip"
+              [ngClass]="{
+                'stock-low': row.stock <= 10,
+                'stock-ok': row.stock > 10 && row.stock <= 50,
+                'stock-high': row.stock > 50
+              }"
+            >
+              {{ row.stock }}
+            </span>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="weightKg">
-            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="weight">Weight</th>
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
 
-            <td mat-cell *matCellDef="let row" class="col-num">
-              <span class="cell-chip"> {{ row.weightKg | number : '1.3-3' }} kg </span>
-            </td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="cell-text cell-description"
+              [matTooltip]="row.description"
+              [matTooltipDisabled]="!row.description || row.description.length <= 40"
+              matTooltipPosition="above"
+            >
+              {{ row.description || '—' | truncate : 40 }}
+            </span>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="stock">
-            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="stock">Stock</th>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
 
-            <td mat-cell *matCellDef="let row" class="col-num">
-              <span
-                class="cell-chip"
-                [ngClass]="{
-                  'stock-low': row.stock <= 10,
-                  'stock-ok': row.stock > 10 && row.stock <= 50,
-                  'stock-high': row.stock > 50
-                }"
-              >
-                {{ row.stock }}
-              </span>
-            </td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="col-actions">
+            <button mat-icon-button class="action-btn" [matMenuTriggerFor]="actionMenu">
+              <mat-icon> more_vert </mat-icon>
+            </button>
 
-          <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <!-- Action Menu -->
 
-            <td mat-cell *matCellDef="let row">
-              <span
-                class="cell-text cell-description"
-                [matTooltip]="row.description"
-                [matTooltipDisabled]="!row.description || row.description.length <= 40"
-                matTooltipPosition="above"
-              >
-                {{ row.description || '—' | truncate : 40 }}
-              </span>
-            </td>
-          </ng-container>
+            <mat-menu #actionMenu="matMenu" class="pm-action-menu">
+              <!-- Edit -->
 
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
+              <button mat-menu-item (click)="openEditDialog(row)">
+                <mat-icon> edit </mat-icon>
 
-            <td mat-cell *matCellDef="let row" class="col-actions">
-              <button mat-icon-button class="action-btn" [matMenuTriggerFor]="actionMenu">
-                <mat-icon> more_vert </mat-icon>
+                <span> Edit </span>
               </button>
 
-              <!-- Action Menu -->
+              <!-- Delete -->
 
-              <mat-menu #actionMenu="matMenu" class="pm-action-menu">
-                <!-- Edit -->
+              <button mat-menu-item class="delete-item" (click)="deleteProduct(row)">
+                <mat-icon> delete_outline </mat-icon>
 
-                <button mat-menu-item (click)="openEditDialog(row)">
-                  <mat-icon> edit </mat-icon>
+                <span> Delete </span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
 
-                  <span> Edit </span>
-                </button>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+          class="pm-header-row"
+        ></tr>
 
-                <!-- Delete -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="pm-row"></tr>
 
-                <button mat-menu-item class="delete-item" (click)="deleteProduct(row)">
-                  <mat-icon> delete_outline </mat-icon>
+        <tr class="mat-mdc-row" *matNoDataRow>
+          <td class="mat-mdc-cell pm-no-data" [attr.colspan]="displayedColumns.length">
+            @if (!loading()) {
 
-                  <span> Delete </span>
-                </button>
-              </mat-menu>
-            </td>
-          </ng-container>
+            <div class="pm-empty-inline">
+              <mat-icon> inventory_2 </mat-icon>
 
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-            class="pm-header-row"
-          ></tr>
+              <span> No products found </span>
+            </div>
 
-          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="pm-row"></tr>
-
-          <tr class="mat-mdc-row" *matNoDataRow>
-            <td class="mat-mdc-cell pm-no-data" [attr.colspan]="displayedColumns.length">
-              @if (!loading()) {
-
-              <div class="pm-empty-inline">
-                <mat-icon> inventory_2 </mat-icon>
-
-                <span> No products found </span>
-              </div>
-
-              }
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <mat-divider> </mat-divider>
-
-      <mat-paginator
-        #paginator
-        class="pm-paginator"
-        [length]="totalCount()"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
-        [pageIndex]="currentPage()"
-        showFirstLastButtons
-        (page)="onPageChange($event)"
-      >
-      </mat-paginator>
+            }
+          </td>
+        </tr>
+      </table>
     </div>
+
+    <mat-divider> </mat-divider>
+
+    <mat-paginator
+      #paginator
+      class="pm-paginator"
+      [length]="totalCount()"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="currentPage()"
+      showFirstLastButtons
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
   </div>
+</div>

@@ -16,15 +16,17 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 24px 24px 20px;
+  gap: 16px;
 
-  &__content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-}
+  padding: 24px 24px 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(69, 64, 225, 0.06),
+      rgba(69, 64, 225, 0.02)
+    );
+} 
 
 .dialog-title {
   margin: 0;

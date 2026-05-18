@@ -1,7 +1,11 @@
+import { EventEmitter } from "@angular/core";
+import { FormControl } from "@angular/forms";
 
 export interface InputFieldConfig {
     reruired?: boolean;
     label: string;
+
+    control?: FormControl;
   
     type: 'text' | 'password' | 'email' | 'number';
   
@@ -36,4 +40,6 @@ export interface InputFieldConfig {
     subscriptSizing?: 'fixed' | 'dynamic';
   
     customErrorMessage?: string;
+
+    iconClick?: () => void;
   }

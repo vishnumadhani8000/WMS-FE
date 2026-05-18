@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ConfirmDialogData } from './confirm-dialog.model';
 
 import { Button } from '../button/button';
+import { ButtonConfig } from '../button/button.config';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -28,6 +29,30 @@ export class ConfirmDialog {
     @Inject(MAT_DIALOG_DATA)
     public data: ConfirmDialogData
   ) {}
+  cancelButtonConfig!: ButtonConfig;
+  confirmButtonConfig!: ButtonConfig;
+
+  ngOnInit(): void {
+    this.cancelButtonConfig = {
+      label: this.data.cancelText || 'Cancel',
+      variant: 'stroked',
+      color: 'primary',
+
+      clicked: () => {
+        this.cancel();
+      },
+    };
+
+    this.confirmButtonConfig = {
+      label: this.data.confirmText || 'Confirm',
+      variant: 'flat',
+      color: 'warn',
+
+      clicked: () => {
+        this.confirm();
+      },
+    };
+  }
 
   confirm(): void {
     this.dialogRef.close(true);

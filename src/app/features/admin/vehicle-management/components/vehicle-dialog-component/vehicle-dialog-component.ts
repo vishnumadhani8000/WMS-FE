@@ -1,11 +1,9 @@
-// vehicle-dialog-component.ts
-
 import { Component, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import {
   AbstractControl,
-  FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   ValidationErrors,
@@ -25,7 +23,9 @@ import { InputField } from '../../../../../shared/components/input-field/input-f
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ToastrService } from 'ngx-toastr';
+import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 
+// Validator
 export function plateNumberValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const raw = control.value as string;
@@ -42,8 +42,20 @@ export function plateNumberValidator(): ValidatorFn {
 
     return isValid
       ? null
-      : { plateFormat: { message: 'Invalid Indian vehicle plate number format.' } };
+      : {
+          plateFormat: {
+            message: 'Invalid Indian vehicle plate number format.',
+          },
+        };
   };
+}
+
+// Typed Form
+interface VehicleForm {
+  name: FormControl<string>;
+  plateNumber: FormControl<string>;
+  capacityKg: FormControl<number | null>;
+  isAvailable: FormControl<boolean>;
 }
 
 @Component({
@@ -65,42 +77,24 @@ export function plateNumberValidator(): ValidatorFn {
   styleUrl: './vehicle-dialog-component.scss',
 })
 export class VehicleDialogComponent implements OnInit, OnDestroy {
-  private fb = inject(FormBuilder);
   private vehicleService = inject(VehicleService);
   private dialogRef = inject(MatDialogRef<VehicleDialogComponent>);
-  private destroy = new Subject<void>();
   private toastr = inject(ToastrService);
-
-  form!: FormGroup;
+  private destroy = new Subject<void>();
+  form: FormGroup<VehicleForm>;
   saving = false;
 
-  vehicleNameConfig: InputFieldConfig = {
-    label: 'Vehicle Name',
-    type: 'text',
-    placeholder: 'e.g. Tata Ace',
-    minlength: 2,
-    maxlength: 100,
-    // subscriptSizing: 'fixed',
-    trimStart: true,
-  };
+  // Configs
+  vehicleNameConfig: InputFieldConfig;
+  plateNumberConfig: InputFieldConfig;
+  capacityConfig: InputFieldConfig;
+  cancelButtonConfig: ButtonConfig;
+  submitButtonConfig: ButtonConfig;
 
-  plateNumberConfig: InputFieldConfig = {
-    label: 'Plate Number',
-    type: 'text',
-    placeholder: 'e.g. MH12AB1234',
-    subscriptSizing: 'dynamic',
-    trimStart: true,
-  };
-
-  capacityConfig: InputFieldConfig = {
-    label: 'Capacity (kg)',
-    type: 'number',
-    placeholder: 'e.g. 1000',
-    min: 0.01,
-    max: 100000,
-    step: 0.01,
-    subscriptSizing: 'dynamic',
-  };
+  constructor(
+    @Inject(MAT_DIALOG_DATA)
+    public data: VehicleDialogData
+  ) {}
 
   get isEdit(): boolean {
     return this.data.mode === 'edit';
@@ -110,37 +104,84 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
     return this.isEdit ? 'Edit Vehicle' : 'Add Vehicle';
   }
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public data: VehicleDialogData
-  ) {}
-
   ngOnInit(): void {
     const vehicle = this.data.vehicle;
 
-    this.form = this.fb.group({
-      name: [
-        vehicle?.name ?? '',
-        [
-          Validators.required,
-          Validators.minLength(this.vehicleNameConfig.minlength!),
-          Validators.maxLength(this.vehicleNameConfig.maxlength!),
-        ],
-      ],
+    // Form
+    this.form = new FormGroup<VehicleForm>({
+      name: new FormControl(vehicle?.name ?? '', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
+      }),
 
-      plateNumber: [vehicle?.plateNumber ?? '', [Validators.required, plateNumberValidator()]],
+      plateNumber: new FormControl(vehicle?.plateNumber ?? '', {
+        nonNullable: true,
+        validators: [Validators.required, plateNumberValidator()],
+      }),
 
-      capacityKg: [
-        vehicle?.capacityKg ?? 0,
-        [
-          Validators.required,
-          Validators.min(this.capacityConfig.min!),
-          Validators.max(this.capacityConfig.max!),
-        ],
-      ],
+      capacityKg: new FormControl(vehicle?.capacityKg ?? null, {
+        validators: [Validators.required, Validators.min(0.01), Validators.max(100000)],
+      }),
 
-      isAvailable: [vehicle?.isAvailable ?? true, [Validators.required]],
+      isAvailable: new FormControl(vehicle?.isAvailable ?? true, {
+        nonNullable: true,
+      }),
     });
+
+    // Vehicle Name Config
+    this.vehicleNameConfig = {
+      label: 'Vehicle Name',
+      type: 'text',
+      placeholder: 'e.g. Tata Ace',
+      minlength: 2,
+      maxlength: 100,
+      trimStart: true,
+      control: this.form.controls.name,
+    };
+
+    // Plate Number Config
+    this.plateNumberConfig = {
+      label: 'Plate Number',
+      type: 'text',
+      placeholder: 'e.g. MH12AB1234',
+      subscriptSizing: 'dynamic',
+      trimStart: true,
+      control: this.form.controls.plateNumber,
+    };
+
+    // Capacity Config
+    this.capacityConfig = {
+      label: 'Capacity (kg)',
+      type: 'number',
+      placeholder: 'e.g. 1000',
+      min: 0.01,
+      max: 100000,
+      step: 0.01,
+      subscriptSizing: 'dynamic',
+      control: this.form.controls.capacityKg,
+    };
+    this.cancelButtonConfig = {
+      label: 'Cancel',
+      variant: 'stroked',
+      color: 'default',
+
+      clicked: () => {
+        this.cancel();
+      },
+    };
+
+    this.submitButtonConfig = {
+      label: this.isEdit ? 'Save Changes' : 'Add Vehicle',
+
+      variant: 'flat',
+      color: 'primary',
+      loading: this.saving,
+      disabled: this.saving,
+
+      clicked: () => {
+        this.submit();
+      },
+    };
   }
 
   ngOnDestroy(): void {
@@ -149,50 +190,38 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    this.plateNumberConfig.label = 'hello';
-
-
     if (this.form.invalid || this.saving) {
       this.form.markAllAsTouched();
       return;
     }
 
     this.saving = true;
-
     const value = this.form.getRawValue();
-
     const request = this.isEdit
       ? this.vehicleService.updateVehicle(this.data.vehicle!.id, value)
       : this.vehicleService.createVehicle(value);
 
-      request.pipe(takeUntil(this.destroy)).subscribe({
-        next: (res) => {
-          console.log('API response:', res);
-      
-          this.toastr.success(
-            this.isEdit
-              ? 'Vehicle updated successfully.'
-              : 'Vehicle added successfully.'
-          );
-      
-          this.dialogRef.close({ saved: true });
-        },
-      
-        error: (err) => {
-          console.error(err);
-      
-          this.saving = false;
-      
-          this.toastr.error(
-            this.isEdit
-              ? 'Failed to update vehicle.'
-              : 'Failed to add vehicle.'
-          );
-        },
-      });
+    request.pipe(takeUntil(this.destroy)).subscribe({
+      next: () => {
+        this.saving = false;
+        this.toastr.success(
+          this.isEdit ? 'Vehicle updated successfully.' : 'Vehicle added successfully.'
+        );
+        this.dialogRef.close({
+          saved: true,
+        });
+      },
+
+      error: (err) => {
+        this.saving = false;
+        this.toastr.error(this.isEdit ? 'Failed to update vehicle.' : 'Failed to add vehicle.');
+      },
+    });
   }
 
   cancel(): void {
-    this.dialogRef.close({ saved: false });
+    this.dialogRef.close({
+      saved: false,
+    });
   }
 }

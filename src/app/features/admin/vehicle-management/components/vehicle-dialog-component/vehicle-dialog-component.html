@@ -30,7 +30,6 @@
       <div class="field-group">
         <app-common-input
         [config]="vehicleNameConfig"
-          formControlName="name"
         >
         </app-common-input>
       </div>
@@ -38,19 +37,13 @@
       <!-- Plate Number -->
       <div class="field-group">
         <app-common-input
-        [config]="plateNumberConfig"
-        formControlName="plateNumber"
-        >
-        </app-common-input>
+        [config]="plateNumberConfig"/>
       </div>
   
       <!-- Capacity -->
       <div class="field-group">
         <app-common-input
-        [config]="capacityConfig"
-          formControlName="capacityKg"
-        >
-        </app-common-input>
+        [config]="capacityConfig"/>
       </div>
   
       <!-- Availability Toggle -->
@@ -81,23 +74,14 @@
   
       <!-- Cancel -->
       <app-common-button
-        label="Cancel"
-        variant="stroked"
-        color="default"
-        (clicked)="cancel()"
-      >
-      </app-common-button>
+        [config]="cancelButtonConfig"
+      />
+
   
       <!-- Submit -->
       <app-common-button
-        [label]="isEdit ? 'Save Changes' : 'Add Vehicle'"
-        variant="flat"
-        color="primary"
-        [loading]="saving"
-        [disabled]="saving"
-        (clicked)="submit()"
-      >
-      </app-common-button>
+        [config]="submitButtonConfig"
+      />
   
     </div>
   </div>

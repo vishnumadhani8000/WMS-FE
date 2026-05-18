@@ -1,5 +1,3 @@
-// product-management.ts
-
 import { Component, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -17,19 +15,18 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from './services/product.service';
 import { Product, ProductFilter } from './models/product.model';
+import { ProductDialogComponent } from './components/product-dialog-component/product-dialog-component';
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { Button } from '../../../shared/components/button/button';
-import { ProductDialogComponent } from './components/product-dialog-component/product-dialog-component';
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
+import { ButtonConfig } from '../../../shared/components/button/button.config';
 
 @Component({
   selector: 'app-product-management',
   standalone: true,
-
   templateUrl: './product-management.html',
-
   styleUrl: './product-management.scss',
 
   imports: [
@@ -61,28 +58,24 @@ export class ProductManagement implements OnInit, OnDestroy {
   readonly DEBOUNCE_MS = 500;
   readonly displayedColumns = ['index', 'name', 'weightKg', 'stock', 'description', 'actions'];
   readonly pageSizeOptions = [5, 10, 25];
+  // Signals
   dataSource = signal<Product[]>([]);
   totalCount = signal(0);
   loading = signal(false);
-  pageSize = 10;
   currentPage = signal(0);
+  pageSize = 10;
   sortBy: string | null = 'createdAt';
-  ascending!: boolean | null;
-  searchControl = new FormControl<string>('', { nonNullable: true });
+  ascending: boolean | null = false;
+  private suppressPageEvent = false;
 
+  searchControl = new FormControl<string>('', {
+    nonNullable: true,
+  });
 
-  searchInputConfig : InputFieldConfig = {
-    label : 'Search',
-    type  : 'text',
-    placeholder:"Search Products...",
-    prefixIcon:'search',
-    icon:this. searchControl.value ? 'close' : '',
-    subscriptSizing:"dynamic",
-    trimStart : true
-  }
+  searchInputConfig!: InputFieldConfig;
+  addProductButtonConfig!: ButtonConfig;
 
-
-  private readonly filter = new BehaviorSubject<ProductFilter>({
+  readonly filter = new BehaviorSubject<ProductFilter>({
     page: 1,
     pageSize: 10,
     search: '',
@@ -91,26 +84,52 @@ export class ProductManagement implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.initializeSearch();
+    // Search Config
+    this.searchInputConfig = {
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Search products...',
+      prefixIcon: 'search',
+      icon: 'close',
+      subscriptSizing: 'dynamic',
+      trimStart: true,
+      control: this.searchControl,
 
+      iconClick: () => {
+        this.clearSearch();
+      },
+    };
+    this.addProductButtonConfig = {
+      label: 'Add Product',
+      variant: 'flat',
+      color: 'primary',
+      prefixIcon: 'add',
+    
+      clicked: () => {
+        this.openAddDialog();
+      },
+    };
+
+    this.initializeSearch();
     this.initializeProductLoader();
   }
 
   ngOnDestroy(): void {
     this.destroy.next();
-
     this.destroy.complete();
   }
 
   private initializeSearch(): void {
     this.searchControl.valueChanges
-      .pipe(debounceTime(this.DEBOUNCE_MS), distinctUntilChanged(), takeUntil(this.destroy))
+      .pipe(
+        debounceTime(this.DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntil(this.destroy)
+      )
 
       .subscribe((search) => {
         this.currentPage.set(0);
-
         this.paginator?.firstPage();
-
         this.filter.next({
           page: 1,
           pageSize: this.pageSize,
@@ -126,7 +145,6 @@ export class ProductManagement implements OnInit, OnDestroy {
       .pipe(
         switchMap((filter) => {
           this.loading.set(true);
-
           return this.productService.getProducts(filter);
         }),
 
@@ -149,14 +167,19 @@ export class ProductManagement implements OnInit, OnDestroy {
   }
 
   onPageChange(event: PageEvent): void {
-    console.log('Page change');
+    if (this.suppressPageEvent) {
+      this.suppressPageEvent = false;
+
+      return;
+    }
+
     this.pageSize = event.pageSize;
     this.currentPage.set(event.pageIndex);
+
     this.filter.next({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
       search: this.searchControl.value,
-
       sortBy: this.sortBy,
       ascending: this.ascending,
     });
@@ -171,10 +194,7 @@ export class ProductManagement implements OnInit, OnDestroy {
       this.ascending = sort.direction === 'asc';
     }
 
-
-
     this.paginator?.firstPage();
-
     this.filter.next({
       page: 1,
       pageSize: this.pageSize,
@@ -198,6 +218,7 @@ export class ProductManagement implements OnInit, OnDestroy {
         data: {
           mode: 'add',
         },
+
         panelClass: 'product-dialog-panel',
         disableClose: true,
       })
@@ -208,9 +229,7 @@ export class ProductManagement implements OnInit, OnDestroy {
         if (!result?.saved) {
           return;
         }
-
         this.toastr.success('Product added successfully.');
-
         this.reload();
       });
   }
@@ -222,9 +241,7 @@ export class ProductManagement implements OnInit, OnDestroy {
           mode: 'edit',
           product,
         },
-
         panelClass: 'product-dialog-panel',
-
         disableClose: true,
       })
 
@@ -234,9 +251,7 @@ export class ProductManagement implements OnInit, OnDestroy {
         if (!result?.saved) {
           return;
         }
-
         this.toastr.success('Product updated successfully.');
-
         this.reload();
       });
   }
@@ -246,6 +261,7 @@ export class ProductManagement implements OnInit, OnDestroy {
       .open(ConfirmDialog, {
         width: '420px',
         disableClose: true,
+
         data: {
           title: 'Delete Product',
           message: `Are you sure you want to delete "${product.name}"?`,
@@ -262,37 +278,30 @@ export class ProductManagement implements OnInit, OnDestroy {
           return;
         }
 
-        this.productService
-          .deleteProduct(product.id)
+        this.productService.deleteProduct(product.id).subscribe({
+          next: () => {
+            this.toastr.warning('Product deleted.');
+            const isLastItemOnPage = this.dataSource().length === 1 && this.currentPage() > 0;
+            if (isLastItemOnPage) {
+              this.currentPage.update((v) => v - 1);
+              this.paginator?.previousPage();
+            } else {
+              this.reload();
+            }
+          },
 
-          .pipe(takeUntil(this.destroy))
-
-          .subscribe({
-            next: () => {
-              this.toastr.warning('Product deleted.');
-              const isLastItemOnPage = this.dataSource().length === 1 && this.currentPage() > 0;
-              if (isLastItemOnPage) {
-                this.currentPage.update((v) => v - 1);
-                this.paginator?.previousPage();
-              }
-              else{
-                this.reload();
-              }
-            },
-
-            error: () => {
-              this.toastr.error('Failed to delete product.');
-            },
-          });
+          error: () => {
+            this.toastr.error('Failed to delete product.');
+          },
+        });
       });
   }
+
   private reload(): void {
-    console.log('Reloading products ');
     this.filter.next({
       page: this.currentPage() + 1,
       pageSize: this.pageSize,
       search: this.searchControl.value,
-
       sortBy: this.sortBy,
       ascending: this.ascending,
     });

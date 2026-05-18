@@ -94,7 +94,7 @@ export class VehicleService {
     return this.http
       .delete<ApiResponse<void>>(`${this.base}/${id}`)
 
-      .pipe(map(() => undefined));
+      .pipe(map(() : void => undefined));
   }
 
   getVehicleById(id: number): Observable<Vehicle> {

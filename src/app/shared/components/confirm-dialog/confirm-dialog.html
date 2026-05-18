@@ -27,19 +27,10 @@
 
   <div class="confirm-dialog__actions">
     <app-common-button
-      label="{{ data.cancelText || 'Cancel' }}"
-      variant="stroked"
-      color="primary"
-      (clicked)="cancel()"
-    >
-    </app-common-button>
-
+     [config]="cancelButtonConfig"/>
+  
     <app-common-button
-      label="{{ data.confirmText || 'Confirm' }}"
-      variant="flat"
-      color="warn"
-      (clicked)="confirm()"
-    >
-    </app-common-button>
+      [config]="confirmButtonConfig"/>
+   
   </div>
 </div>

@@ -87,7 +87,7 @@ export class ProductService {
     return this.http
       .delete<ApiResponse<void>>(`${this.base}/${id}`)
 
-      .pipe(map(() => undefined));
+      .pipe(map(():void => undefined));
   }
 
   getProductById(id: number): Observable<Product> {

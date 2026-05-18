@@ -25,59 +25,40 @@
   <mat-divider></mat-divider>
 
   <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-    <div class="field-group">
-      <app-common-input
-       [config]="productNameConfig"
-        formControlName="name"
-      >
-      </app-common-input>
-    </div>
 
+    <app-common-input
+      [config]="productNameConfig"
+
+    />
+  
     <div class="two-col">
-      <!-- Weight -->
-      <div class="field-group">
-        <app-common-input
-          [config]="weightConfig"
-          formControlName="weightKg"
-        >
-        </app-common-input>
-      </div>
-
-      <!-- Stock -->
-      <div class="field-group">
-        <app-common-input
-          [config]="stockConfig"
-          formControlName="stock"
-        >
-        </app-common-input>
-      </div>
-    </div>
-
-    <div class="field-group">
       <app-common-input
-        [config]="descriptionConfig"
-        formControlName="description"
-        >
-      </app-common-input>
-    </div>
-  </form>
+        [config]="weightConfig"
 
+      />
+  
+      <app-common-input
+        [config]="stockConfig"
+  
+      />
+    </div>
+  
+    <app-common-textarea
+    [config]="descriptionConfig">
+  </app-common-textarea>
+  </form>
   <mat-divider></mat-divider>
 
   <div class="dialog-footer">
     <!-- Cancel -->
-    <app-common-button label="Cancel" variant="stroked" color="default" (clicked)="cancel()">
-    </app-common-button>
+    <app-common-button 
+    [config]="cancelButtonConfig"/>
+
 
     <!-- Submit -->
     <app-common-button
-      [label]="isEdit ? 'Save Changes' : 'Add Product'"
-      variant="flat"
-      color="primary"
-      [loading]="saving"
-      [disabled]="saving"
-      (clicked)="submit()"
-    >
-    </app-common-button>
+      [config]="submitButtonConfig"
+    />
+   
   </div>
 </div>
