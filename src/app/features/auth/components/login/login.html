@@ -1,68 +1,33 @@
 <!-- login.html -->
 
 <div class="login-wrapper">
-
-    <div class="login-card">
-  
-      <!-- LOGO -->
-      <div class="login-logo">
-        <mat-icon class="logo-icon">warehouse</mat-icon>
-      </div>
-  
-      <!-- HEADER -->
-      <div class="login-header">
-        <h1 class="login-title">Welcome</h1>
-        <p class="login-subtitle">Sign in to your WMS account</p>
-      </div>
-  
-      <!-- FORM -->
-      <form
-        class="login-form"
-        [formGroup]="loginForm"
-        (ngSubmit)="submit()"
-        autocomplete="off"
-      >
-  
-        <!-- EMAIL -->
-        <app-common-input
-          label="Email"
-          type="email"
-          placeholder="Enter your email"
-          prefixIcon="email"
-          formControlName="email"
-          [trimStart]="true"
-        />
-  
-        <!-- PASSWORD -->
-        <app-common-input
-          label="Password"
-          type="password"
-          placeholder="Enter your password"
-          prefixIcon="lock"
-          formControlName="password"
-          [trimStart]="true"
-        />
-  
-        <!-- FORGOT PASSWORD -->
-        <div class="login-forgot">
-          <a routerLink="/auth/forgot-password" class="forgot-link">
-            Forgot password?
-          </a>
-        </div>
-  
-        <!-- SUBMIT -->
-        <app-common-button
-          label="Sign In"
-          type="submit"
-          variant="raised"
-          color="primary"
-          [fullWidth]="true"
-          [loading]="isSubmitting"
-          [disabled]="loginForm.invalid"
-        />
-  
-      </form>
-  
+  <div class="login-card">
+    <!-- LOGO -->
+    <div class="login-logo">
+      <mat-icon class="logo-icon">warehouse</mat-icon>
     </div>
-  
+
+    <!-- HEADER -->
+    <div class="login-header">
+      <h1 class="login-title">Welcome</h1>
+      <p class="login-subtitle">Sign in to your WMS account</p>
+    </div>
+
+    <!-- FORM -->
+    <form class="login-form" [formGroup]="form" (ngSubmit)="submit()" autocomplete="off">
+      <!-- EMAIL -->
+      <app-common-input [config]="emailConfig" />
+
+      <!-- PASSWORD -->
+      <app-common-input [config]="passwordConfig" />
+
+      <!-- FORGOT PASSWORD -->
+      <div class="login-forgot">
+        <a routerLink="/auth/forgot-password" class="forgot-link"> Forgot password? </a>
+      </div>
+
+      <!-- SUBMIT -->
+      <app-common-button [config]="loginButtonConfig" />
+    </form>
   </div>
+</div>

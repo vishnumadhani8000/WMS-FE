@@ -13,11 +13,10 @@
     </div>
 
     <div class="menu-list">
-        <a *ngFor="let menu of menus" [routerLink]="menu.route" routerLinkActive="active-menu" class="menu-item">
-
-            <mat-icon>{{ menu.icon }}</mat-icon>
+        <a *ngFor="let menu of menus" [routerLink]="menu.route" routerLinkActive="active-menu" class="menu-item"  (click)="isMobile && closeSidebar()">
 
             @if (isOpen) {
+            <mat-icon>{{ menu.icon }}</mat-icon>
             <span>
                 {{ menu.title }}
             </span>

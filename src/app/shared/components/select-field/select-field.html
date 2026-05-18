@@ -1,42 +1,41 @@
 <mat-form-field
   class="full-width"
-  [appearance]="appearance"
-  [subscriptSizing]="subscriptSizing">
-
+  [appearance]="config.appearance || 'outline'"
+  [subscriptSizing]="config.subscriptSizing || 'fixed'"
+>
   <mat-label>
-    {{ label }}
+    {{ config.label }}
+
+    @if (isRequired) {
+    <span class="required-star">*</span>
+    }
   </mat-label>
 
-  @if (prefixIcon) {
-    <mat-icon matPrefix class="prefix-icon">
-      {{ prefixIcon }}
-    </mat-icon>
+  @if (config.prefixIcon) {
+  <mat-icon matPrefix class="prefix-icon">
+    {{ config.prefixIcon }}
+  </mat-icon>
   }
 
   <mat-select
-    [value]="value"
-    [disabled]="disabled"
-    (selectionChange)="handleSelection($event.value)"
-    (blur)="onTouched(); markTouched()">
-
-    @for (option of options; track option.value) {
-      <mat-option [value]="option.value">
-        {{ option.label }}
-      </mat-option>
+    [formControl]="config.control!"
+    (selectionChange)="markDirty()"
+    (blur)="markTouched()"
+  >
+    @for (option of config.options; track option.value) {
+    <mat-option [value]="option.value">
+      {{ option.label }}
+    </mat-option>
     }
-
   </mat-select>
 
-  @if (hint) {
-    <mat-hint>
-      {{ hint }}
-    </mat-hint>
+  @if (config.hint) {
+  <mat-hint>
+    {{ config.hint }}
+  </mat-hint>
+  } @if ( config.control?.invalid && (config.control?.dirty || config.control?.touched) ) {
+  <mat-error>
+    {{ errorMessage }}
+  </mat-error>
   }
-
-  @if (errorMessage) {
-    <mat-error>
-      {{ errorMessage }}
-    </mat-error>
-  }
-
 </mat-form-field>

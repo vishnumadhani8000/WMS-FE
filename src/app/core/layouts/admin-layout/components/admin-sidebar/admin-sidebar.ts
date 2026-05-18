@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,13 +17,13 @@ import { MatIconModule } from '@angular/material/icon';
 export class AdminSidebar {
 
   @Input() isOpen = true;
-  @Input() isMobile = false;
-
+  @Input() isMobile : boolean = false;
+  @Output() sidebarClose = new EventEmitter<void>();  
   menus = [
     {
       title: 'Driver Management',
       icon: 'local_shipping',
-      route: '/admin/driver-management'
+      route: '/admin/driver-management' 
     },
     {
       title: 'Product Management',
@@ -33,7 +33,7 @@ export class AdminSidebar {
     {
       title: 'Vehicle Management',
       icon: 'directions_car',
-      route: '/vehicle-management'
+      route: '/admin/vehicle-management'
     },
     {
       title: 'Order Management',
@@ -51,4 +51,8 @@ export class AdminSidebar {
       route: '/tracker'
     }
   ];
+
+  closeSidebar() {
+    this.sidebarClose.emit();
+  }
 }

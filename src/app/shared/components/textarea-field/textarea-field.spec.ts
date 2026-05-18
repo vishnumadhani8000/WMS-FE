@@ -1,23 +1,66 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { TextareaField } from './textarea-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { TextareaFieldConfig } from './textearea-field.config';
 
-describe('TextareaField', () => {
-  let component: TextareaField;
-  let fixture: ComponentFixture<TextareaField>;
+@Component({
+  selector: 'app-common-textarea',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  templateUrl: './textarea-field.html',
+  styleUrl: './textarea-field.scss',
+})
+export class TextareaField {
+  @Input({ required: true })
+  config: TextareaFieldConfig;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TextareaField]
-    })
-    .compileComponents();
+  get isRequired(): boolean {
+    return this.config.required || !!this.config.control?.hasValidator(Validators.required);
+  }
 
-    fixture = TestBed.createComponent(TextareaField);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  trimAndTouch(): void {
+    const control = this.config.control;
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    if (!control) return;
+
+    const trimmed = (control.value || '').trim();
+
+    if (trimmed !== control.value) {
+      control.setValue(trimmed);
+    }
+
+    control.markAsTouched();
+  }
+
+  get errorMessage(): string {
+    if (this.config.customErrorMessage) {
+      return this.config.customErrorMessage;
+    }
+
+    const control = this.config.control;
+
+    if (!control?.errors) {
+      return '';
+    }
+
+    const e = control.errors;
+
+    if (e['required']) {
+      return `${this.config.label} is required.`;
+    }
+
+    if (e['minlength']) {
+      return `Minimum ${e['minlength'].requiredLength} characters required.`;
+    }
+
+    if (e['maxlength']) {
+      return `Maximum ${e['maxlength'].requiredLength} characters allowed.`;
+    }
+
+    return 'Invalid field.';
+  }
+}

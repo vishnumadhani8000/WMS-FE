@@ -25,78 +25,40 @@
   <mat-divider></mat-divider>
 
   <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-    <div class="field-group">
-      <app-common-input
-        label="Product Name"
-        placeholder="e.g. Wireless Keyboard"
-        formControlName="name"
-        [maxlength]="100"
-        subscriptSizing="dynamic"
-        [trimStart]="true"
-      >
-      </app-common-input>
-    </div>
 
+    <app-common-input
+      [config]="productNameConfig"
+
+    />
+  
     <div class="two-col">
-      <!-- Weight -->
-      <div class="field-group">
-        <app-common-input
-          label="Weight (kg)"
-          type="number"
-          placeholder="e.g. 0.850"
-          formControlName="weightKg"
-          [min]="0.001"
-          [max]="9999"
-          [step]="0.001"
-          subscriptSizing="dynamic"
-        >
-        </app-common-input>
-      </div>
-
-      <!-- Stock -->
-      <div class="field-group">
-        <app-common-input
-          label="Stock Quantity"
-          type="number"
-          placeholder="e.g. 100"
-          formControlName="stock"
-          [min]="0"
-          [max]="1000000"
-          [step]="1"
-          subscriptSizing="dynamic"
-        >
-        </app-common-input>
-      </div>
-    </div>
-
-    <div class="field-group">
       <app-common-input
-        label="Description"
-        placeholder="Optional short product description..."
-        formControlName="description"
-        [maxlength]="500"
-        subscriptSizing="dynamic"
-      >
-      </app-common-input>
-    </div>
-  </form>
+        [config]="weightConfig"
 
+      />
+  
+      <app-common-input
+        [config]="stockConfig"
+  
+      />
+    </div>
+  
+    <app-common-textarea
+    [config]="descriptionConfig">
+  </app-common-textarea>
+  </form>
   <mat-divider></mat-divider>
 
   <div class="dialog-footer">
     <!-- Cancel -->
-    <app-common-button label="Cancel" variant="stroked" color="default" (clicked)="cancel()">
-    </app-common-button>
+    <app-common-button 
+    [config]="cancelButtonConfig"/>
+
 
     <!-- Submit -->
     <app-common-button
-      [label]="isEdit ? 'Save Changes' : 'Add Product'"
-      variant="flat"
-      color="primary"
-      [loading]="saving"
-      [disabled]="saving"
-      (clicked)="submit()"
-    >
-    </app-common-button>
+      [config]="submitButtonConfig"
+    />
+   
   </div>
 </div>

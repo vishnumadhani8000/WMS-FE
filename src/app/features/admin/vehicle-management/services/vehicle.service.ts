@@ -1,26 +1,33 @@
+// vehicle.service.ts
 
 import { Injectable } from '@angular/core';
+
 import { HttpClient, HttpParams } from '@angular/common/http';
+
 import { Observable } from 'rxjs';
+
 import { map } from 'rxjs/operators';
-import { Product, ProductFilter, ProductFormValue } from '../models/product.model';
-import { environment } from '../../../../../environments/environment'
+
+import { Vehicle, VehicleFilter, VehicleFormValue } from '../models/vehicle.model';
+
+import { environment } from '../../../../../environments/environment';
+
 import { PaginatedResponse } from '../../../../core/models/paginated-response.model';
+
 import { ApiResponse } from '../../../../core/models/api-responce.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService {
-  private readonly base = `${environment.baseUrl}/products`;
+export class VehicleService {
+  private readonly base = `${environment.baseUrl}/vehicles`;
 
   constructor(private http: HttpClient) {}
 
-  getProducts(filter: ProductFilter): Observable<PaginatedResponse<Product>> {
+  getVehicles(filter: VehicleFilter): Observable<PaginatedResponse<Vehicle>> {
     let params = new HttpParams()
 
       .set('pageNumber', filter.page.toString())
-
       .set('pageSize', filter.pageSize.toString());
 
     // Search
@@ -40,12 +47,12 @@ export class ProductService {
     }
 
     return this.http
-      .get<ApiResponse<PaginatedResponse<Product>>>(this.base, { params })
+      .get<ApiResponse<PaginatedResponse<Vehicle>>>(this.base, { params })
 
       .pipe(
         map((res) => {
           if (!res.data) {
-            throw new Error('Failed to load products');
+            throw new Error('Failed to load vehicles');
           }
 
           return res.data;
@@ -53,14 +60,14 @@ export class ProductService {
       );
   }
 
-  createProduct(form: ProductFormValue): Observable<Product> {
+  createVehicle(form: VehicleFormValue): Observable<Vehicle> {
     return this.http
-      .post<ApiResponse<Product>>(this.base, form)
+      .post<ApiResponse<Vehicle>>(this.base, form)
 
       .pipe(
         map((res) => {
           if (!res.data) {
-            throw new Error('Failed to create product');
+            throw new Error('Failed to create vehicle');
           }
 
           return res.data;
@@ -68,14 +75,14 @@ export class ProductService {
       );
   }
 
-  updateProduct(id: number, form: ProductFormValue): Observable<Product> {
+  updateVehicle(id: number, form: VehicleFormValue): Observable<Vehicle> {
     return this.http
-      .put<ApiResponse<Product>>(`${this.base}/${id}`, form)
+      .put<ApiResponse<Vehicle>>(`${this.base}/${id}`, form)
 
       .pipe(
         map((res) => {
           if (!res.data) {
-            throw new Error('Failed to update product');
+            throw new Error('Failed to update vehicle');
           }
 
           return res.data;
@@ -83,21 +90,21 @@ export class ProductService {
       );
   }
 
-  deleteProduct(id: number): Observable<void> {
+  deleteVehicle(id: number): Observable<void> {
     return this.http
       .delete<ApiResponse<void>>(`${this.base}/${id}`)
 
-      .pipe(map(():void => undefined));
+      .pipe(map(() : void => undefined));
   }
 
-  getProductById(id: number): Observable<Product> {
+  getVehicleById(id: number): Observable<Vehicle> {
     return this.http
-      .get<ApiResponse<Product>>(`${this.base}/${id}`)
+      .get<ApiResponse<Vehicle>>(`${this.base}/${id}`)
 
       .pipe(
         map((res) => {
           if (!res.data) {
-            throw new Error('Product not found');
+            throw new Error('Vehicle not found');
           }
 
           return res.data;

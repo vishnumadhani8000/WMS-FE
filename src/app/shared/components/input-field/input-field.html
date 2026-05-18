@@ -1,84 +1,63 @@
-<!-- input-field.html -->
-
 <mat-form-field
   class="full-width"
-  [appearance]="appearance"
-  [subscriptSizing]="subscriptSizing"
+  [appearance]="config.appearance || 'outline'"
+  [subscriptSizing]="config.subscriptSizing || 'dynamic'"
 >
   <mat-label>
-    {{ label }}
-
-    @if (isRequired) {
-      <span class="required-star">*</span>
-    }
+    {{ config.label }}
+    <!-- @if (isRequired) {
+    <span class="required-star">*</span>
+    } -->
   </mat-label>
 
-  @if (prefixIcon) {
-    <mat-icon matPrefix class="prefix-icon">
-      {{ prefixIcon }}
-    </mat-icon>
+  @if (config.prefixIcon) {
+  <mat-icon matPrefix class="prefix-icon">{{ config.prefixIcon }}</mat-icon>
   }
 
   <input
     matInput
+    [formControl]="config.control!"
     [type]="inputType"
-    [placeholder]="placeholder"
-    [disabled]="disabled"
-    [readonly]="readonly"
-    [value]="value"
-    [attr.minlength]="minlength"
-    [attr.maxlength]="maxlength"
-    [attr.min]="min"
-    [attr.max]="max"
-    [attr.step]="step"
-    [attr.pattern]="pattern"
+    [placeholder]="config.placeholder || ''"
+    [readonly]="config.readonly"
+    [attr.minlength]="config.minlength"
+    [attr.maxlength]="config.maxlength"
+    [attr.min]="config.min"
+    [attr.max]="config.max"
+    [attr.step]="config.step"
+    [attr.pattern]="config.pattern"
     autocomplete="new-password"
-    (input)="handleInputEvent($event)"
-    (blur)="onTouched(); markTouched()"
+    (focus)="config.control?.markAsTouched()"
   />
 
-  @if (type === 'password') {
-    <button
-      mat-icon-button
-      matSuffix
-      type="button"
-      (click)="togglePassword()"
-      [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-      tabindex="-1"
-    >
-      <mat-icon>
-        {{ showPassword ? 'visibility_off' : 'visibility' }}
-      </mat-icon>
+  @if (config.type === 'password') {
+  <button
+    mat-icon-button
+    matSuffix
+    type="button"
+    (click)="togglePassword()"
+    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+    tabindex="-1"
+  >
+    <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+  </button>
+  }
+   @if ( (config.iconPath || config.icon) && config.type !== 'password' && ( config.icon !==
+  'close' || config.control?.value ) ) {
+  <span matSuffix>
+    <button mat-icon-button type="button" (click)="handleIconClick()">
+      @if (config.iconPath) {
+      <img [src]="config.iconPath" width="22" height="22" alt="icon" />
+      } @else if (config.icon) {
+      <mat-icon>{{ config.icon }}</mat-icon>
+      }
     </button>
+  </span>
+  } @if (config.hint) {
+  <mat-hint>{{ config.hint }}</mat-hint>
   }
 
-  @if ((iconPath || icon) && type !== 'password') {
-    <span matSuffix>
-      <button
-        mat-icon-button
-        type="button"
-        (click)="handleIconClick()"
-      >
-        @if (iconPath) {
-          <img
-            [src]="iconPath"
-            width="22"
-            height="22"
-            alt="icon"
-          />
-        }
-        @else if (icon) {
-          <mat-icon>{{ icon }}</mat-icon>
-        }
-      </button>
-    </span>
-  }
-
-  @if (hint) {
-    <mat-hint>{{ hint }}</mat-hint>
-  }
-
-  <mat-error>
+  <mat-error *ngIf="config.control?.invalid && (config.control?.dirty || config.control?.touched)">
     {{ errorMessage }}
   </mat-error>
 </mat-form-field>

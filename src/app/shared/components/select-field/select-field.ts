@@ -1,120 +1,54 @@
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { Component, Input, Optional, Self, ViewChild, AfterViewInit } from '@angular/core';
-import { ControlValueAccessor, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 
-type SelectValue = string | number | null;
-
-interface SelectOption {
-  label: string;
-  value: string | number;
-}
+import { SelectFieldConfig } from './select-field.config';
 
 @Component({
   selector: 'app-common-select',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatIconModule],
   templateUrl: './select-field.html',
-  styleUrl: './select-field.scss'
+  styleUrl: './select-field.scss',
 })
+export class SelectField {
+  @Input({ required: true })
+  config!: SelectFieldConfig;
 
-export class SelectField
-  implements ControlValueAccessor, AfterViewInit {
-
-  @Input() label = '';
-  @Input() hint = '';
-  @Input() prefixIcon = '';
-  @Input() appearance: 'outline' | 'fill' = 'outline';
-  @Input() subscriptSizing: 'fixed' | 'dynamic' = 'fixed';
-  @Input() options: SelectOption[] = [];
-
-  @ViewChild(MatSelect) matSelect!: MatSelect;
-
-  value: SelectValue = null;
-
-  disabled = false;
-  onChange: (value: SelectValue) => void = () => { };
-
-  onTouched: () => void = () => { };
-
-  constructor(
-    @Optional()
-    @Self()
-    public ngControl: NgControl) {
-
-    if (this.ngControl) {
-      this.ngControl.valueAccessor = this;
-    }
+  get isRequired(): boolean {
+    return this.config.required || !!this.config.control?.hasValidator(Validators.required);
   }
 
-
-  ngAfterViewInit(): void {
-    Object.defineProperty(this.matSelect, 'errorState', {
-      get: () => {
-
-        const control = this.ngControl?.control;
-        return !!(control && control.invalid && (control.touched || control.dirty));
-      }
-    });
-  }
-
-  handleSelection(value: SelectValue): void {
-
-    this.value = value;
-
-    this.onChange(value);
-
-    if (this.ngControl?.control) {
-      this.ngControl.control.markAsDirty();
-      this.ngControl.control.updateValueAndValidity();
-    }
-  }
   markTouched(): void {
-
-    if (this.ngControl?.control) {
-
-      this.ngControl.control.markAsTouched();
-    }
+    this.config.control?.markAsTouched();
   }
 
+  markDirty(): void {
+    this.config.control?.markAsDirty();
+    this.config.control?.updateValueAndValidity();
+  }
 
   get errorMessage(): string {
-    const control = this.ngControl?.control;
-    if (!control || !control.errors || !(control.touched || control.dirty)) {
+    if (this.config.customErrorMessage) {
+      return this.config.customErrorMessage;
+    }
+
+    const control = this.config.control;
+
+    if (!control?.errors) {
       return '';
     }
 
     const e = control.errors;
 
     if (e['required']) {
-      return `${this.label} is required.`;
+      return `${this.config.label} is required.`;
     }
+
     return 'Invalid field.';
-  }
-
-
-  writeValue(value: SelectValue): void {
-    this.value = value;
-  }
-
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
   }
 }

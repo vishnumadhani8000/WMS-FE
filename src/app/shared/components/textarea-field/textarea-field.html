@@ -1,48 +1,45 @@
 <mat-form-field
   class="full-width"
-  [appearance]="appearance"
-  [subscriptSizing]="subscriptSizing"
+  [appearance]="config.appearance || 'outline'"
+  [subscriptSizing]="config.subscriptSizing || 'dynamic'"
 >
   <mat-label>
-    {{ label }}
+    {{ config.label }}
 
     @if (isRequired) {
-      <span class="required-star">*</span>
+    <span class="required-star">*</span>
     }
   </mat-label>
 
-  @if (prefixIcon) {
-    <mat-icon matPrefix class="prefix-icon">
-      {{ prefixIcon }}
-    </mat-icon>
+  @if (config.prefixIcon) {
+  <mat-icon matPrefix class="prefix-icon">
+    {{ config.prefixIcon }}
+  </mat-icon>
   }
 
   <textarea
     matInput
-    [rows]="rows"
-    [placeholder]="placeholder"
-    [readonly]="readonly"
-    [disabled]="disabled"
-    [maxLength]="maxlength"
-    [value]="value"
-    (input)="handleInput($event)"
-    (blur)="onTouched(); markTouched()"
+    [formControl]="config.control!"
+    [rows]="config.rows || 4"
+    [placeholder]="config.placeholder || ''"
+    [readonly]="config.readonly"
+    [attr.maxlength]="config.maxlength"
+    (input)="handleInput()"
+    (blur)="trimAndTouch()"
   >
   </textarea>
 
-  @if (hint) {
-    <mat-hint>
-      {{ hint }}
-    </mat-hint>
-  }
-
-  @if (maxlength) {
-    <mat-hint align="end">
-      {{ value.length }}/{{ maxlength }}
-    </mat-hint>
-  }
-
+  @if (config.hint) {
+  <mat-hint>
+    {{ config.hint }}
+  </mat-hint>
+  } 
+  @if (config.maxlength) {
+  <mat-hint align="end"> {{ config.control?.value?.length || 0 }}/{{ config.maxlength }} </mat-hint>
+  } 
+  @if ( config.control?.invalid && (config.control?.dirty || config.control?.touched) ) {
   <mat-error>
     {{ errorMessage }}
   </mat-error>
+  }
 </mat-form-field>
