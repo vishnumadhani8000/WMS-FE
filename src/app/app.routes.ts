@@ -6,6 +6,7 @@ import { AdminLayout } from './core/layouts/admin-layout/admin-layout';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { CustomerLayout } from './core/layouts/customer-layout/customer-layout';
 
 export const routes: Routes = [
 
@@ -37,9 +38,9 @@ export const routes: Routes = [
                     import('./features/admin/vehicle-management/vehicle-management.js')
                         .then((m) => m.VehicleManagement),
             },
-            { 
-                path : APP_ROUTES.ADMIN.DESTINATION_MANAGEMENT,
-                loadComponent : () =>
+            {
+                path: APP_ROUTES.ADMIN.DESTINATION_MANAGEMENT,
+                loadComponent: () =>
                     import('./features/admin/state-city-management/state-city-management.js')
                         .then((m) => m.StateCityManagement),
 
@@ -54,10 +55,37 @@ export const routes: Routes = [
         ],
     },
 
+    {
+        path: APP_ROUTES.CUSTOMER.ROOT,
+        component: CustomerLayout,
+        canActivate: [authGuard, roleGuard],
+        data: {
+            role: 'Customer',
+        },
+
+        children:[
+            {
+                path: APP_ROUTES.CUSTOMER.PRODUCT,
+                loadComponent: () =>
+                    import('./features/customer/products/products.js')
+                        .then((m) => m.Products),
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.CART,
+                loadComponent:()=>
+                    import('./features/customer/cart/cart.js')
+                         .then((m)=>m.Cart)
+            }
+
+        ]
+
+
+    },
+
 
     //----------------------------- Login Route
-    
-    
+
+
     {
         path: APP_ROUTES.AUTH.LOGIN,
 
@@ -71,6 +99,12 @@ export const routes: Routes = [
                 .then((m) => m.Login),
     },
 
+    {
+        path: `${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
+        loadComponent: () =>
+            import('../app/core/layouts/customer-layout/customer-header/customer-header.js')
+                .then((m) => m.CustomerHeader)
+    },
     {
         path: '',
         redirectTo: APP_ROUTES.AUTH.LOGIN,

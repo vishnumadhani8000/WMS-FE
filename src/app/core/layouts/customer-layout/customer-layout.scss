@@ -1,0 +1,30 @@
+@use 'styles/variables' as *;
+
+// ── Root Wrapper ───────────────────────────────────────────
+.page-wrapper {
+  min-height: 100vh;
+  background: $page-bg;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-x: hidden;
+}
+
+// ── Main Layout ────────────────────────────────────────────
+.customer-layout {
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Router Outlet Content Fix ─────────────────────────────
+.customer-layout > * {
+  min-width: 0;
+}

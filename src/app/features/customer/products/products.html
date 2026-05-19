@@ -1,0 +1,109 @@
+<div class="product-page">
+  <header class="product-header">
+    <h1 class="product-title">Product Catalog</h1>
+  </header>
+
+  <section class="product-toolbar">
+    <div class="product-search">
+      <app-common-input [config]="searchConfig"> </app-common-input>
+    </div>
+
+    <span class="product-count">
+      {{ totalCount() }}
+      products available
+    </span>
+  </section>
+
+  <div class="product-card">
+    @if (loading()) {
+    <mat-progress-bar mode="indeterminate"> </mat-progress-bar>
+    }
+
+    <div class="product-table-wrap">
+      <table mat-table [dataSource]="loading() ? [] : products()" class="product-table">
+        <ng-container matColumnDef="index">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+
+          <td mat-cell *matCellDef="let row; let i = index">
+            {{ rowIndex(i) }}
+          </td>
+        </ng-container>
+
+        <!-- Product Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>PRODUCT NAME</th>
+
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="cell-text cell-name"
+              [matTooltip]="row.name"
+              [matTooltipDisabled]="row.name.length <= 30"
+              matTooltipPosition="above"
+            >
+              {{ row.name | truncate : 30 }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>DESCRIPTION</th>
+
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="cell-text cell-description"
+              [matTooltip]="row.description"
+              [matTooltipDisabled]="!row.description || row.description.length <= 40"
+              matTooltipPosition="above"
+            >
+              {{ row.description || '—' | truncate : 40 }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Weight -->
+        <ng-container matColumnDef="weight">
+          <th mat-header-cell *matHeaderCellDef class="col-num">WEIGHT</th>
+
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span class="cell-chip"> {{ row.weightKg | number : '1.3-3' }} kg </span>
+          </td>
+        </ng-container>
+
+  
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>ACTIONS</th>
+
+          <td mat-cell *matCellDef="let row">
+            <app-common-button [config]="cartButtonConfig(row)"> </app-common-button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="product-no-data" [attr.colspan]="displayedColumns.length">
+            <div class="product-empty-state">
+              <mat-icon> inventory_2 </mat-icon>
+
+              <span> No products found </span>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      [length]="totalCount()"
+      [pageSize]="pageSize"
+      [pageIndex]="page()"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
+  </div>
+</div>

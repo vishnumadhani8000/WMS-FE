@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -76,8 +76,8 @@ export class VehicleManagement implements OnInit {
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 
-  searchInputConfig!: InputFieldConfig;
-  addVehicleButtonConfig!: ButtonConfig;
+  searchInputConfig: InputFieldConfig;
+  addVehicleButtonConfig: ButtonConfig;
 
   readonly filter = new BehaviorSubject<VehicleFilter>({
     page: 1,
@@ -88,7 +88,7 @@ export class VehicleManagement implements OnInit {
   });
 
   ngOnInit(): void {
-    // Search Config
+   
     this.searchInputConfig = {
       label: 'Search',
       type: 'text',
@@ -117,7 +117,6 @@ export class VehicleManagement implements OnInit {
     };
 
     this.initializeSearch();
-
     this.initializeVehicleLoader();
   }
 
@@ -149,7 +148,6 @@ export class VehicleManagement implements OnInit {
 
           return this.vehicleService.getVehicles(filter);
         }),
-
         takeUntilDestroyed(this.destroyref)
       )
       .subscribe({
@@ -208,7 +206,7 @@ export class VehicleManagement implements OnInit {
       .afterClosed()
 
       .subscribe((result) => {
-        if (!result?.saved) {
+        if (!result.saved) {
           return;
         }
         this.reload();

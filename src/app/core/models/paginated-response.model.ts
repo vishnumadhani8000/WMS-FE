@@ -7,6 +7,4 @@ export interface PaginatedResponse<T> {
     pageNumber: number;
     pageSize: number;
     totalPages: number;
-    hasPrevious: boolean;
-    hasNext: boolean;
   }

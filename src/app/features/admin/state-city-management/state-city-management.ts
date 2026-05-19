@@ -22,6 +22,7 @@ import { InputFieldConfig } from '../../../shared/components/input-field/input-f
 import { ButtonConfig } from '../../../shared/components/button/button.config';
 import { StateDialogComponent } from './components/state-dialog-component/state-dialog-component';
 import { CityDialogComponent } from './components/city-dialog-component/city-dialog-component';
+import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-state-city-management',
@@ -399,9 +400,23 @@ export class StateCityManagement implements OnInit {
   }
 
   deleteState(state: State): void {
-    if (!confirm(`Delete "${state.name}"?`)) {
-      return;
-    }
+    this.dialog
+       .open(ConfirmDialog, {
+          width: '420px',
+          disableClose: true,
+          data: {
+            title: 'Delete State',
+            message: `Are you sure you want to delete "${state.name}"? This will also delete all associated cities.`,
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            type: 'warning',
+          },
+        })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
     this.stateService
       .deleteState(state.id)
@@ -412,7 +427,7 @@ export class StateCityManagement implements OnInit {
 
           if (this.selectedState()?.id === state.id) {
             this.selectedState.set(null);
-            this.cities.set([]);
+            this.cities.set([]); 
           }
 
           this.loadStates();
@@ -422,12 +437,27 @@ export class StateCityManagement implements OnInit {
           this.toastr.error('Failed to delete state.');
         },
       });
+    });
   }
 
   deleteCity(city: City): void {
-    if (!confirm(`Delete "${city.name}"?`)) {
-      return;
-    }
+    this.dialog
+    .open(ConfirmDialog, {
+      width: '420px',
+      disableClose: true,
+      data: {
+        title: 'Delete City',
+        message: `Are you sure you want to delete "${city.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'warning',
+      },
+    })
+    .afterClosed()
+    .subscribe((confirmed) => {
+       if (!confirmed) {
+         return;
+       }
 
     this.cityService
       .deleteCity(city.id)
@@ -442,6 +472,7 @@ export class StateCityManagement implements OnInit {
           this.toastr.error('Failed to delete city.');
         },
       });
+    });
   }
 
   clearStateSearch(): void {

@@ -27,7 +27,6 @@ import { ButtonConfig } from '../../../shared/components/button/button.config';
 @Component({
   selector: 'app-product-management',
   standalone: true,
-
   templateUrl: './product-management.html',
   styleUrl: './product-management.scss',
 
@@ -58,9 +57,7 @@ export class ProductManagement implements OnInit {
   paginator!: MatPaginator;
 
   readonly DEBOUNCE_MS = 500;
-
   readonly displayedColumns = ['index', 'name', 'weightKg', 'stock', 'description', 'actions'];
-
   readonly pageSizeOptions = [5, 10, 25];
 
   dataSource = signal<Product[]>([]);
@@ -71,8 +68,8 @@ export class ProductManagement implements OnInit {
     nonNullable: true,
   });
 
-  searchInputConfig!: InputFieldConfig;
-  addProductButtonConfig!: ButtonConfig;
+  searchInputConfig: InputFieldConfig;
+  addProductButtonConfig: ButtonConfig;
 
   readonly filter = new BehaviorSubject<ProductFilter>({
     page: 1,
@@ -204,7 +201,6 @@ export class ProductManagement implements OnInit {
       })
 
       .afterClosed()
-
       .subscribe((result) => {
         if (!result?.saved) {
           return;

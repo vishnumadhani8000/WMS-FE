@@ -19,11 +19,10 @@
       <app-common-input [config]="searchInputConfig" />
     </div>
 
-    <app-common-button [config]="addProductButtonConfig"> </app-common-button>
+    <app-common-button [config]="addProductButtonConfig"/>
   </section>
 
   <div class="pm-card">
-    <!-- Loading -->
     @if (loading()) {
 
     <mat-progress-bar mode="indeterminate" class="pm-progress"> </mat-progress-bar>
@@ -109,18 +108,12 @@
               <mat-icon> more_vert </mat-icon>
             </button>
 
-            <!-- Action Menu -->
-
             <mat-menu #actionMenu="matMenu" class="pm-action-menu">
-              <!-- Edit -->
-
               <button mat-menu-item (click)="openEditDialog(row)">
                 <mat-icon> edit </mat-icon>
 
                 <span> Edit </span>
               </button>
-
-              <!-- Delete -->
 
               <button mat-menu-item class="delete-item" (click)="deleteProduct(row)">
                 <mat-icon> delete_outline </mat-icon>

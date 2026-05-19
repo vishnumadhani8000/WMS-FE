@@ -190,14 +190,24 @@ $bp-md: 768px;
   }
 
   // ── Center Sortable Headers ──────────────────────────────
-  .mat-column-capacityKg,
-  .mat-column-isAvailable {
-    .mat-sort-header-container {
-      justify-content: center !important;
-    }
-
-    .mat-sort-header-content {
-      text-align: center;
+  ::ng-deep {
+    .mat-column-capacityKg{
+      
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        text-align: center !important;
+      }
+  
+      .mat-sort-header-container {
+        width: 100%;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+  
+      .mat-sort-header-content {
+        text-align: center !important;
+      }
     }
   }
 
