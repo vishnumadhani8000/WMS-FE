@@ -37,6 +37,13 @@ export const routes: Routes = [
                     import('./features/admin/vehicle-management/vehicle-management.js')
                         .then((m) => m.VehicleManagement),
             },
+            { 
+                path : APP_ROUTES.ADMIN.DESTINATION_MANAGEMENT,
+                loadComponent : () =>
+                    import('./features/admin/state-city-management/state-city-management.js')
+                        .then((m) => m.StateCityManagement),
+
+            },
 
             {
                 path: '**',

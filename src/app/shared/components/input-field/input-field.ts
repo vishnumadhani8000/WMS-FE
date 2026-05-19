@@ -22,8 +22,7 @@ import { InputFieldConfig } from './input-field.config';
   styleUrl: './input-field.scss',
 })
 export class InputField {
-    @Input({ required: true }) config: InputFieldConfig;
-    
+  @Input({ required: true }) config: InputFieldConfig;
 
   showPassword = false;
 
@@ -39,7 +38,23 @@ export class InputField {
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
+  handleInput(event: Event): void {
 
+    if(this.config.trimStart===undefined||this.config.trimStart===false){return;}
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value;
+
+    if (this.config.trimStart === true) {
+      value = value.trimStart();
+    }
+
+    this.config.control?.setValue(value, {
+      emitEvent: false,
+    });
+
+    input.value = value;
+  }
   handleIconClick(): void {
     this.config.iconClick?.();
   }
@@ -49,13 +64,13 @@ export class InputField {
     if (!this.config.control.errors) return '';
 
     const e = this.config.control.errors;
-    if (e['required'])   return `${this.config.label || 'This field'} is required.`;
+    if (e['required']) return `${this.config.label || 'This field'} is required.`;
     if (e['whitespace']) return 'This field cannot be empty or spaces only.';
-    if (e['email'])      return 'Please enter a valid email address.';
-    if (e['minlength'])  return `Minimum ${e['minlength'].requiredLength} characters required.`;
-    if (e['maxlength'])  return `Maximum ${e['maxlength'].requiredLength} characters allowed.`;
-    if (e['min'])        return `Minimum value is ${e['min'].min}.`;
-    if (e['max'])        return `Maximum value is ${e['max'].max}.`;
+    if (e['email']) return 'Please enter a valid email address.';
+    if (e['minlength']) return `Minimum ${e['minlength'].requiredLength} characters required.`;
+    if (e['maxlength']) return `Maximum ${e['maxlength'].requiredLength} characters allowed.`;
+    if (e['min']) return `Minimum value is ${e['min'].min}.`;
+    if (e['max']) return `Maximum value is ${e['max'].max}.`;
     if (e['pattern']) {
       return this.config.type === 'password'
         ? 'Use uppercase, lowercase, number & special character.'

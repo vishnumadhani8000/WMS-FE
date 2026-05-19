@@ -1,22 +1,16 @@
 import { Component, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
-
 import { ProductService } from '../../services/product.service';
 import { ProductDialogData } from '../../models/product.model';
-
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
-
 import { ToastrService } from 'ngx-toastr';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import { TextareaField } from "../../../../../shared/components/textarea-field/textarea-field";
@@ -77,7 +71,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const p = this.data.product;
 
-    // Form
+   
     this.form = new FormGroup<ProductForm>({
       name: new FormControl(p?.name ?? '', {
         nonNullable: true,
@@ -94,7 +88,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
 
       description: new FormControl(p?.description ?? '', {
         nonNullable: true,
-        validators: [Validators.required, Validators.maxLength(500)],
+        validators: [ Validators.maxLength(500)],
       }),
     });
 
@@ -131,14 +125,14 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     };
 
     this.descriptionConfig = {
-      required: true,
       label: 'Description',
       placeholder: 'Optional short product description...',
       maxlength: 500,
       rows: 3,
-      subscriptSizing: 'dynamic',
+      trimStart: true,
       control: this.form.controls.description,
     };
+    
     this.cancelButtonConfig = {
       label: 'Cancel',
       variant: 'stroked',

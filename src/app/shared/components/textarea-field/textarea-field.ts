@@ -33,27 +33,20 @@ export class TextareaField {
     );
   }
 
-  handleInput(): void {
-    if (!this.config.trimStart) return;
-
-    const value = this.config.control.value || '';
-
-    if (value.startsWith(' ')) {
-      this.config.control.setValue(value.trimStart(), {
-        emitEvent: false,
-      });
-    }
-  }
-
-  trimAndTouch(): void {
-    const trimmed = (this.config.control.value || '').trim();
-
-    if (trimmed !== this.config.control.value) {
-      this.config.control.setValue(trimmed);
+  handleInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value;
+    if (this.config.trimStart) {
+      value = value.trimStart();
     }
 
-    this.config.control.markAsTouched();
+    this.config.control?.setValue(value, {
+      emitEvent: false,
+    });
+
+    input.value = value;
   }
+   
 
   get errorMessage(): string {
     if (this.config.customErrorMessage) {

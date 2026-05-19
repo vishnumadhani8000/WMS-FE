@@ -41,9 +41,9 @@ export class AdminSidebar {
       route: '/order-management'
     },
     {
-      title: 'City Management',
+      title: 'Destination Management',
       icon: 'location_city',
-      route: '/city-management'
+      route: '/admin/destination-management'
     },
     {
       title: 'Tracker',

@@ -1,0 +1,29 @@
+<div class="dialog-wrapper">
+    <div class="dialog-header">
+      <div class="dialog-header__content">
+        <h2 class="dialog-title">{{ title }}</h2>
+        <p class="dialog-subtitle">
+          @if (isEdit) { Update city details and save changes. }
+          @else { Fill in the details to add a new city to {{ data.stateName }}. }
+        </p>
+      </div>
+      <button class="close-btn" mat-icon-button type="button" (click)="cancel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  
+    <mat-divider></mat-divider>
+  
+    <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
+      <div class="field-group">
+        <app-common-input [config]="nameConfig" />
+      </div>
+    </form>
+  
+    <mat-divider></mat-divider>
+  
+    <div class="dialog-footer">
+      <app-common-button [config]="cancelButtonConfig" />
+      <app-common-button [config]="submitButtonConfig" />
+    </div>
+  </div>
