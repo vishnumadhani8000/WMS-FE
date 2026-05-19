@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -18,14 +19,15 @@ import { Product, ProductFilter } from './models/product.model';
 import { ProductDialogComponent } from './components/product-dialog-component/product-dialog-component';
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { Button } from '../../../shared/components/button/button';
-import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
 
 @Component({
   selector: 'app-product-management',
   standalone: true,
+
   templateUrl: './product-management.html',
   styleUrl: './product-management.scss',
 
@@ -46,27 +48,24 @@ import { ButtonConfig } from '../../../shared/components/button/button.config';
     TruncatePipe,
   ],
 })
-export class ProductManagement implements OnInit, OnDestroy {
+export class ProductManagement implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly dialog = inject(MatDialog);
   private readonly toastr = inject(ToastrService);
-  private readonly destroy = new Subject<void>();
+  private readonly destroyref = inject(DestroyRef);
 
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
 
   readonly DEBOUNCE_MS = 500;
+
   readonly displayedColumns = ['index', 'name', 'weightKg', 'stock', 'description', 'actions'];
+
   readonly pageSizeOptions = [5, 10, 25];
-  // Signals
+
   dataSource = signal<Product[]>([]);
   totalCount = signal(0);
   loading = signal(false);
-  currentPage = signal(0);
-  pageSize = 10;
-  sortBy: string | null = 'createdAt';
-  ascending: boolean | null = false;
-  private suppressPageEvent = false;
 
   searchControl = new FormControl<string>('', {
     nonNullable: true,
@@ -93,18 +92,21 @@ export class ProductManagement implements OnInit, OnDestroy {
       icon: 'close',
       subscriptSizing: 'dynamic',
       trimStart: true,
+
       control: this.searchControl,
 
       iconClick: () => {
         this.clearSearch();
       },
     };
+
+    // Add Button Config
     this.addProductButtonConfig = {
       label: 'Add Product',
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'add',
-    
+
       clicked: () => {
         this.openAddDialog();
       },
@@ -114,28 +116,23 @@ export class ProductManagement implements OnInit, OnDestroy {
     this.initializeProductLoader();
   }
 
-  ngOnDestroy(): void {
-    this.destroy.next();
-    this.destroy.complete();
-  }
-
   private initializeSearch(): void {
     this.searchControl.valueChanges
       .pipe(
         debounceTime(this.DEBOUNCE_MS),
         distinctUntilChanged(),
-        takeUntil(this.destroy)
+        takeUntilDestroyed(this.destroyref)
       )
 
       .subscribe((search) => {
-        this.currentPage.set(0);
         this.paginator?.firstPage();
+
         this.filter.next({
           page: 1,
-          pageSize: this.pageSize,
+          pageSize: this.filter.value.pageSize,
           search,
-          sortBy: this.sortBy,
-          ascending: this.ascending,
+          sortBy: this.filter.value.sortBy,
+          ascending: this.filter.value.ascending,
         });
       });
   }
@@ -145,17 +142,17 @@ export class ProductManagement implements OnInit, OnDestroy {
       .pipe(
         switchMap((filter) => {
           this.loading.set(true);
+
           return this.productService.getProducts(filter);
         }),
 
-        takeUntil(this.destroy)
+        takeUntilDestroyed(this.destroyref)
       )
 
       .subscribe({
         next: (result) => {
           this.dataSource.set(result.items);
           this.totalCount.set(result.totalCount);
-          this.currentPage.set(result.pageNumber - 1);
           this.loading.set(false);
         },
 
@@ -167,45 +164,29 @@ export class ProductManagement implements OnInit, OnDestroy {
   }
 
   onPageChange(event: PageEvent): void {
-    if (this.suppressPageEvent) {
-      this.suppressPageEvent = false;
-
-      return;
-    }
-
-    this.pageSize = event.pageSize;
-    this.currentPage.set(event.pageIndex);
-
     this.filter.next({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
       search: this.searchControl.value,
-      sortBy: this.sortBy,
-      ascending: this.ascending,
+      sortBy: this.filter.value.sortBy,
+      ascending: this.filter.value.ascending,
     });
   }
 
   onSortChange(sort: Sort): void {
-    if (!sort.direction) {
-      this.sortBy = null;
-      this.ascending = null;
-    } else {
-      this.sortBy = sort.active;
-      this.ascending = sort.direction === 'asc';
-    }
-
     this.paginator?.firstPage();
+
     this.filter.next({
       page: 1,
-      pageSize: this.pageSize,
+      pageSize: this.filter.value.pageSize,
       search: this.searchControl.value,
-      sortBy: this.sortBy ?? undefined,
-      ascending: this.ascending ?? undefined,
+      sortBy: sort.direction ? sort.active : undefined,
+      ascending: sort.direction === '' ? undefined : sort.direction === 'asc',
     });
   }
 
   rowIndex(index: number): number {
-    return this.currentPage() * this.pageSize + index + 1;
+    return (this.filter.value.page - 1) * this.filter.value.pageSize + index + 1;
   }
 
   clearSearch(): void {
@@ -219,7 +200,6 @@ export class ProductManagement implements OnInit, OnDestroy {
           mode: 'add',
         },
 
-        panelClass: 'product-dialog-panel',
         disableClose: true,
       })
 
@@ -230,6 +210,7 @@ export class ProductManagement implements OnInit, OnDestroy {
           return;
         }
         this.toastr.success('Product added successfully.');
+
         this.reload();
       });
   }
@@ -241,17 +222,17 @@ export class ProductManagement implements OnInit, OnDestroy {
           mode: 'edit',
           product,
         },
-        panelClass: 'product-dialog-panel',
         disableClose: true,
       })
 
       .afterClosed()
-
       .subscribe((result) => {
         if (!result?.saved) {
           return;
         }
+
         this.toastr.success('Product updated successfully.');
+
         this.reload();
       });
   }
@@ -281,10 +262,11 @@ export class ProductManagement implements OnInit, OnDestroy {
         this.productService.deleteProduct(product.id).subscribe({
           next: () => {
             this.toastr.warning('Product deleted.');
-            const isLastItemOnPage = this.dataSource().length === 1 && this.currentPage() > 0;
+
+            const isLastItemOnPage = this.dataSource().length === 1 && this.filter.value.page > 1;
+
             if (isLastItemOnPage) {
-              this.currentPage.update((v) => v - 1);
-              this.paginator?.previousPage();
+              this.paginator.previousPage();
             } else {
               this.reload();
             }
@@ -299,11 +281,11 @@ export class ProductManagement implements OnInit, OnDestroy {
 
   private reload(): void {
     this.filter.next({
-      page: this.currentPage() + 1,
-      pageSize: this.pageSize,
+      page: this.filter.value.page,
+      pageSize: this.filter.value.pageSize,
       search: this.searchControl.value,
-      sortBy: this.sortBy,
-      ascending: this.ascending,
+      sortBy: this.filter.value.sortBy,
+      ascending: this.filter.value.ascending,
     });
   }
 }

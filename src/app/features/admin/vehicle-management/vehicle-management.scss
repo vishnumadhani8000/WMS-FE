@@ -375,24 +375,3 @@ $bp-md: 768px;
     font-weight: 500;
   }
 }
-
-// ── Dialog ─────────────────────────────────────────────────
-:host-context(.vehicle-dialog-panel) {
-  .mat-mdc-dialog-container {
-    overflow: hidden;
-    border-radius: 18px;
-  }
-}
-
-::ng-deep .mat-column-capacityKg .mat-sort-header-container,
-::ng-deep .mat-column-isAvailable .mat-sort-header-container {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 4px !important;
-}
-
-::ng-deep .mat-column-capacityKg .mat-sort-header-content,
-::ng-deep .mat-column-isAvailable .mat-sort-header-content {
-  text-align: center !important;
-}

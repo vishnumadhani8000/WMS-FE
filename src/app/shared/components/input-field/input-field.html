@@ -26,7 +26,7 @@
     [attr.max]="config.max"
     [attr.step]="config.step"
     [attr.pattern]="config.pattern"
-    autocomplete="new-password"
+    (input)="handleInput($event)"
     (focus)="config.control?.markAsTouched()"
   />
 

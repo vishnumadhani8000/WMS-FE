@@ -2,100 +2,66 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Product, ProductFilter, ProductFormValue } from '../models/product.model';
+import { State, StateFilter, StateFormValue } from '../models/state-city.model';
 import { environment } from '../../../../../environments/environment';
 import { PaginatedResponse } from '../../../../core/models/paginated-response.model';
 import { ApiResponse } from '../../../../core/models/api-responce.model';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ProductService {
-  private readonly base = `${environment.baseUrl}/products`;
+@Injectable({ providedIn: 'root' })
+export class StateService {
+  private readonly base = `${environment.baseUrl}/state`;
 
   constructor(private http: HttpClient) {}
 
-  getProducts(filter: ProductFilter): Observable<PaginatedResponse<Product>> {
+  getStates(filter: StateFilter): Observable<PaginatedResponse<State>> {
     let params = new HttpParams()
-
       .set('pageNumber', filter.page.toString())
       .set('pageSize', filter.pageSize.toString());
 
     if (filter.search?.trim()) {
       params = params.set('search', filter.search.trim());
     }
-
     if (filter.sortBy) {
       params = params.set('sortBy', filter.sortBy);
     }
-
     if (filter.ascending !== null && filter.ascending !== undefined) {
       params = params.set('ascending', filter.ascending.toString());
     }
-
     return this.http
-      .get<ApiResponse<PaginatedResponse<Product>>>(this.base, { params })
-
+      .get<ApiResponse<PaginatedResponse<State>>>(this.base, { params })
       .pipe(
         map((res) => {
-          if (!res.data) {
-            throw new Error('Failed to load products');
-          }
-
+          if (!res.data) throw new Error('Failed to load states');
           return res.data;
         })
       );
   }
 
-  createProduct(form: ProductFormValue): Observable<Product> {
+  createState(form: StateFormValue): Observable<State> {
     return this.http
-      .post<ApiResponse<Product>>(this.base, form)
-
+      .post<ApiResponse<State>>(this.base, form)
       .pipe(
         map((res) => {
-          if (!res.data) {
-            throw new Error('Failed to create product');
-          }
-
+          if (!res.data) throw new Error('Failed to create state');
           return res.data;
         })
       );
   }
 
-  updateProduct(id: number, form: ProductFormValue): Observable<Product> {
+  updateState(id: number, form: StateFormValue): Observable<State> {
     return this.http
-      .put<ApiResponse<Product>>(`${this.base}/${id}`, form)
-
+      .put<ApiResponse<State>>(`${this.base}/${id}`, form)
       .pipe(
         map((res) => {
-          if (!res.data) {
-            throw new Error('Failed to update product');
-          }
-
+          if (!res.data) throw new Error('Failed to update state');
           return res.data;
         })
       );
   }
 
-  deleteProduct(id: number): Observable<void> {
+  deleteState(id: number): Observable<void> {
     return this.http
       .delete<ApiResponse<void>>(`${this.base}/${id}`)
-
       .pipe(map((): void => undefined));
-  }
-
-  getProductById(id: number): Observable<Product> {
-    return this.http
-      .get<ApiResponse<Product>>(`${this.base}/${id}`)
-
-      .pipe(
-        map((res) => {
-          if (!res.data) {
-            throw new Error('Product not found');
-          }
-
-          return res.data;
-        })
-      );
   }
 }

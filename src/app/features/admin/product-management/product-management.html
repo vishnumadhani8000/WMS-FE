@@ -161,9 +161,9 @@
       #paginator
       class="pm-paginator"
       [length]="totalCount()"
-      [pageSize]="pageSize"
+      [pageSize]="this.filter.value.pageSize"
       [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="currentPage()"
+      [pageIndex]="this.filter.value.page - 1"
       showFirstLastButtons
       (page)="onPageChange($event)"
     >

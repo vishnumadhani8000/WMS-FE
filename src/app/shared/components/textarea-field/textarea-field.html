@@ -1,7 +1,7 @@
 <mat-form-field
   class="full-width"
   [appearance]="config.appearance || 'outline'"
-  [subscriptSizing]="config.subscriptSizing || 'dynamic'"
+  [subscriptSizing]="config.subscriptSizing || 'fixed'"
 >
   <mat-label>
     {{ config.label }}
@@ -24,8 +24,8 @@
     [placeholder]="config.placeholder || ''"
     [readonly]="config.readonly"
     [attr.maxlength]="config.maxlength"
-    (input)="handleInput()"
-    (blur)="trimAndTouch()"
+    (input)="handleInput($event)"
+    (focus)="config.control?.markAsTouched()"
   >
   </textarea>
 

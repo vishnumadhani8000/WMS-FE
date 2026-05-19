@@ -3,6 +3,7 @@ import { FormControl } from "@angular/forms";
 
 export interface InputFieldConfig {
     reruired?: boolean;
+    
     label: string;
 
     control?: FormControl;
@@ -35,7 +36,7 @@ export interface InputFieldConfig {
   
     readonly?: boolean;
   
-    trimStart?: boolean;
+    trimStart?: boolean;   
   
     subscriptSizing?: 'fixed' | 'dynamic';
   
