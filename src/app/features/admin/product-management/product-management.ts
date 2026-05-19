@@ -200,7 +200,6 @@ export class ProductManagement implements OnInit {
           mode: 'add',
         },
 
-        panelClass: 'product-dialog-panel',
         disableClose: true,
       })
 
@@ -210,7 +209,6 @@ export class ProductManagement implements OnInit {
         if (!result?.saved) {
           return;
         }
-
         this.toastr.success('Product added successfully.');
 
         this.reload();
@@ -224,13 +222,10 @@ export class ProductManagement implements OnInit {
           mode: 'edit',
           product,
         },
-
-        panelClass: 'product-dialog-panel',
         disableClose: true,
       })
 
       .afterClosed()
-
       .subscribe((result) => {
         if (!result?.saved) {
           return;

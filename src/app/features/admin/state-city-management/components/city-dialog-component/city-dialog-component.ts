@@ -1,11 +1,8 @@
 import { Component, DestroyRef, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatIcon } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
@@ -27,7 +24,6 @@ interface CityForm {
     ReactiveFormsModule,
     MatDialogModule,
     MatDividerModule,
-    MatIcon,
     InputField,
     Button,
   ],
@@ -45,6 +41,7 @@ export class CityDialogComponent implements OnInit{
   nameConfig: InputFieldConfig;
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
+  closeButtonConfig: ButtonConfig;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: CityDialogData) {}
 
@@ -88,6 +85,13 @@ export class CityDialogComponent implements OnInit{
       disabled: this.saving,
       clicked: () => this.submit(),
     };
+
+    this.closeButtonConfig = {
+      prefixIcon: 'close',
+      variant: 'stroked',
+      clicked : () => this.cancel(),
+
+    }
   }
 
 

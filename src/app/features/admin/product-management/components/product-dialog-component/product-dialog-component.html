@@ -6,59 +6,34 @@
       </h2>
 
       <p class="dialog-subtitle">
-        @if (isEdit) { Update product details and save changes. }
-        @else { Fill in the details to create a new product. }
+        @if (isEdit) { Update product details and save changes. } @else { Fill in the details to
+        create a new product. }
       </p>
     </div>
 
-    <button
-      class="close-btn"
-      mat-icon-button
-      type="button"
-      (click)="cancel()"
-      aria-label="Close dialog"
-    >
-      <mat-icon> close </mat-icon>
-    </button>
+    <app-common-button [config]="closeButtonConfig" />
   </div>
 
   <mat-divider></mat-divider>
 
   <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
+    <app-common-input [config]="productNameConfig" />
 
-    <app-common-input
-      [config]="productNameConfig"
-
-    />
-  
     <div class="two-col">
-      <app-common-input
-        [config]="weightConfig"
+      <app-common-input [config]="weightConfig" />
 
-      />
-  
-      <app-common-input
-        [config]="stockConfig"
-  
-      />
+      <app-common-input [config]="stockConfig" />
     </div>
-  
-    <app-common-textarea
-    [config]="descriptionConfig">
-  </app-common-textarea>
+
+    <app-common-textarea [config]="descriptionConfig"> </app-common-textarea>
   </form>
   <mat-divider></mat-divider>
 
   <div class="dialog-footer">
     <!-- Cancel -->
-    <app-common-button 
-    [config]="cancelButtonConfig"/>
-
+    <app-common-button [config]="cancelButtonConfig" />
 
     <!-- Submit -->
-    <app-common-button
-      [config]="submitButtonConfig"
-    />
-   
+    <app-common-button [config]="submitButtonConfig" />
   </div>
 </div>

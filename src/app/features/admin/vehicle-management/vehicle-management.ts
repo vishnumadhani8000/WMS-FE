@@ -123,9 +123,12 @@ export class VehicleManagement implements OnInit {
 
   private initializeSearch(): void {
     this.searchControl.valueChanges
-      .pipe(debounceTime(this.DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyref))
+      .pipe(
+        debounceTime(this.DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyref)
+      )
       .subscribe((search) => {
-
         this.paginator?.firstPage();
 
         this.filter.next({
@@ -199,7 +202,6 @@ export class VehicleManagement implements OnInit {
         data: {
           mode: 'add',
         },
-        panelClass: 'vehicle-dialog-panel',
         disableClose: true,
       })
 
@@ -220,8 +222,6 @@ export class VehicleManagement implements OnInit {
           mode: 'edit',
           vehicle,
         },
-
-        panelClass: 'vehicle-dialog-panel',
         disableClose: true,
       })
 
@@ -260,9 +260,7 @@ export class VehicleManagement implements OnInit {
           next: () => {
             this.toastr.warning('Vehicle deleted.');
 
-            const isLastItemOnPage =
-              this.dataSource().length === 1 &&
-              this.filter.value.page > 1;
+            const isLastItemOnPage = this.dataSource().length === 1 && this.filter.value.page > 1;
 
             if (isLastItemOnPage) {
               this.paginator.previousPage();

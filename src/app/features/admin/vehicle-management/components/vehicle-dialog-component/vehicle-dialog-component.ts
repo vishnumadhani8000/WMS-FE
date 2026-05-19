@@ -15,7 +15,6 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { VehicleService } from '../../services/vehicle.service';
 import { VehicleDialogData } from '../../models/vehicle.model';
@@ -67,7 +66,6 @@ interface VehicleForm {
     ReactiveFormsModule,
     MatDialogModule,
     MatDividerModule,
-    MatIcon,
     MatSlideToggleModule,
     InputField,
     Button,
@@ -90,6 +88,7 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
   capacityConfig: InputFieldConfig;
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
+  closeButtonConfig: ButtonConfig;
 
   constructor(
     @Inject(MAT_DIALOG_DATA)
@@ -182,6 +181,14 @@ export class VehicleDialogComponent implements OnInit, OnDestroy {
         this.submit();
       },
     };
+    this.closeButtonConfig = {
+      prefixIcon: 'close',
+      variant: 'stroked',
+
+      clicked: () => {
+        this.cancel();
+      },
+    }
   }
 
   ngOnDestroy(): void {

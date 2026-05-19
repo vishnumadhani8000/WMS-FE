@@ -298,6 +298,7 @@ export class StateCityManagement implements OnInit {
         data: {
           mode: 'add',
         },
+        disableClose: true,
       })
 
       .afterClosed()
@@ -320,7 +321,10 @@ export class StateCityManagement implements OnInit {
           mode: 'edit',
           state,
         },
+
+        disableClose: true,
       })
+      
 
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -349,6 +353,7 @@ export class StateCityManagement implements OnInit {
           stateId: state.id,
           stateName: state.name,
         },
+        disableClose : true
       })
 
       .afterClosed()
@@ -379,6 +384,7 @@ export class StateCityManagement implements OnInit {
           stateName: state.name,
           city,
         },
+        disableClose: true,
       })
 
       .afterClosed()

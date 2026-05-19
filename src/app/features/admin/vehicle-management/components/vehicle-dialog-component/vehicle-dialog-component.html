@@ -10,16 +10,9 @@
           @else { Fill in the details to register a new vehicle. }
         </p>
       </div>
-  
-      <button
-        class="close-btn"
-        mat-icon-button
-        type="button"
-        (click)="cancel()"
-        aria-label="Close dialog"
-      >
-        <mat-icon> close </mat-icon>
-      </button>
+
+      <app-common-button
+        [config]="closeButtonConfig"/>
     </div>
   
     <mat-divider></mat-divider>
