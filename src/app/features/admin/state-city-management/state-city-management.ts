@@ -80,14 +80,14 @@ export class StateCityManagement implements OnInit {
   citySortBy: string | null = 'createdAt';
   citySortAsc: boolean | null = false;
 
-  stateSearchControl = new FormControl<string>('', {nonNullable: true });
-  citySearchControl = new FormControl<string>('', {nonNullable: true});
+  stateSearchControl = new FormControl<string>('', { nonNullable: true });
+  citySearchControl = new FormControl<string>('', { nonNullable: true });
 
   stateSearchConfig: InputFieldConfig;
   citySearchConfig: InputFieldConfig;
 
   addStateButtonConfig: ButtonConfig;
-  addCityButtonConfig : ButtonConfig;
+  addCityButtonConfig: ButtonConfig;
   ngOnInit(): void {
     this.initializeConfigs();
     this.initializeSearch();
@@ -323,9 +323,7 @@ export class StateCityManagement implements OnInit {
       })
 
       .afterClosed()
-
       .pipe(takeUntilDestroyed(this.destroyRef))
-
       .subscribe((res) => {
         if (!res?.saved) {
           return;
