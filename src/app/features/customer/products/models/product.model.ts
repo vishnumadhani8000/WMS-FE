@@ -6,3 +6,10 @@ export interface Product {
     weightKg: number;
     stock: number;
   }
+    
+  export interface AddToCartDto {
+  
+    productId: number;
+    quantity: number;
+  }
+  

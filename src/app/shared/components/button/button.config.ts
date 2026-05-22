@@ -1,4 +1,4 @@
-export type ButtonVariant = 'raised' | 'flat' | 'stroked';
+export type ButtonVariant = 'raised' | 'flat' | 'stroked'| 'icon'; 
 
 export type ButtonColor =
   | 'primary'

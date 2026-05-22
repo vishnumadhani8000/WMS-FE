@@ -81,8 +81,8 @@ export class StateCityManagement implements OnInit {
   citySortBy: string | null = 'createdAt';
   citySortAsc: boolean | null = false;
 
-  stateSearchControl = new FormControl<string>('', { nonNullable: true });
-  citySearchControl = new FormControl<string>('', { nonNullable: true });
+  stateSearchControl = new FormControl<string>('');
+  citySearchControl = new FormControl<string>('');
 
   stateSearchConfig: InputFieldConfig;
   citySearchConfig: InputFieldConfig;
@@ -325,7 +325,6 @@ export class StateCityManagement implements OnInit {
 
         disableClose: true,
       })
-      
 
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -354,7 +353,7 @@ export class StateCityManagement implements OnInit {
           stateId: state.id,
           stateName: state.name,
         },
-        disableClose : true
+        disableClose: true,
       })
 
       .afterClosed()
@@ -401,78 +400,78 @@ export class StateCityManagement implements OnInit {
 
   deleteState(state: State): void {
     this.dialog
-       .open(ConfirmDialog, {
-          width: '420px',
-          disableClose: true,
-          data: {
-            title: 'Delete State',
-            message: `Are you sure you want to delete "${state.name}"? This will also delete all associated cities.`,
-            confirmText: 'Delete',
-            cancelText: 'Cancel',
-            type: 'warning',
-          },
-        })
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Delete State',
+          message: `Are you sure you want to delete "${state.name}"? This will also delete all associated cities.`,
+          confirmText: 'Delete',
+          cancelText: 'Cancel',
+          type: 'warning',
+        },
+      })
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) {
           return;
         }
 
-    this.stateService
-      .deleteState(state.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('State deleted.');
+        this.stateService
+          .deleteState(state.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.toastr.success('State deleted.');
 
-          if (this.selectedState()?.id === state.id) {
-            this.selectedState.set(null);
-            this.cities.set([]); 
-          }
+              if (this.selectedState()?.id === state.id) {
+                this.selectedState.set(null);
+                this.cities.set([]);
+              }
 
-          this.loadStates();
-        },
+              this.loadStates();
+            },
 
-        error: () => {
-          this.toastr.error('Failed to delete state.');
-        },
+            error: () => {
+              this.toastr.error('Failed to delete state.');
+            },
+          });
       });
-    });
   }
 
   deleteCity(city: City): void {
     this.dialog
-    .open(ConfirmDialog, {
-      width: '420px',
-      disableClose: true,
-      data: {
-        title: 'Delete City',
-        message: `Are you sure you want to delete "${city.name}"?`,
-        confirmText: 'Delete',
-        cancelText: 'Cancel',
-        type: 'warning',
-      },
-    })
-    .afterClosed()
-    .subscribe((confirmed) => {
-       if (!confirmed) {
-         return;
-       }
-
-    this.cityService
-      .deleteCity(city.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('City deleted.');
-          this.loadCities();
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Delete City',
+          message: `Are you sure you want to delete "${city.name}"?`,
+          confirmText: 'Delete',
+          cancelText: 'Cancel',
+          type: 'warning',
         },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
-        error: () => {
-          this.toastr.error('Failed to delete city.');
-        },
+        this.cityService
+          .deleteCity(city.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.toastr.success('City deleted.');
+              this.loadCities();
+            },
+
+            error: () => {
+              this.toastr.error('Failed to delete city.');
+            },
+          });
       });
-    });
   }
 
   clearStateSearch(): void {

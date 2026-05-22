@@ -115,7 +115,7 @@ $bp-md: 768px;
 // ── Table ──────────────────────────────────────────────────
 .pm-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 1000px;
   table-layout: fixed;
 
   // ── Column Widths ────────────────────────────────────────
@@ -132,6 +132,9 @@ $bp-md: 768px;
   }
 
   .mat-column-stock {
+    width: 8%;
+  }
+  .mat-column-price{
     width: 8%;
   }
 
@@ -192,6 +195,7 @@ $bp-md: 768px;
   // ── Center Sortable Headers ──────────────────────────────
   ::ng-deep {
     .mat-column-weightKg,
+    .mat-column-price,
     .mat-column-stock{
       
       th.mat-mdc-header-cell,

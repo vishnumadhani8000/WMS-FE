@@ -14,8 +14,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { ToastrService } from 'ngx-toastr';
-import { ProductService } from './services/product.service';
-import { Product, ProductFilter } from './models/product.model';
+import { ProductManagementService } from './services/product-management.service';
+import { Product, ProductFilter } from './models/product-management.model';
 import { ProductDialogComponent } from './components/product-dialog-component/product-dialog-component';
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { Button } from '../../../shared/components/button/button';
@@ -48,16 +48,16 @@ import { ButtonConfig } from '../../../shared/components/button/button.config';
   ],
 })
 export class ProductManagement implements OnInit {
-  private readonly productService = inject(ProductService);
+  private readonly productManagementService = inject(ProductManagementService);
   private readonly dialog = inject(MatDialog);
   private readonly toastr = inject(ToastrService);
   private readonly destroyref = inject(DestroyRef);
 
   @ViewChild(MatPaginator)
-  paginator!: MatPaginator;
+  paginator: MatPaginator;
 
   readonly DEBOUNCE_MS = 500;
-  readonly displayedColumns = ['index', 'name', 'weightKg', 'stock', 'description', 'actions'];
+  readonly displayedColumns = ['index', 'name', 'weightKg', 'stock','price', 'description', 'actions'];
   readonly pageSizeOptions = [5, 10, 25];
 
   dataSource = signal<Product[]>([]);
@@ -140,7 +140,7 @@ export class ProductManagement implements OnInit {
         switchMap((filter) => {
           this.loading.set(true);
 
-          return this.productService.getProducts(filter);
+          return this.productManagementService.getProducts(filter);
         }),
 
         takeUntilDestroyed(this.destroyref)
@@ -255,7 +255,7 @@ export class ProductManagement implements OnInit {
           return;
         }
 
-        this.productService.deleteProduct(product.id).subscribe({
+        this.productManagementService.deleteProduct(product.id).subscribe({
           next: () => {
             this.toastr.warning('Product deleted.');
 

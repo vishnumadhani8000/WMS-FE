@@ -74,7 +74,7 @@ export class VehicleManagement implements OnInit {
   totalCount = signal(0);
   loading = signal(false);
 
-  searchControl = new FormControl<string>('', { nonNullable: true });
+  searchControl = new FormControl<string>('');
 
   searchInputConfig: InputFieldConfig;
   addVehicleButtonConfig: ButtonConfig;

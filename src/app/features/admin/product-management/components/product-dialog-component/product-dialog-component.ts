@@ -5,8 +5,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { ProductService } from '../../services/product.service';
-import { ProductDialogData } from '../../models/product.model';
+import { ProductManagementService } from '../../services/product-management.service';
+import { ProductDialogData } from '../../models/product-management.model';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
@@ -18,6 +18,7 @@ import { TextareaFieldConfig } from '../../../../../shared/components/textarea-f
 interface ProductForm {
   name: FormControl<string>;
   weightKg: FormControl<number | null>;
+  price:FormControl<number|null>;
   stock: FormControl<number | null>;
   description: FormControl<string>;
 }
@@ -40,7 +41,7 @@ interface ProductForm {
   styleUrl: './product-dialog-component.scss',
 })
 export class ProductDialogComponent implements OnInit, OnDestroy {
-  private productService = inject(ProductService);
+  private productManagementService = inject(ProductManagementService);
   private dialogRef = inject(MatDialogRef<ProductDialogComponent>);
   private toastr = inject(ToastrService);
   private destroy = new Subject<void>();
@@ -53,6 +54,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
+  productPriceConfig:InputFieldConfig;
 
   constructor(
     @Inject(MAT_DIALOG_DATA)
@@ -87,6 +89,10 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       description: new FormControl(p?.description ?? '', {
         nonNullable: true,
         validators: [Validators.maxLength(500)],
+      }),
+
+      price: new FormControl(p?.price ?? null,{
+        validators:[Validators.required,Validators.min(1),Validators.max(10000000)]
       }),
     });
 
@@ -130,6 +136,15 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       trimStart: true,
       control: this.form.controls.description,
     };
+    this.productPriceConfig = {
+      label:'Price',
+      type :'number',
+      placeholder:'e.g.1000',
+      min:1,
+      max:10000000,
+      step:1,
+      control:this.form.controls.price,
+    }
 
     this.cancelButtonConfig = {
       label: 'Cancel',
@@ -140,6 +155,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
         this.cancel();
       },
     };
+  
 
     this.submitButtonConfig = {
       label: this.isEdit ? 'Save Changes' : 'Add Product',
@@ -178,10 +194,16 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
 
     const value = this.form.getRawValue();
 
+    const payload = this.isEdit
+      ? {
+          id: this.data.product.id,
+          ...value,
+        }
+      : value;
+    
     const request = this.isEdit
-      ? this.productService.updateProduct(this.data.product.id, value)
-      : this.productService.createProduct(value);
-
+      ? this.productManagementService.updateProduct(this.data.product.id, payload)
+      : this.productManagementService.createProduct(payload);
     request.pipe(takeUntil(this.destroy)).subscribe({
       next: (product) => {
         this.saving = false;

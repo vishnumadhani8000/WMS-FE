@@ -5,6 +5,7 @@ export interface Product {
   name: string;
   weightKg: number;
   stock: number;
+  price:number;
   description?: string;
 }
 

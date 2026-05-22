@@ -1,27 +1,36 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressBar } from '@angular/material/progress-bar';
+
 import { ToastrService } from 'ngx-toastr';
+
 import { Button } from '../../../shared/components/button/button';
+import { InputField } from '../../../shared/components/input-field/input-field';
+
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
-import { ProductService } from './services/product.service';
-import { Product } from './models/product.model';
-import { MatProgressBar } from "@angular/material/progress-bar";
-import { InputField } from "../../../shared/components/input-field/input-field";
-import { TruncatePipe } from "../../../shared/pipes/truncate-pipe";
 
+import { ProductService } from './services/product.service';
+
+import { Product, AddToCartDto } from './models/product.model';
+
+import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 
 @Component({
   selector: 'app-product',
   standalone: true,
-
   templateUrl: './products.html',
   styleUrl: './products.scss',
 
@@ -32,36 +41,40 @@ import { TruncatePipe } from "../../../shared/pipes/truncate-pipe";
     MatPaginatorModule,
     MatIconModule,
     MatTooltipModule,
-    Button,
     MatProgressBar,
+    Button,
     InputField,
-    TruncatePipe
-],
+    TruncatePipe,
+  ],
 })
 export class Products implements OnInit {
-  private readonly productService = inject(ProductService);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
+
+  constructor(
+    private readonly productService : ProductService,
+    private readonly toastr : ToastrService,
+    private readonly destroyRef : DestroyRef
+  ){}
+
   readonly DEBOUNCE_MS = 400;
-  readonly displayedColumns = ['index', 'name', 'description', 'weight', 'actions'];
+  readonly displayedColumns = ['index', 'name', 'description', 'price', 'actions'];
   readonly pageSizeOptions = [5, 10, 25];
-  products = signal<Product[]>([]);
-  totalCount = signal(0);
-  loading = signal(false);
-  page = signal(0);
+  readonly products = signal<Product[]>([]);
+  readonly totalCount = signal(0);
+  readonly loading = signal(false);
+
+  readonly page = signal(0);
+
   pageSize = 10;
 
   searchControl = new FormControl<string>('', {
     nonNullable: true,
   });
 
-  searchConfig: InputFieldConfig;
+  searchConfig!: InputFieldConfig;
 
   ngOnInit(): void {
     this.initializeConfigs();
-
     this.initializeSearch();
-
     this.loadProducts();
   }
 
@@ -87,10 +100,8 @@ export class Products implements OnInit {
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
-
       .subscribe(() => {
         this.page.set(0);
-
         this.loadProducts();
       });
   }
@@ -105,23 +116,25 @@ export class Products implements OnInit {
         search: this.searchControl.value,
       })
 
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
 
       .subscribe({
         next: (response) => {
           if (!response.isSuccess || !response.data) {
-            this.loading.set(false);
             this.toastr.error('Failed to load products.');
             return;
           }
 
           this.products.set(response.data.items);
           this.totalCount.set(response.data.totalCount);
-          this.loading.set(false);
         },
 
         error: () => {
-          this.loading.set(false);
           this.toastr.error('Failed to load products.');
         },
       });
@@ -130,6 +143,7 @@ export class Products implements OnInit {
   onPageChange(event: PageEvent): void {
     this.page.set(event.pageIndex);
     this.pageSize = event.pageSize;
+
     this.loadProducts();
   }
 
@@ -143,15 +157,31 @@ export class Products implements OnInit {
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'shopping_cart',
+
       clicked: () => {
         this.addToCart(product);
       },
     };
   }
 
-  addToCart(product: Product): void {
-    console.log(product);
-    this.toastr.success(`${product.name} added to cart.`);
+  private addToCart(product: Product): void {
+    const dto: AddToCartDto = { 
+      productId: product.id,
+      quantity: 1,
+    };
+
+    this.productService
+      .addToCart(dto)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Product added to cart.');
+        },
+
+        error: (err) => {
+          this.toastr.error(err?.error?.message||'Something went wrong.');
+        },
+      });
   }
 
   clearSearch(): void {
