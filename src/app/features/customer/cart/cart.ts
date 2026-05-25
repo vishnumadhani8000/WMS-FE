@@ -16,6 +16,8 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { CartItem } from './models/cart.model';
 import { CartService } from './Services/cart.service';
 import { Button } from '../../../shared/components/button/button';
+import { AddAddressDialogComponent } from '../address/components/add-address-dialog-component/add-address-dialog-component';
+import { Address } from '../address/address';
 
 @Component({
   selector: 'app-cart',
@@ -32,8 +34,7 @@ import { Button } from '../../../shared/components/button/button';
     MatTooltipModule,
     MatProgressBarModule,
     MatRippleModule,
-    Button
- 
+    Button,
   ],
 })
 export class Cart implements OnInit {
@@ -44,35 +45,23 @@ export class Cart implements OnInit {
     private readonly destroyRef: DestroyRef
   ) {}
 
-  readonly displayedColumns = [
-    'index',
-    'name',
-    'description',
-    'weight',
-    'quantity',
-    'actions',
-  ];
+  readonly displayedColumns = ['index', 'name', 'description', 'weight', 'quantity', 'actions'];
 
   cartItems = signal<CartItem[]>([]);
   totalWeightKg = signal(0);
   loading = signal(false);
+  quantityloading = signal(false);
   placingOrder = signal(false);
 
-  totalItems = computed(() =>
-    this.cartItems().reduce((sum, i) => sum + i.quantity, 0)
-  );
+  totalItems = computed(() => this.cartItems().reduce((sum, i) => sum + i.quantity, 0));
   totalAmount = computed(() =>
-    this.cartItems().reduce(
-      (sum, item) => sum + (item.price * item.quantity),
-      0
-    )
+    this.cartItems().reduce((sum, item) => sum + item.price * item.quantity, 0)
   );
 
   placeOrderButtonConfig: ButtonConfig;
   deleteButtonConfig: (item: CartItem) => ButtonConfig;
-   incrementButtonConfig: (item: CartItem) => ButtonConfig;
+  incrementButtonConfig: (item: CartItem) => ButtonConfig;
   decrementButtonConfig: (item: CartItem) => ButtonConfig;
-
 
   ngOnInit(): void {
     this.initializeConfigs();
@@ -80,7 +69,6 @@ export class Cart implements OnInit {
   }
 
   private initializeConfigs(): void {
-
     this.placeOrderButtonConfig = {
       label: 'Place Order',
       variant: 'flat',
@@ -88,28 +76,27 @@ export class Cart implements OnInit {
       prefixIcon: 'shopping_bag',
       clicked: () => this.placeOrder(),
     };
-  
+
     this.deleteButtonConfig = (item: CartItem): ButtonConfig => ({
       variant: 'icon',
       color: 'warn',
       prefixIcon: 'delete_outline',
       clicked: () => this.confirmDelete(item),
     });
-  
+
     this.incrementButtonConfig = (item: CartItem): ButtonConfig => ({
       variant: 'icon',
       color: 'primary',
       prefixIcon: 'add',
-      disabled:
-        this.loading() || item.quantity >= item.availableStock,
+      disabled: this.quantityloading() || item.quantity >= item.availableStock,
       clicked: () => this.increment(item),
     });
-  
+
     this.decrementButtonConfig = (item: CartItem): ButtonConfig => ({
       variant: 'icon',
       color: 'default',
       prefixIcon: 'remove',
-      disabled: this.loading(),
+      disabled: this.quantityloading(),
       clicked: () => this.decrement(item),
     });
   }
@@ -123,12 +110,12 @@ export class Cart implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          if (!res.isSuccess ) {
-            this.loading.set(false);
-            this.toastr.error('Failed to load cart.');
-            return;
-          }
-          if(res.isSuccess && !res.data){
+          // if (!res.isSuccess ) {
+          //   this.loading.set(false);
+          //   this.toastr.error('Failed to load cart.');
+          //   return;
+          // }
+          if (res.isSuccess && !res.data) {
             this.loading.set(false);
             return;
           }
@@ -153,31 +140,31 @@ export class Cart implements OnInit {
     }
     this.updateQuantity(item, item.quantity + 1);
   }
-  
 
   decrement(item: CartItem): void {
     if (item.quantity <= 1) {
       this.confirmDelete(item);
       return;
     }
-
+      
     this.updateQuantity(item, item.quantity - 1);
   }
 
   private updateQuantity(item: CartItem, quantity: number): void {
+    this.quantityloading.set(true);
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {  
-            this.loadCart(); 
+        next: () => {
+          this.loadCart();
+          this.quantityloading.set(false);
         },
         error: (err) => {
-          this.toastr.error(
-            err?.error?.message || 'Failed to update quantity.'
-          );
+          this.toastr.error(err?.error?.message || 'Failed to update quantity.');
           this.loadCart();
-        }
+          this.quantityloading.set(false);
+        },
       });
   }
 
@@ -198,6 +185,7 @@ export class Cart implements OnInit {
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) return;
+
         this.deleteItem(item);
       });
   }
@@ -209,12 +197,8 @@ export class Cart implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.isSuccess) {
-            this.cartItems.update((items) =>
-              items.filter((i) => i.cartItemId !== item.cartItemId)
-            );
+            this.cartItems.update((items) => items.filter((i) => i.cartItemId !== item.cartItemId));
             this.toastr.success('Item removed from cart.');
-          } else {
-            this.toastr.error(res.message);
           }
         },
         error: () => this.toastr.error('Failed to remove item.'),
@@ -223,49 +207,115 @@ export class Cart implements OnInit {
 
   // ── Place Order ───────────────
   placeOrder(): void {
-    if (this.cartItems().length === 0) {
-      this.toastr.warning('Your cart is empty.');
-      return;
-    }
-
-    this.placingOrder.set(true);
-    this.placeOrderButtonConfig = {
-      ...this.placeOrderButtonConfig,
-      label: 'Placing Order...',
-      disabled: true,
-    };
+    // if (this.cartItems().length === 0) {
+    //   this.toastr.warning('Your cart is empty.');
+    //   return;
+    // }
 
     this.cartService
-      .placeOrder()
+      .getUserAddresses()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.placingOrder.set(false);
-          this.placeOrderButtonConfig = {
-            ...this.placeOrderButtonConfig,
-            label: 'Place Order',
-            disabled: false,
-          };
+          const addresses = res.data ?? [];
+          if (addresses.length > 0) {
+            this.dialog
+              .open(Address, {
+                width: '800px',
+                maxWidth: '95vw',
+                disableClose: true,
+                data: {
+                  addresses,
+                },
+              })
+              .afterClosed()
+              .subscribe((result) => {
+                if (!result?.saved || !result.address) {
+                  return;
+                }
 
-          if (res.isSuccess) {
-            this.cartItems.set([]);
-            this.totalWeightKg.set(0);
-            this.toastr.success('Order placed successfully!');
-          } else {
-            this.toastr.error(res.message);
+                console.log('Selected Address:', result.address);
+
+                // this.confirmPlaceOrder(result.address);
+              });
+
+            return;
           }
+
+          // No addresses
+          this.dialog
+            .open(AddAddressDialogComponent, {
+              width: '700px',
+              maxWidth: '95vw',
+              disableClose: true,
+              data: {
+                existingCount: 0,
+              },
+            })
+            .afterClosed()
+            .subscribe((result) => {
+              if (!result?.saved || !result.address) {
+                return;
+              }
+
+              console.log('New Address:', result.address);
+
+              // this.confirmPlaceOrder(result.address);
+            });
         },
 
         error: () => {
-          this.placingOrder.set(false);
-          this.placeOrderButtonConfig = {
-            ...this.placeOrderButtonConfig,
-            label: 'Place Order',
-            disabled: false,
-          };
-          this.toastr.error('Failed to place order.');
+          this.toastr.error('Failed to load addresses.');
         },
       });
   }
+  // private confirmPlaceOrder(address: any): void {
 
+  //   this.placingOrder.set(true);
+
+  //   this.placeOrderButtonConfig = {
+  //     ...this.placeOrderButtonConfig,
+  //     label: 'Placing Order...',
+  //     disabled: true,
+  //   };
+
+  //   this.cartService
+  //     .placeOrder(address)
+  //     .pipe(takeUntilDestroyed(this.destroyRef))
+  //     .subscribe({
+  //       next: (res) => {
+
+  //         this.placingOrder.set(false);
+
+  //         this.placeOrderButtonConfig = {
+  //           ...this.placeOrderButtonConfig,
+  //           label: 'Place Order',
+  //           disabled: false,
+  //         };
+
+  //         if (res.isSuccess) {
+
+  //           this.cartItems.set([]);
+  //           this.totalWeightKg.set(0);
+
+  //           this.toastr.success('Order placed successfully!');
+  //         } else {
+  //           this.toastr.error(res.message);
+  //         }
+  //       },
+
+  //       error: () => {
+
+  //         this.placingOrder.set(false);
+
+  //         this.placeOrderButtonConfig = {
+  //           ...this.placeOrderButtonConfig,
+  //           label: 'Place Order',
+  //           disabled: false,
+  //         };
+
+  //         this.toastr.error('Failed to place order.');
+  //       },
+  //     });
+  // }
 }

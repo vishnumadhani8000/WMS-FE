@@ -119,7 +119,26 @@ $bp-md: 768px;
     color: $text-main;
     font-size: 16px;
   }
-
+  ::ng-deep {
+    .mat-column-price{
+      
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        text-align: center !important;
+      }
+  
+      .mat-sort-header-container {
+        width: 100%;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+  
+      .mat-sort-header-content {
+        text-align: center !important;
+      }
+    }
+  }
   .mat-column-index,
   .mat-column-price,
   .mat-column-actions {

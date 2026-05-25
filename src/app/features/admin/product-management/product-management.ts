@@ -97,7 +97,6 @@ export class ProductManagement implements OnInit {
       },
     };
 
-    // Add Button Config
     this.addProductButtonConfig = {
       label: 'Add Product',
       variant: 'flat',
@@ -139,7 +138,6 @@ export class ProductManagement implements OnInit {
       .pipe(
         switchMap((filter) => {
           this.loading.set(true);
-
           return this.productManagementService.getProducts(filter);
         }),
 

@@ -11,7 +11,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBar } from '@angular/material/progress-bar';
 
 import { ToastrService } from 'ngx-toastr';
@@ -27,6 +26,8 @@ import { ProductService } from './services/product.service';
 import { Product, AddToCartDto } from './models/product.model';
 
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
+import { MatSort, Sort, MatSortHeader } from "@angular/material/sort";
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-product',
@@ -45,7 +46,9 @@ import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
     Button,
     InputField,
     TruncatePipe,
-  ],
+    MatSort,
+    MatSortHeader
+],
 })
 export class Products implements OnInit {
 
@@ -58,19 +61,20 @@ export class Products implements OnInit {
   readonly DEBOUNCE_MS = 400;
   readonly displayedColumns = ['index', 'name', 'description', 'price', 'actions'];
   readonly pageSizeOptions = [5, 10, 25];
-  readonly products = signal<Product[]>([]);
-  readonly totalCount = signal(0);
-  readonly loading = signal(false);
 
-  readonly page = signal(0);
-
+   products = signal<Product[]>([]);
+   totalCount = signal(0);
+   loading = signal(false);
+   page = signal(0);
+  sortBy = signal<string | null>(null);
+  ascending = signal<boolean | null>(null);
   pageSize = 10;
 
   searchControl = new FormControl<string>('', {
     nonNullable: true,
   });
 
-  searchConfig!: InputFieldConfig;
+  searchConfig: InputFieldConfig;
 
   ngOnInit(): void {
     this.initializeConfigs();
@@ -109,13 +113,13 @@ export class Products implements OnInit {
   loadProducts(): void {
     this.loading.set(true);
 
-    this.productService
-      .getAll({
-        page: this.page() + 1,
-        pageSize: this.pageSize,
-        search: this.searchControl.value,
-      })
-
+    this.productService.getAll({
+      page: this.page() + 1,
+      pageSize: this.pageSize,
+      search: this.searchControl.value,
+      sortBy: this.sortBy() ?? undefined,
+      ascending: this.ascending() ?? undefined,
+    })
       .pipe(
         finalize(() => {
           this.loading.set(false);
@@ -143,7 +147,6 @@ export class Products implements OnInit {
   onPageChange(event: PageEvent): void {
     this.page.set(event.pageIndex);
     this.pageSize = event.pageSize;
-
     this.loadProducts();
   }
 
@@ -183,7 +186,20 @@ export class Products implements OnInit {
         },
       });
   }
+  onSortChange(sort: Sort): void {
 
+    if (!sort.direction) {
+      this.sortBy.set(null);
+      this.ascending.set(null);
+    } else {
+      this.sortBy.set(sort.active);
+      this.ascending.set(sort.direction === 'asc');
+    }
+  
+    this.page.set(0);
+  
+    this.loadProducts();
+  }
   clearSearch(): void {
     this.searchControl.setValue('');
   }

@@ -19,14 +19,11 @@ export class CartService {
 
   private readonly http = inject(HttpClient);
 
-  private readonly baseUrl =
-    `${environment.baseUrl}/cart`;
+  private readonly baseUrl =`${environment.baseUrl}`;
 
   // GET CURRENT USER CART
   getCart(): Observable<ApiResponse<CartResponseDto>> {
-    return this.http.get<ApiResponse<CartResponseDto>>(
-      this.baseUrl
-    );
+    return this.http.get<ApiResponse<CartResponseDto>>(`${this.baseUrl}/cart`);
   }
 
   // ADD TO CART
@@ -34,7 +31,7 @@ export class CartService {
     dto: AddToCartDto
   ): Observable<ApiResponse<object>> {
     return this.http.post<ApiResponse<object>>(
-      `${this.baseUrl}/add`,
+      `${this.baseUrl}/cart/add`,
       dto
     );
   }
@@ -45,7 +42,7 @@ export class CartService {
     dto: UpdateCartItemQuantityDto
   ): Observable<ApiResponse<object>> {
     return this.http.put<ApiResponse<object>>(
-      `${this.baseUrl}/items/${cartItemId}/quantity`,
+      `${this.baseUrl}/cart/items/${cartItemId}/quantity`,
       dto
     );
   }
@@ -55,15 +52,20 @@ export class CartService {
     cartItemId: number
   ): Observable<ApiResponse<object>> {
     return this.http.delete<ApiResponse<object>>(
-      `${this.baseUrl}/items/${cartItemId}`
+      `${this.baseUrl}/cart/items/${cartItemId}`
     );
   }
 
   // PLACE ORDER
   placeOrder(): Observable<ApiResponse<object>> {
     return this.http.post<ApiResponse<object>>(
-      `${environment.baseUrl}/orders`,
+      `${environment.baseUrl}/cart/orders`,
       {}
+    );
+  }
+  getUserAddresses(): Observable<any> {
+    return this.http.get<any>(
+      `${this.baseUrl}/user-addresses`
     );
   }
 }

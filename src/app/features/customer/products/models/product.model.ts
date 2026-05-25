@@ -3,8 +3,7 @@ export interface Product {
     id: number;
     name: string;
     description: string;
-    weightKg: number;
-    stock: number;
+    price:number;
   }
     
   export interface AddToCartDto {
