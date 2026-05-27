@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -23,6 +23,7 @@ import { ButtonConfig } from '../../../shared/components/button/button.config';
 import { StateDialogComponent } from './components/state-dialog-component/state-dialog-component';
 import { CityDialogComponent } from './components/city-dialog-component/city-dialog-component';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-state-city-management',
@@ -53,8 +54,7 @@ export class StateCityManagement implements OnInit {
   private readonly toastr = inject(ToastrService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly DEBOUNCE_MS = 400;
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   readonly stateColumns = ['index', 'name', 'actions'];
   readonly cityColumns = ['index', 'name', 'actions'];
@@ -72,8 +72,8 @@ export class StateCityManagement implements OnInit {
   statePage = signal(0);
   cityPage = signal(0);
 
-  statePageSize = 10;
-  cityPageSize = 10;
+  statePageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  cityPageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   stateSortBy: string | null = 'createdAt';
   stateSortAsc: boolean | null = false;
@@ -148,7 +148,7 @@ export class StateCityManagement implements OnInit {
   private initializeSearch(): void {
     this.stateSearchControl.valueChanges
       .pipe(
-        debounceTime(this.DEBOUNCE_MS),
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -160,7 +160,7 @@ export class StateCityManagement implements OnInit {
 
     this.citySearchControl.valueChanges
       .pipe(
-        debounceTime(this.DEBOUNCE_MS),
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -173,7 +173,7 @@ export class StateCityManagement implements OnInit {
 
   loadStates(): void {
     this.stateLoading.set(true);
-
+  
     this.stateService
       .getStates({
         page: this.statePage() + 1,
@@ -182,20 +182,14 @@ export class StateCityManagement implements OnInit {
         sortBy: this.stateSortBy ?? undefined,
         ascending: this.stateSortAsc ?? undefined,
       })
-
-      .pipe(takeUntilDestroyed(this.destroyRef))
-
+      .pipe(
+        finalize(() => this.stateLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (res) => {
           this.states.set(res.items);
           this.stateTotalCount.set(res.totalCount);
-          this.stateLoading.set(false);
-        },
-
-        error: () => {
-          this.stateLoading.set(false);
-
-          this.toastr.error('Failed to load states.');
         },
       });
   }
@@ -219,20 +213,16 @@ export class StateCityManagement implements OnInit {
         ascending: this.citySortAsc ?? undefined,
       })
 
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.destroyRef),
+            finalize(()=>this.cityLoading.set(false)))
 
       .subscribe({
         next: (res) => {
           this.cities.set(res.items);
           this.cityTotalCount.set(res.totalCount);
-          this.cityLoading.set(false);
-        },
-
-        error: () => {
-          this.cityLoading.set(false);
-          this.toastr.error('Failed to load cities.');
         },
       });
+        this.cityLoading.set(false);
   }
 
   onStateSortChange(sort: Sort): void {
@@ -431,10 +421,6 @@ export class StateCityManagement implements OnInit {
 
               this.loadStates();
             },
-
-            error: () => {
-              this.toastr.error('Failed to delete state.');
-            },
           });
       });
   }
@@ -465,10 +451,6 @@ export class StateCityManagement implements OnInit {
             next: () => {
               this.toastr.success('City deleted.');
               this.loadCities();
-            },
-
-            error: () => {
-              this.toastr.error('Failed to delete city.');
             },
           });
       });

@@ -109,19 +109,13 @@ export class StateDialogComponent implements OnInit {
 
     request.pipe(takeUntilDestroyed(this.destroyref)).subscribe({
       next: () => {
-        this.saving = false;
         this.toastr.success(
           this.isEdit ? 'State updated successfully.' : 'State added successfully.'
         );
         this.dialogRef.close({ saved: true });
       },
-      error: (err: any) => {
-        this.saving = false;
-        this.toastr.error(
-          err?.error?.message || (this.isEdit ? 'Failed to update state.' : 'Failed to add state.')
-        );
-      },
     });
+    this.saving = false;
   }
 
   cancel(): void {

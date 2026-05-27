@@ -6,9 +6,9 @@ export interface InputFieldConfig {
     
     label: string;
 
-    control?: FormControl;
+    control: FormControl;
   
-    type: 'text' | 'password' | 'email' | 'number';
+    type?: 'text' | 'password' | 'email' | 'number';
   
     placeholder?: string ;
   

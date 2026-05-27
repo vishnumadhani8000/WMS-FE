@@ -213,13 +213,8 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
           product,
         });
       },
-
-      error: () => {
-        this.saving = false;
-
-        this.toastr.error('Something went wrong');
-      },
     });
+    this.saving = false;
   }
 
   cancel(): void {

@@ -28,6 +28,7 @@ import { Product, AddToCartDto } from './models/product.model';
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { MatSort, Sort, MatSortHeader } from "@angular/material/sort";
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-product',
@@ -48,27 +49,26 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     TruncatePipe,
     MatSort,
     MatSortHeader
-],
+  ],
 })
 export class Products implements OnInit {
 
   constructor(
-    private readonly productService : ProductService,
-    private readonly toastr : ToastrService,
-    private readonly destroyRef : DestroyRef
-  ){}
+    private readonly productService: ProductService,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef
+  ) { }
 
-  readonly DEBOUNCE_MS = 400;
   readonly displayedColumns = ['index', 'name', 'description', 'price', 'actions'];
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS
 
-   products = signal<Product[]>([]);
-   totalCount = signal(0);
-   loading = signal(false);
-   page = signal(0);
+  products = signal<Product[]>([]);
+  totalCount = signal(0);
+  loading = signal(false);
+  page = signal(0);
   sortBy = signal<string | null>(null);
   ascending = signal<boolean | null>(null);
-  pageSize = 10;
+  pageSize:number= APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   searchControl = new FormControl<string>('', {
     nonNullable: true,
@@ -100,7 +100,7 @@ export class Products implements OnInit {
   private initializeSearch(): void {
     this.searchControl.valueChanges
       .pipe(
-        debounceTime(this.DEBOUNCE_MS),
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -137,10 +137,6 @@ export class Products implements OnInit {
           this.products.set(response.data.items);
           this.totalCount.set(response.data.totalCount);
         },
-
-        error: () => {
-          this.toastr.error('Failed to load products.');
-        },
       });
   }
 
@@ -168,7 +164,7 @@ export class Products implements OnInit {
   }
 
   private addToCart(product: Product): void {
-    const dto: AddToCartDto = { 
+    const dto: AddToCartDto = {
       productId: product.id,
       quantity: 1,
     };
@@ -179,11 +175,7 @@ export class Products implements OnInit {
       .subscribe({
         next: () => {
           this.toastr.success('Product added to cart.');
-        },
-
-        error: (err) => {
-        this.toastr.error(err?.error?.message||'Something went wrong.');
-        },
+        }
       });
   }
   onSortChange(sort: Sort): void {
@@ -195,9 +187,9 @@ export class Products implements OnInit {
       this.sortBy.set(sort.active);
       this.ascending.set(sort.direction === 'asc');
     }
-  
+
     this.page.set(0);
-  
+
     this.loadProducts();
   }
   clearSearch(): void {

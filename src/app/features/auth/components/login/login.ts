@@ -149,22 +149,9 @@ export class Login implements OnInit {
         ]);
       },
 
-      error: (err) => {
-        const message = err?.error?.message || 'Invalid email or password';
-
-        this.toast.error(message);
-
-        this.isSubmitting = false;
-
-        this.loginButtonConfig.loading = false;
-      },
-
-      complete: () => {
-        this.isSubmitting = false;
-
-        this.loginButtonConfig.loading = false;
-      },
     });
+    this.isSubmitting = false;
+    this.loginButtonConfig.loading = false;
   }
 
   trimEmail(): void {

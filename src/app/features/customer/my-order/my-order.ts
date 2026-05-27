@@ -45,13 +45,9 @@ export class MyOrders implements OnInit {
       .subscribe({
         next: (res) => {
           this.orders.set(res.data ?? []);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.loading.set(false);
-          this.toastr.error(err?.error?.message || 'Failed to load orders.');
         },
       });
+      this.loading.set(false);
   }
 
   getStatusMeta(status: string): OrderStatusMeta {

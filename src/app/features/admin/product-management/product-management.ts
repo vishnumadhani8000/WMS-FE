@@ -2,7 +2,7 @@ import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angul
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, switchMap } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -23,6 +23,7 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-product-management',
@@ -56,9 +57,9 @@ export class ProductManagement implements OnInit {
   @ViewChild(MatPaginator)
   paginator: MatPaginator;
 
-  readonly DEBOUNCE_MS = 500;
+  readonly DEBOUNCE_MS = APP_CONSTANTS.SEARCH_DEBOUNCE_MS;
   readonly displayedColumns = ['index', 'name', 'weightKg', 'stock','price', 'description', 'actions'];
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly pageSizeOptions =APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   dataSource = signal<Product[]>([]);
   totalCount = signal(0);
@@ -73,7 +74,7 @@ export class ProductManagement implements OnInit {
 
   readonly filter = new BehaviorSubject<ProductFilter>({
     page: 1,
-    pageSize: 10,
+    pageSize: APP_CONSTANTS.DEFAULT_PAGE_SIZE,
     search: '',
     sortBy: 'createdAt',
     ascending: false,
@@ -135,10 +136,12 @@ export class ProductManagement implements OnInit {
 
   private initializeProductLoader(): void {
     this.filter
-      .pipe(
-        switchMap((filter) => {
+    .pipe(
+      switchMap((filter) => {
           this.loading.set(true);
-          return this.productManagementService.getProducts(filter);
+          return this.productManagementService.getProducts(filter).pipe(
+            finalize(()=>this.loading.set(false))
+          );
         }),
 
         takeUntilDestroyed(this.destroyref)
@@ -148,12 +151,6 @@ export class ProductManagement implements OnInit {
         next: (result) => {
           this.dataSource.set(result.items);
           this.totalCount.set(result.totalCount);
-          this.loading.set(false);
-        },
-
-        error: () => {
-          this.loading.set(false);
-          this.toastr.error('Failed to load products.');
         },
       });
   }
@@ -266,9 +263,6 @@ export class ProductManagement implements OnInit {
             }
           },
 
-          error: () => {
-            this.toastr.error('Failed to delete product.');
-          },
         });
       });
   }

@@ -24,8 +24,6 @@ import {
   ConfirmOrderDialogResult,
 } from '../confirm-order-dialog/models/confirmOrder.model';
 import { SelectAddressDialogResult } from '../address/models/SelectAddressDialogData.model';
-import { ApiResponse } from '../../../core/models/api-responce.model';
-import { AddressData } from '../address/models/addresh.model';
 @Component({
   selector: 'app-cart',
   standalone: true,
@@ -58,6 +56,7 @@ export class Cart implements OnInit {
   quantityLoading = signal(false);
   cartId = signal(0);
   totalItems = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
+
   totalAmount = computed(() =>
     this.cartItems().reduce((sum, item) => sum + item.price * item.quantity, 0)
   );
@@ -123,14 +122,9 @@ export class Cart implements OnInit {
           this.cartItems.set(res.data.items ?? []);
           this.totalWeightKg.set(res.data.totalWeightKg ?? 0);
 
-          this.loading.set(false);
-        },
-
-        error: (err) => {
-          this.loading.set(false);
-          this.toastr.error(err?.error.message || 'Failed to load cart.');
         },
       });
+      this.loading.set(false);
   }
 
   increment(item: CartItem): void {
@@ -156,18 +150,9 @@ export class Cart implements OnInit {
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.loadCart();
-          this.quantityLoading.set(false);
-        },
-
-        error: (err) => {
-          this.quantityLoading.set(false);
-          this.toastr.error(err?.error?.message ?? 'Failed to update quantity.');
-          this.loadCart();
-        },
-      });
+      .subscribe({});
+      this.quantityLoading.set(false);
+      this.loadCart();
   }
 
   confirmDelete(item: CartItem): void {
@@ -199,12 +184,8 @@ export class Cart implements OnInit {
         next: (res) => {
           if (!res.isSuccess) return;
 
-          this.cartItems.update((items) => items.filter((i) => i.cartItemId !== item.cartItemId));
+          this.loadCart();
           this.toastr.success('Item removed from cart.');
-        },
-
-        error: (err) => {
-          this.toastr.error(err?.error?.message||'Failed to remove item.');
         },
       });
   }
@@ -230,10 +211,6 @@ export class Cart implements OnInit {
           }
 
           this.openAddAddressDialog(orderItems);
-        },
-
-        error: (err) => {
-          this.toastr.error(err?.error?.message || 'Failed to load addresses.');
         },
       });
   }
@@ -313,7 +290,7 @@ export class Cart implements OnInit {
         if (!response.isSuccess) {
           const message = response.errors?.[0] ?? response.message ?? 'Failed to place order.';
           this.toastr.error(message);
-          this.loadCart();  
+          this.loadCart();
           return;
         }
 
@@ -335,10 +312,6 @@ export class Cart implements OnInit {
           }
 
           this.openSelectAddressDialog(addresses, orderItems);
-        },
-
-        error: (err) => {
-          this.toastr.error(err?.error.message || 'Failed to load addresses.');
         },
       });
   }

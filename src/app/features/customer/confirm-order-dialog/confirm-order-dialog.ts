@@ -1,7 +1,5 @@
 import { Component, DestroyRef, Inject, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,8 +11,6 @@ import {
   OrderItem,
 } from './models/confirmOrder.model';
 import { ConfirmOrderService } from './services/ConfirmOrderService';
-import { ApiResponse } from '../../../core/models/api-responce.model';
-import { Dialog } from '@angular/cdk/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -28,7 +24,7 @@ export class ConfirmOrderDialog implements OnInit {
   private confirmOrderService = inject(ConfirmOrderService);
   private dialogRef = inject(MatDialogRef<ConfirmOrderDialog>);
   private readonly destroyRef = inject(DestroyRef);
-  
+
   cancelButtonConfig: ButtonConfig;
   placeOrderButtonConfig: ButtonConfig;
 
@@ -82,23 +78,13 @@ export class ConfirmOrderDialog implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.setLoading(false);
-  
           this.dialogRef.close({
             confirmed: true,
             response: res,
           });
         },
-  
-        error: (err) => {
-          this.setLoading(false);
-  
-          this.dialogRef.close({
-            confirmed: true,
-            response: err.error,
-          });
-        },
       });
+      this.setLoading(false);
   }
   cancel(): void {
     this.dialogRef.close({ confirmed: false } as ConfirmOrderDialogResult);

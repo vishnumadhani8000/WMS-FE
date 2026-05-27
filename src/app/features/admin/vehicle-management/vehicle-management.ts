@@ -2,7 +2,7 @@ import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject, signal } f
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -23,6 +23,7 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-vehicle-management',
@@ -68,7 +69,7 @@ export class VehicleManagement implements OnInit {
     'actions',
   ];
 
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly pageSizeOptions =APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   dataSource = signal<Vehicle[]>([]);
   totalCount = signal(0);
@@ -81,7 +82,7 @@ export class VehicleManagement implements OnInit {
 
   readonly filter = new BehaviorSubject<VehicleFilter>({
     page: 1,
-    pageSize: 10,
+    pageSize: APP_CONSTANTS.DEFAULT_PAGE_SIZE,
     search: '',
     sortBy: 'createdAt',
     ascending: false,
@@ -145,8 +146,10 @@ export class VehicleManagement implements OnInit {
       .pipe(
         switchMap((filter) => {
           this.loading.set(true);
-
-          return this.vehicleService.getVehicles(filter);
+  
+          return this.vehicleService.getVehicles(filter).pipe(
+            finalize(() => this.loading.set(false))
+          );
         }),
         takeUntilDestroyed(this.destroyref)
       )
@@ -154,16 +157,9 @@ export class VehicleManagement implements OnInit {
         next: (result) => {
           this.dataSource.set(result.items);
           this.totalCount.set(result.totalCount);
-          this.loading.set(false);
-        },
-
-        error: () => {
-          this.loading.set(false);
-          this.toastr.error('Failed to load vehicles.');
-        },
+        }
       });
   }
-
   onPageChange(event: PageEvent): void {
     this.filter.next({
       page: event.pageIndex + 1,

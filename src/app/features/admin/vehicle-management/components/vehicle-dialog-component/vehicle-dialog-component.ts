@@ -218,12 +218,8 @@
             saved: true,
           });
         },
-
-        error: (err) => {
-          this.saving = false;
-          this.toastr.error(this.isEdit ? 'Failed to update vehicle.' : 'Failed to add vehicle.');
-        },
       });
+      this.saving = false;
     }
 
     cancel(): void {

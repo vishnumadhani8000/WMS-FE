@@ -99,7 +99,7 @@ export class AddAddressDialogComponent implements OnInit {
       }),
     });
 
-    this.form.controls.stateId.valueChanges.pipe(takeUntilDestroyed(this.destroyref)).subscribe((stateId) => {
+    this.form.controls.stateId.valueChanges.pipe(takeUntilDestroyed()).subscribe((stateId) => {
           this.loadCities(stateId);
     });
   }
@@ -108,7 +108,7 @@ export class AddAddressDialogComponent implements OnInit {
     this.addressLineConfig = {
       label: 'Address Line',
       type: 'text',
-      placeholder: 'e.g. 123 Main Street, Apartment 4B',
+      // placeholder: 'e.g. 123 Main Street, Apartment 4B',
       maxlength: 200,
       subscriptSizing: 'dynamic',
       trimStart: true,
@@ -180,12 +180,9 @@ export class AddAddressDialogComponent implements OnInit {
       .subscribe({
         next: (states) => {
           this.stateConfig = { ...this.stateConfig, options: states };
-          this.loadingStates = false;
-        },
-        error: () => {
-          this.loadingStates = false;
         },
       });
+      this.loadingStates = false;
   }
 
   private loadCities(state: number): void {
@@ -196,12 +193,9 @@ export class AddAddressDialogComponent implements OnInit {
       .subscribe({
         next: (cities) => {
           this.cityConfig = { ...this.cityConfig, options: cities };
-          this.loadingCities = false;
-        },
-        error: () => {
-          this.loadingCities = false;
         },
       });
+      this.loadingCities = false;
   }
 
   save(): void {
@@ -230,31 +224,20 @@ export class AddAddressDialogComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyref))
       .subscribe({
         next: (res) => {
-  
-          this.saveButtonConfig = {
-            ...this.saveButtonConfig,
-            loading: false,
-          };
-  
           if (!res.isSuccess) {
             return;
           }
-  
           this.dialogRef.close({
             saved: true,
             address: res.data,
           });
         },
   
-        error: () => {
-  
-          this.saveButtonConfig = {
-            ...this.saveButtonConfig,
-            loading: false,
-            disabled: false,
-          };
-        },
       });
+      this.saveButtonConfig = {
+        ...this.saveButtonConfig,
+        loading: false,
+      };
   }
   cancel(): void {
     this.dialogRef.close({ saved: false } as AddAddressDialogResult);
