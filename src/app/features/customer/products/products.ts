@@ -182,7 +182,7 @@ export class Products implements OnInit {
         },
 
         error: (err) => {
-          this.toastr.error(err?.error?.message||'Something went wrong.');
+        this.toastr.error(err?.error?.message||'Something went wrong.');
         },
       });
   }

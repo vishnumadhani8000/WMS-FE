@@ -21,3 +21,18 @@
     export interface UpdateCartItemQuantityDto {
       quantity: number;
     }
+    export interface CheckoutOrderItem {
+      id: number;
+      name: string;
+      quantity: number;
+      unitPrice: number;
+    }
+    
+    export interface CheckoutAddress {
+      addressId: number;
+      addressLine: string;
+      landmark?: string;
+      cityName: string;
+      stateName: string;
+      pincode: string;
+    }

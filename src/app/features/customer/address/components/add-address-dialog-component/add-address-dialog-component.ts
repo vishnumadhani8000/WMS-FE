@@ -48,8 +48,6 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
   private dialogRef = inject(MatDialogRef<AddAddressDialogComponent>);
   private userAddressService = inject(AddressService);
   private destroy = new Subject<void>();
-
-  saving = false;
   loadingStates = false;
   loadingCities = false;
 
@@ -99,11 +97,7 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
     });
 
     this.form.controls.state.valueChanges.pipe(takeUntil(this.destroy)).subscribe((state) => {
-      this.form.controls.city.reset(null);
-      this.cityConfig = { ...this.cityConfig, options: [] };
-      if (state) {
-        this.loadCities(state);
-      }
+          this.loadCities(state);
     });
   }
 
@@ -169,8 +163,6 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
       label: 'Save & Continue',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.save(),
     };
   }
@@ -208,21 +200,18 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.saving = true;
-
+  
     this.saveButtonConfig = {
       ...this.saveButtonConfig,
       loading: true,
-
     };
-
+  
     const formValue = this.form.getRawValue();
-
+  
     const payload = {
       addressLine: formValue.addressLine,
       landmark: formValue.landmark,
@@ -230,35 +219,33 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
       cityId: formValue.city,
       pincode: formValue.pincode,
     };
-
+  
     this.userAddressService
       .createAddress(payload)
       .pipe(takeUntil(this.destroy))
       .subscribe({
         next: (res) => {
-          this.saving = false;
+  
           this.saveButtonConfig = {
             ...this.saveButtonConfig,
             loading: false,
-            disabled: false,
           };
-
+  
           if (!res.isSuccess) {
             return;
           }
-
+  
           this.dialogRef.close({
             saved: true,
             address: res.data,
           });
         },
-
+  
         error: () => {
-          this.saving = false;
+  
           this.saveButtonConfig = {
             ...this.saveButtonConfig,
             loading: false,
-            disabled: false,
           };
         },
       });

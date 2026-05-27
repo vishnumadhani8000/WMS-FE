@@ -1,13 +1,12 @@
-import { Address } from "../address";
-import { AddressData } from "./addresh.model";
-
+import { AddressData } from './addresh.model';
 
 export interface SelectAddressDialogData {
   addresses: AddressData[];
-  selectedAddressId?: number;
+  selectedAddressId?: number | null;
 }
 
 export interface SelectAddressDialogResult {
-  saved: boolean;
+  saved?: boolean;
   address?: AddressData;
+  action?: 'add-new';
 }

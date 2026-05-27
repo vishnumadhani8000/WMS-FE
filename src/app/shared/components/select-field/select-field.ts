@@ -17,7 +17,7 @@ import { SelectFieldConfig } from './select-field.config';
 })
 export class SelectField {
   @Input({ required: true })
-  config!: SelectFieldConfig;
+  config: SelectFieldConfig;
 
   get isRequired(): boolean {
     return this.config.required || !!this.config.control?.hasValidator(Validators.required);
@@ -25,11 +25,6 @@ export class SelectField {
 
   markTouched(): void {
     this.config.control?.markAsTouched();
-  }
-
-  markDirty(): void {
-    this.config.control?.markAsDirty();
-    this.config.control?.updateValueAndValidity();
   }
 
   get errorMessage(): string {

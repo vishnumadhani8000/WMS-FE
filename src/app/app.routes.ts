@@ -75,6 +75,12 @@ export const routes: Routes = [
                 loadComponent:()=>
                     import('./features/customer/cart/cart.js')
                          .then((m)=>m.Cart)
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.ORDERS,
+                loadComponent:()=> 
+                    import('./features/customer/my-order/my-order.js')
+                .then((m)=>m.MyOrders)
             }
 
         ]

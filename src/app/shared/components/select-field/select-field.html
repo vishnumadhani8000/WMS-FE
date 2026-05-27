@@ -15,7 +15,6 @@
 
   <mat-select
     [formControl]="config.control!"
-    (selectionChange)="markDirty()"
     (blur)="markTouched()"
   >
     @for (option of config.options; track option.value) {

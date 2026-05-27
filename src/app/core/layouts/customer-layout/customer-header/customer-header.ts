@@ -22,8 +22,8 @@ export class CustomerHeader {
 
   navItems: NavItem[] = [
     { label: 'Products',  icon: 'inventory_2',   route: '/customer/product' },
-    { label: 'Cart',      icon: 'shopping_cart', route: '/customer/cart',   badge: 3 },
-    { label: 'My Orders', icon: 'history',       route: '/orders' },
+    { label: 'Cart',      icon: 'shopping_cart', route: '/customer/cart'},
+    { label: 'My Orders', icon: 'history',       route: '/customer/my-orders' },
   ];
 
   toggleMenu(): void {
