@@ -1,8 +1,6 @@
-import { Component, Inject, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,14 +14,14 @@ import {
   AddAddressDialogData,
   AddAddressDialogResult,
 } from '../../models/addAddressDialogData.model';
-import { AddressData } from '../../models/addresh.model';
 import { AddressService } from '../../services/address.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface AddressForm {
   addressLine: FormControl<string>;
   landmark: FormControl<string>;
-  state: FormControl<number | null>;
-  city: FormControl<number | null>;
+  stateId: FormControl<number | null>;
+  cityId: FormControl<number | null>;
   pincode: FormControl<string>;
 }
 
@@ -43,11 +41,10 @@ interface AddressForm {
   templateUrl: './add-address-dialog-component.html',
   styleUrl: './add-address-dialog-component.scss',
 })
-export class AddAddressDialogComponent implements OnInit, OnDestroy {
-  private statesCitiesService = inject(AddressService);
-  private dialogRef = inject(MatDialogRef<AddAddressDialogComponent>);
-  private userAddressService = inject(AddressService);
-  private destroy = new Subject<void>();
+export class AddAddressDialogComponent implements OnInit {
+
+
+  saving = false;
   loadingStates = false;
   loadingCities = false;
 
@@ -63,7 +60,13 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
   saveButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
 
+
   constructor(
+    private readonly statesCitiesService: AddressService,
+    private readonly userAddressService: AddressService,
+    private readonly dialogRef: MatDialogRef<AddAddressDialogComponent>,
+    private readonly destroyref : DestroyRef,
+  
     @Inject(MAT_DIALOG_DATA)
     public data: AddAddressDialogData
   ) {}
@@ -84,10 +87,10 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
         nonNullable: true,
         validators: [Validators.maxLength(100)],
       }),
-      state: new FormControl<number | null>(null, {
+      stateId: new FormControl<number | null>(null, {
         validators: [Validators.required],
       }),
-      city: new FormControl<number | null>(null, {
+      cityId: new FormControl<number | null>(null, {
         validators: [Validators.required],
       }),
       pincode: new FormControl('', {
@@ -96,8 +99,8 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
       }),
     });
 
-    this.form.controls.state.valueChanges.pipe(takeUntil(this.destroy)).subscribe((state) => {
-          this.loadCities(state);
+    this.form.controls.stateId.valueChanges.pipe(takeUntilDestroyed(this.destroyref)).subscribe((stateId) => {
+          this.loadCities(stateId);
     });
   }
 
@@ -135,14 +138,14 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
       label: 'State',
       options: [],
       subscriptSizing: 'dynamic',
-      control: this.form.controls.state,
+      control: this.form.controls.stateId,
     };
 
     this.cityConfig = {
       label: 'City',
       options: [],
       subscriptSizing: 'dynamic',
-      control: this.form.controls.city,
+      control: this.form.controls.cityId,
     };
 
     this.closeButtonConfig = {
@@ -163,6 +166,8 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
       label: 'Save & Continue',
       variant: 'flat',
       color: 'primary',
+      loading: this.saving,
+      disabled: this.saving,
       clicked: () => this.save(),
     };
   }
@@ -171,7 +176,7 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
     this.loadingStates = true;
     this.statesCitiesService
       .getStates()
-      .pipe(takeUntil(this.destroy))
+      .pipe(takeUntilDestroyed(this.destroyref))
       .subscribe({
         next: (states) => {
           this.stateConfig = { ...this.stateConfig, options: states };
@@ -187,7 +192,7 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
     this.loadingCities = true;
     this.statesCitiesService
       .getCitiesByState(state)
-      .pipe(takeUntil(this.destroy))
+      .pipe(takeUntilDestroyed(this.destroyref))
       .subscribe({
         next: (cities) => {
           this.cityConfig = { ...this.cityConfig, options: cities };
@@ -215,14 +220,14 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
     const payload = {
       addressLine: formValue.addressLine,
       landmark: formValue.landmark,
-      stateId: formValue.state,
-      cityId: formValue.city,
+      stateId: formValue.stateId,
+      cityId: formValue.cityId,
       pincode: formValue.pincode,
     };
   
     this.userAddressService
       .createAddress(payload)
-      .pipe(takeUntil(this.destroy))
+      .pipe(takeUntilDestroyed(this.destroyref))
       .subscribe({
         next: (res) => {
   
@@ -246,6 +251,7 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
           this.saveButtonConfig = {
             ...this.saveButtonConfig,
             loading: false,
+            disabled: false,
           };
         },
       });
@@ -254,8 +260,4 @@ export class AddAddressDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close({ saved: false } as AddAddressDialogResult);
   }
 
-  ngOnDestroy(): void {
-    this.destroy.next();
-    this.destroy.complete();
-  }
 }

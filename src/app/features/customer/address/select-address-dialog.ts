@@ -1,10 +1,6 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
@@ -18,13 +14,7 @@ import { AddressData } from './models/addresh.model';
 @Component({
   selector: 'app-select-address-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatDividerModule,
-    MatIconModule,
-    Button,
-  ],
+  imports: [CommonModule, MatDialogModule, MatDividerModule, MatIconModule, Button],
   templateUrl: './select-address-dialog.html',
   styleUrl: './select-address-dialog.scss',
 })
@@ -46,9 +36,7 @@ export class SelectAddressDialog implements OnInit {
   ngOnInit(): void {
     this.addresses = [...(this.data.addresses ?? [])];
 
-    this.selectedAddressId =
-      this.data.selectedAddressId ??
-      (this.addresses[0]?.addressId ?? null);
+    this.selectedAddressId = this.data.selectedAddressId ?? this.addresses[0]?.addressId ?? null;
 
     this.closeButtonConfig = {
       ariaLabel: 'Close',
@@ -90,9 +78,7 @@ export class SelectAddressDialog implements OnInit {
   }
 
   confirm(): void {
-    const address = this.addresses.find(
-      (a) => a.addressId === this.selectedAddressId
-    );
+    const address = this.addresses.find((a) => a.addressId === this.selectedAddressId);
 
     if (!address) return;
 

@@ -225,7 +225,7 @@ export class Cart implements OnInit {
           }));
 
           if (addresses.length) {
-            this.openAddressDialog(addresses, orderItems);
+            this.openSelectAddressDialog(addresses, orderItems);
             return;
           }
 
@@ -238,7 +238,7 @@ export class Cart implements OnInit {
       });
   }
 
-  private openAddressDialog(addresses: CheckoutAddress[], orderItems: CheckoutOrderItem[]): void {
+  private openSelectAddressDialog(addresses: CheckoutAddress[], orderItems: CheckoutOrderItem[]): void {
     this.dialog
       .open(SelectAddressDialog, {
         width: '800px',
@@ -261,6 +261,7 @@ export class Cart implements OnInit {
         this.openConfirmOrderDialog(result.address, orderItems);
       });
   }
+
   private openAddAddressDialog(orderItems: CheckoutOrderItem[]): void {
     this.dialog
       .open(AddAddressDialogComponent, {
@@ -311,9 +312,8 @@ export class Cart implements OnInit {
 
         if (!response.isSuccess) {
           const message = response.errors?.[0] ?? response.message ?? 'Failed to place order.';
-
           this.toastr.error(message);
-          this.loadCart();
+          this.loadCart();  
           return;
         }
 
@@ -334,7 +334,7 @@ export class Cart implements OnInit {
             return;
           }
 
-          this.openAddressDialog(addresses, orderItems);
+          this.openSelectAddressDialog(addresses, orderItems);
         },
 
         error: (err) => {
