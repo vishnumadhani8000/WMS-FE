@@ -1,0 +1,94 @@
+<header class="header">
+    <div class="header__inner">
+  
+      <!-- ── Brand ── -->
+      <a class="header__brand" routerLink="/">
+        <span class="header__brand-icon" aria-hidden="true">
+          <mat-icon>warehouse</mat-icon>
+        </span>
+        <span class="header__brand-name">WMS</span>
+      </a>
+  
+      <!-- ── Desktop Nav ── -->
+      <nav class="header__nav" aria-label="Main navigation">
+        <a
+          *ngFor="let item of navItems"
+          class="header__nav-link"
+          [routerLink]="item.route"
+          routerLinkActive="header__nav-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          <mat-icon class="header__nav-icon" aria-hidden="true">{{ item.icon }}</mat-icon>
+          {{ item.label }}
+          <span *ngIf="item.badge" class="header__nav-badge">{{ item.badge }}</span>
+        </a>
+      </nav>
+  
+      <!-- ── Profile link (right side, desktop) ── -->
+      <a
+        class="header__nav-link header__profile-link"
+        routerLink="/profile"
+        routerLinkActive="header__nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        aria-label="Profile"
+      >
+        <mat-icon class="header__nav-icon" aria-hidden="true">account_circle</mat-icon>
+        Profile
+      </a>
+  
+      <!-- ── Hamburger (mobile) ── -->
+      <button
+        class="header__hamburger"
+        (click)="toggleMenu()"
+        aria-label="Toggle menu"
+        [attr.aria-expanded]="mobileMenuOpen()"
+      >
+        <mat-icon>{{ mobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+      </button>
+  
+    </div>
+  
+    <!-- ── Mobile Drawer ── -->
+    <div
+      class="header__mobile-nav"
+      [class.header__mobile-nav--open]="mobileMenuOpen()"
+      role="dialog"
+      aria-label="Mobile navigation"
+    >
+      <nav aria-label="Mobile navigation">
+        <a
+          *ngFor="let item of navItems"
+          class="header__mobile-link"
+          [routerLink]="item.route"
+          routerLinkActive="header__mobile-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          <mat-icon class="header__nav-icon" aria-hidden="true">{{ item.icon }}</mat-icon>
+          {{ item.label }}
+          <span *ngIf="item.badge" class="header__nav-badge">{{ item.badge }}</span>
+        </a>
+  
+        <!-- Profile link inside mobile drawer -->
+        <a
+          class="header__mobile-link"
+          routerLink="/profile"
+          routerLinkActive="header__mobile-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          <mat-icon class="header__nav-icon" aria-hidden="true">account_circle</mat-icon>
+          Profile
+        </a>
+      </nav>
+    </div>
+  
+    <!-- Backdrop -->
+    <div
+      *ngIf="mobileMenuOpen()"
+      class="header__backdrop"
+      (click)="closeMenu()"
+      aria-hidden="true"
+    ></div>
+  </header>

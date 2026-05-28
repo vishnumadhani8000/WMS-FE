@@ -32,7 +32,6 @@ export class AdminHeader {
         ]);
 
       },
-
       error: () => {
         this.router.navigate([
           `/${APP_ROUTES.AUTH.LOGIN}`,

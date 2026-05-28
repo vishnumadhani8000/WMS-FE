@@ -1,0 +1,187 @@
+@use 'styles/variables' as *;
+
+$bp-sm: 480px;
+$bp-md: 768px;
+
+.product-page {
+  padding: 28px;
+  background: $page-bg;
+
+  @media (max-width: $bp-md) {
+    padding: 16px;
+  }
+
+  @media (max-width: $bp-sm) {
+    padding: 12px;
+  }
+}
+
+.product-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.product-title {
+  margin: 0;
+  font-size: $fs-h4;
+  font-weight: $fw-bold;
+  color: $text-main;
+}
+
+.product-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.product-search {
+  width: 420px;
+  max-width: 100%;
+
+  @media (max-width: $bp-md) {
+    width: 100%;
+  }
+}
+
+.product-count {
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+  color: $text-muted;
+}
+
+.product-card {
+  background: $surface-soft;
+  border: 1px solid $border;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+}
+
+.product-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-table {
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
+
+  .mat-column-index {
+    width: 8%;
+  }
+
+  .mat-column-name {
+    width: 20%;
+  }
+
+  .mat-column-description {
+    width:  25%;
+  }
+
+  .mat-column-price {
+    width: 12%;
+  }
+
+  .mat-column-actions {
+    width: 20%;
+  }
+
+  .mat-mdc-header-row {
+    background: $surface-soft;
+    height: 56px;
+  }
+
+  th.mat-mdc-header-cell {
+    padding: 0 16px;
+    color: $text-muted;
+    font-size: $fs-caption;
+    font-weight: $fw-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    border-bottom: 2px solid $border !important;
+  }
+
+  td.mat-mdc-cell {
+    height: 64px;
+    padding: 0 16px;
+    border-bottom: 1px solid $border;
+    font-weight: $fw-medium;
+    color: $text-main;
+    font-size: 16px;
+  }
+  ::ng-deep {
+    .mat-column-price{
+      
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        text-align: center !important;
+      }
+  
+      .mat-sort-header-container {
+        width: 100%;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+  
+      .mat-sort-header-content {
+        text-align: center !important;
+      }
+    }
+  }
+  .mat-column-index,
+  .mat-column-price,
+  .mat-column-actions {
+    text-align: center !important;
+  }
+
+  .mat-mdc-row {
+    transition: background 0.18s ease;
+
+    &:hover {
+      background: $hover-bg;
+    }
+  }
+}
+
+// ── Product Name ───────────────────────────────────────────
+.product-name {
+  font-size: 16px;
+  font-weight: $fw-medium;
+  color: $text-main;
+}
+.product-no-data {
+  text-align: center !important;
+  padding: 48px 16px !important;
+  border-bottom: none !important;
+}
+
+.product-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: $text-muted;
+
+  mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    opacity: 0.5;
+  }
+
+  span {
+    font-size: 15px;
+    font-weight: 500;
+  }
+}

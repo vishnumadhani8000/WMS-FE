@@ -33,7 +33,6 @@ export class CityService {
       .get<ApiResponse<PaginatedResponse<City>>>(this.base, { params })
       .pipe(
         map((res) => {
-          if (!res.data) throw new Error('Failed to load cities');
           return res.data;
         })
       );
@@ -44,7 +43,6 @@ export class CityService {
       .post<ApiResponse<City>>(this.base, form)
       .pipe(
         map((res) => {
-          if (!res.data) throw new Error('Failed to create city');
           return res.data;
         })
       );
@@ -55,7 +53,6 @@ export class CityService {
       .put<ApiResponse<City>>(`${this.base}/${id}`, form)
       .pipe(
         map((res) => {
-          if (!res.data) throw new Error('Failed to update city');
           return res.data;
         })
       );

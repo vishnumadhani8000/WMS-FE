@@ -1,0 +1,72 @@
+<div class="dialog-wrapper">
+
+    <!-- Header -->
+    <div class="dialog-header">
+      <div class="dialog-header__content">
+        <div class="dialog-title-row">
+          <span class="dialog-icon">
+            <mat-icon>check_circle</mat-icon>
+          </span>
+          <h2 class="dialog-title">Confirm Your Order</h2>
+        </div>
+        <p class="dialog-subtitle">You are about to place an order for:</p>
+      </div>
+    </div>
+  
+    <mat-divider />
+  
+    <!-- Scrollable items section -->
+    <div class="dialog-body-scroll">
+      <div class="items-list">
+        @for (item of items; track item.id) {
+          <div class="item-row">
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-unit-price">₹{{ item.unitPrice | number:'1.2-2' }} × {{ item.quantity }}</span>
+            </div>
+            <div class="item-right">
+              <span class="item-qty">Qty: {{ item.quantity }}</span>
+              <span class="item-subtotal">₹{{ (item.unitPrice * item.quantity) | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  
+    <!-- Sticky summary section (never scrolls) -->
+    <div class="dialog-body-sticky">
+  
+      <mat-divider />
+  
+      <!-- Totals Row -->
+      <div class="totals-row">
+        <div class="totals-row__left">
+          <span class="totals-label">Total Items:</span>
+          <span class="totals-count">{{ totalItems }}</span>
+        </div>
+        <div class="totals-row__right">
+          <span class="totals-label">Total Amount:</span>
+          <span class="totals-amount">₹{{ totalPrice | number:'1.2-2' }}</span>
+        </div>
+      </div>
+  
+      <!-- Delivery Address -->
+      <div class="address-card">
+        <div class="address-card__label">
+          <mat-icon class="address-icon">location_on</mat-icon>
+          <span>Delivery Address</span>
+        </div>
+        <p class="address-card__text">{{ fullAddress }}</p>
+      </div>
+  
+    </div>
+  
+    <mat-divider />
+  
+    <!-- Footer -->
+    <div class="dialog-footer">
+      <app-common-button [config]="cancelButtonConfig" />
+      <app-common-button [config]="placeOrderButtonConfig" />
+    </div>
+  
+  </div>

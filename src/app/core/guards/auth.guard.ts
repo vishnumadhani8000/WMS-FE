@@ -23,7 +23,7 @@ export const authGuard: CanActivateFn = ( route: ActivatedRouteSnapshot,) => {
       return router.createUrlTree([
         role === 'Admin'
           ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT}`
-          : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.HOME}`,
+          : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
       ]);
     }
 

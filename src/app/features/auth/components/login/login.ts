@@ -1,32 +1,19 @@
 import { CommonModule } from '@angular/common';
-
 import { Component, inject, OnInit } from '@angular/core';
-
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
 import { Router } from '@angular/router';
-
 import { MatIconModule } from '@angular/material/icon';
-
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
+import {  MatSnackBarModule } from '@angular/material/snack-bar';
 import { ToastrService } from 'ngx-toastr';
-
 import { Button } from '../../../../shared/components/button/button';
-
 import { ButtonConfig } from '../../../../shared/components/button/button.config';
-
 import { InputField } from '../../../../shared/components/input-field/input-field';
-
 import { InputFieldConfig } from '../../../../shared/components/input-field/input-field.config';
-
 import { AuthService } from '../../services/auth.service';
-
 import { APP_ROUTES } from '../../../../shared/constants/app-routes.constants';
 
 interface LoginForm {
   email: FormControl<string>;
-
   password: FormControl<string>;
 }
 
@@ -53,11 +40,11 @@ export class Login implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly toast = inject(ToastrService);
 
-  form!: FormGroup<LoginForm>;
+  form: FormGroup<LoginForm>;
   isSubmitting = false;
-  emailConfig!: InputFieldConfig;
-  passwordConfig!: InputFieldConfig;
-  loginButtonConfig!: ButtonConfig;
+  emailConfig: InputFieldConfig;
+  passwordConfig: InputFieldConfig;
+  loginButtonConfig: ButtonConfig;
 
   ngOnInit(): void {
     this.form = new FormGroup<LoginForm>({
@@ -66,11 +53,8 @@ export class Login implements OnInit {
 
         validators: [
           Validators.required,
-
           Validators.email,
-
           Validators.maxLength(50),
-
           Validators.pattern(/^\S+@\S+\.\S+$/),
         ],
       }),
@@ -80,41 +64,24 @@ export class Login implements OnInit {
 
         validators: [
           Validators.required,
-
           Validators.minLength(8),
-
           Validators.maxLength(25),
-
           Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/),
         ],
       }),
     });
 
-    // =========================
-    // Email Config
-    // =========================
 
     this.emailConfig = {
       label: 'Email',
-
       type: 'email',
-
       placeholder: 'Enter your email',
-
       prefixIcon: 'email',
-
       maxlength: 50,
-
-      subscriptSizing: 'dynamic',
-
       trimStart: true,
-
-      control: this.form.controls.email,
+      formControlName:'email',
     };
 
-    // =========================
-    // Password Config
-    // =========================
 
     this.passwordConfig = {
       label: 'Password',
@@ -122,9 +89,8 @@ export class Login implements OnInit {
       placeholder: 'Enter your password',
       prefixIcon: 'lock',
       maxlength: 50,
-      subscriptSizing: 'dynamic',
       trimStart: true,
-      control: this.form.controls.password,
+      formControlName :'password',
     };
 
 
@@ -177,26 +143,13 @@ export class Login implements OnInit {
         this.router.navigate([
           role === 'Admin'
             ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT}`
-            : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.HOME}`,
+            : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
         ]);
       },
 
-      error: (err) => {
-        const message = err?.error?.message || 'Invalid email or password';
-
-        this.toast.error(message);
-
-        this.isSubmitting = false;
-
-        this.loginButtonConfig.loading = false;
-      },
-
-      complete: () => {
-        this.isSubmitting = false;
-
-        this.loginButtonConfig.loading = false;
-      },
     });
+    this.isSubmitting = false;
+    this.loginButtonConfig.loading = false;
   }
 
   trimEmail(): void {

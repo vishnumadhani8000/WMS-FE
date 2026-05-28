@@ -1,0 +1,74 @@
+<div class="cart-page">
+  <header class="cart-header">
+    <h1 class="cart-header__title">My Cart</h1>
+  </header>
+
+  @if (loading()) {
+  <mat-progress-bar mode="indeterminate" class="cart-progress" />
+  }
+
+  <div class="cart-list">
+    @if (!loading() && cartItems().length === 0) {
+    <div class="cart-empty">
+      <mat-icon>shopping_cart</mat-icon>
+      <span>Your cart is empty</span>
+    </div>
+    } @for (item of cartItems(); track item.cartItemId) {
+
+    <div class="cart-item">
+      <div class="cart-item__body">
+        <!-- Top -->
+        <div class="cart-item__top">
+          <div class="cart-item__info">
+            <span class="cart-item__name">
+              {{ item.productName }}
+            </span>
+
+            <span class="cart-item__price">
+              {{ item.price * item.quantity| currency : 'INR' }}
+            </span>
+          </div>
+
+          <!-- Right Actions -->
+          <div class="cart-item__right">
+            <!-- Quantity -->
+            <div class="qty-control">
+              <app-common-button [config]="decrementButtonConfig(item)" />
+
+              <span class="qty-value">
+                {{ item.quantity }}
+              </span>
+
+              <app-common-button [config]="incrementButtonConfig(item)" />
+            </div>
+
+            <!-- Delete -->
+            <app-common-button [config]="deleteButtonConfig(item)" />
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  @if (!loading() && cartItems().length > 0) {
+
+  <div class="cart-summary">
+    <div class="cart-summary__row">
+      <span class="summary-label">Total Items</span>
+      <span class="summary-value">
+        {{ totalItems() }}
+      </span>
+    </div>
+
+    <div class="cart-summary__row">
+      <span class="summary-label">Total Amount</span>
+      <span class="summary-value">
+        {{ totalAmount() | currency : 'INR' }}
+      </span>
+    </div>
+
+    <app-common-button [config]="placeOrderButtonConfig" />
+  </div>
+  }
+</div>

@@ -1,8 +1,8 @@
 import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -23,6 +23,7 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-vehicle-management',
@@ -68,37 +69,39 @@ export class VehicleManagement implements OnInit {
     'actions',
   ];
 
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   dataSource = signal<Vehicle[]>([]);
   totalCount = signal(0);
   loading = signal(false);
 
-  searchControl = new FormControl<string>('', { nonNullable: true });
+  form = new FormGroup({
+    searchControl: new FormControl('', {
+      nonNullable: true,
+    }),
+  });
 
-  searchInputConfig!: InputFieldConfig;
-  addVehicleButtonConfig!: ButtonConfig;
+  searchInputConfig: InputFieldConfig;
+  addVehicleButtonConfig: ButtonConfig;
 
   readonly filter = new BehaviorSubject<VehicleFilter>({
     page: 1,
-    pageSize: 10,
+    pageSize: APP_CONSTANTS.DEFAULT_PAGE_SIZE,
     search: '',
     sortBy: 'createdAt',
     ascending: false,
   });
 
   ngOnInit(): void {
-    // Search Config
+
     this.searchInputConfig = {
       label: 'Search',
       type: 'text',
       placeholder: 'Search vehicles...',
       prefixIcon: 'search',
       icon: 'close',
-      subscriptSizing: 'dynamic',
       trimStart: true,
-
-      control: this.searchControl,
+      formControlName: 'searchControl',
 
       iconClick: () => {
         this.clearSearch();
@@ -117,12 +120,11 @@ export class VehicleManagement implements OnInit {
     };
 
     this.initializeSearch();
-
     this.initializeVehicleLoader();
   }
 
   private initializeSearch(): void {
-    this.searchControl.valueChanges
+    this.form.controls.searchControl.valueChanges
       .pipe(
         debounceTime(this.DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -147,30 +149,24 @@ export class VehicleManagement implements OnInit {
         switchMap((filter) => {
           this.loading.set(true);
 
-          return this.vehicleService.getVehicles(filter);
+          return this.vehicleService.getVehicles(filter).pipe(
+            finalize(() => this.loading.set(false))
+          );
         }),
-
         takeUntilDestroyed(this.destroyref)
       )
       .subscribe({
         next: (result) => {
           this.dataSource.set(result.items);
           this.totalCount.set(result.totalCount);
-          this.loading.set(false);
-        },
-
-        error: () => {
-          this.loading.set(false);
-          this.toastr.error('Failed to load vehicles.');
-        },
+        }
       });
   }
-
   onPageChange(event: PageEvent): void {
     this.filter.next({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });
@@ -182,7 +178,7 @@ export class VehicleManagement implements OnInit {
     this.filter.next({
       page: 1,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: sort.direction ? sort.active : undefined,
       ascending: sort.direction === '' ? undefined : sort.direction === 'asc',
     });
@@ -193,7 +189,7 @@ export class VehicleManagement implements OnInit {
   }
 
   clearSearch(): void {
-    this.searchControl.setValue('');
+    this.form.controls.searchControl.setValue('');
   }
 
   openAddDialog(): void {
@@ -208,7 +204,7 @@ export class VehicleManagement implements OnInit {
       .afterClosed()
 
       .subscribe((result) => {
-        if (!result?.saved) {
+        if (!result.saved) {
           return;
         }
         this.reload();
@@ -276,7 +272,7 @@ export class VehicleManagement implements OnInit {
     this.filter.next({
       page: this.filter.value.page,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });

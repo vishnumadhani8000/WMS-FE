@@ -1,7 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-
 import { AdminSidebar } from './components/admin-sidebar/admin-sidebar';
 import { AdminHeader } from './components/admin-header/admin-header';
 
@@ -14,8 +13,9 @@ import { AdminHeader } from './components/admin-header/admin-header';
     CommonModule,
     RouterOutlet,
     AdminSidebar,
-    AdminHeader
-  ]
+    AdminHeader,
+    
+]
 })
 export class AdminLayout {
 

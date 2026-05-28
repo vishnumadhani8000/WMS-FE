@@ -1,22 +1,17 @@
-<mat-form-field
-  class="full-width"
-  [appearance]="config.appearance || 'outline'"
-  [subscriptSizing]="config.subscriptSizing || 'dynamic'"
->
+<mat-form-field class="full-width" [appearance]="config.appearance || 'outline'" subscriptSizing="dynamic">
   <mat-label>
     {{ config.label }}
-    <!-- @if (isRequired) {
-    <span class="required-star">*</span>
-    } -->
   </mat-label>
 
   @if (config.prefixIcon) {
-  <mat-icon matPrefix class="prefix-icon">{{ config.prefixIcon }}</mat-icon>
+  <mat-icon matPrefix>
+    {{ config.prefixIcon }}
+  </mat-icon>
   }
 
   <input
     matInput
-    [formControl]="config.control!"
+    [formControl]="control"
     [type]="inputType"
     [placeholder]="config.placeholder || ''"
     [readonly]="config.readonly"
@@ -27,37 +22,31 @@
     [attr.step]="config.step"
     [attr.pattern]="config.pattern"
     (input)="handleInput($event)"
-    (focus)="config.control?.markAsTouched()"
   />
 
   @if (config.type === 'password') {
-  <button
-    mat-icon-button
-    matSuffix
-    type="button"
-    (click)="togglePassword()"
-    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-    tabindex="-1"
-  >
-    <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+  <button mat-icon-button matSuffix type="button" (click)="togglePassword()">
+    <mat-icon>
+      {{ showPassword ? 'visibility_off' : 'visibility' }}
+    </mat-icon>
   </button>
-  }
-   @if ( (config.iconPath || config.icon) && config.type !== 'password' && ( config.icon !==
-  'close' || config.control?.value ) ) {
-  <span matSuffix>
-    <button mat-icon-button type="button" (click)="handleIconClick()">
-      @if (config.iconPath) {
-      <img [src]="config.iconPath" width="22" height="22" alt="icon" />
-      } @else if (config.icon) {
-      <mat-icon>{{ config.icon }}</mat-icon>
-      }
-    </button>
-  </span>
+  } @if ((config.icon || config.iconPath) && config.type !== 'password') {
+  <button mat-icon-button matSuffix type="button" (click)="handleIconClick()">
+    @if (config.iconPath) {
+    <img [src]="config.iconPath" width="22" height="22" alt="icon" />
+    } @if (config.icon) {
+    <mat-icon>
+      {{ config.icon }}
+    </mat-icon>
+    }
+  </button>
   } @if (config.hint) {
-  <mat-hint>{{ config.hint }}</mat-hint>
+  <mat-hint>
+    {{ config.hint }}
+  </mat-hint>
   }
 
-  <mat-error *ngIf="config.control?.invalid && (config.control?.dirty || config.control?.touched)">
+  <mat-error *ngIf="control.invalid && (control.dirty || control.touched)">
     {{ errorMessage }}
   </mat-error>
 </mat-form-field>

@@ -1,45 +1,33 @@
 <header class="header">
+  <div class="header-left">
+    <button class="menu-btn" mat-icon-button (click)="toggleSidebar.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
 
-    <div class="header-left">
+    <h2 class="menu-btn">WMS</h2>
+  </div>
 
-        <button class="menu-btn" mat-icon-button (click)="toggleSidebar.emit()">
-            <mat-icon>menu</mat-icon>
-        </button>
+  <div class="profile-section" [matMenuTriggerFor]="profileMenu">
+    <mat-icon>account_circle</mat-icon>
 
-        <h2 class="menu-btn">WMS</h2>
-
+    <div class="profile-info">
+      <span class="profile-name"> Admin </span>
     </div>
 
-    <div class="profile-section" [matMenuTriggerFor]="profileMenu">
-
-        <mat-icon>account_circle</mat-icon>
-
-        <div class="profile-info">
-
-            <span class="profile-name">
-                Admin
-            </span>
-        </div>
-
-        <mat-icon class="dropdown-icon">
-            keyboard_arrow_down
-        </mat-icon>
-    </div>
-
+    <mat-icon class="dropdown-icon"> keyboard_arrow_down </mat-icon>
+  </div>
 </header>
 
 <!-- Dropdown Menu -->
 
 <mat-menu #profileMenu="matMenu" class="profile-menu">
+  <button mat-menu-item>
+    <mat-icon>person_outline</mat-icon>
+    <span>My Profile</span>
+  </button>
 
-    <button mat-menu-item>
-        <mat-icon>person_outline</mat-icon>
-        <span>My Profile</span>
-    </button>
-
-    <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-    </button>
-
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Logout</span>
+  </button>
 </mat-menu>

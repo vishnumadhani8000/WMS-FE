@@ -1,8 +1,8 @@
 import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, switchMap } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -14,8 +14,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { ToastrService } from 'ngx-toastr';
-import { ProductService } from './services/product.service';
-import { Product, ProductFilter } from './models/product.model';
+import { ProductManagementService } from './services/product-management.service';
+import { Product, ProductFilter } from './models/product-management.model';
 import { ProductDialogComponent } from './components/product-dialog-component/product-dialog-component';
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { Button } from '../../../shared/components/button/button';
@@ -23,11 +23,11 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-product-management',
   standalone: true,
-
   templateUrl: './product-management.html',
   styleUrl: './product-management.scss',
 
@@ -49,34 +49,34 @@ import { ButtonConfig } from '../../../shared/components/button/button.config';
   ],
 })
 export class ProductManagement implements OnInit {
-  private readonly productService = inject(ProductService);
+  private readonly productManagementService = inject(ProductManagementService);
   private readonly dialog = inject(MatDialog);
   private readonly toastr = inject(ToastrService);
   private readonly destroyref = inject(DestroyRef);
 
   @ViewChild(MatPaginator)
-  paginator!: MatPaginator;
+  paginator: MatPaginator;
 
-  readonly DEBOUNCE_MS = 500;
-
-  readonly displayedColumns = ['index', 'name', 'weightKg', 'stock', 'description', 'actions'];
-
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly DEBOUNCE_MS = APP_CONSTANTS.SEARCH_DEBOUNCE_MS;
+  readonly displayedColumns = ['index', 'name', 'weightKg', 'stock','price', 'description', 'actions'];
+  readonly pageSizeOptions =APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   dataSource = signal<Product[]>([]);
   totalCount = signal(0);
   loading = signal(false);
 
-  searchControl = new FormControl<string>('', {
-    nonNullable: true,
+  form = new FormGroup({
+    searchControl: new FormControl('', {
+      nonNullable: true,
+    }),
   });
 
-  searchInputConfig!: InputFieldConfig;
-  addProductButtonConfig!: ButtonConfig;
+  searchInputConfig: InputFieldConfig;
+  addProductButtonConfig: ButtonConfig;
 
   readonly filter = new BehaviorSubject<ProductFilter>({
     page: 1,
-    pageSize: 10,
+    pageSize: APP_CONSTANTS.DEFAULT_PAGE_SIZE,
     search: '',
     sortBy: 'createdAt',
     ascending: false,
@@ -90,17 +90,14 @@ export class ProductManagement implements OnInit {
       placeholder: 'Search products...',
       prefixIcon: 'search',
       icon: 'close',
-      subscriptSizing: 'dynamic',
       trimStart: true,
-
-      control: this.searchControl,
+      formControlName: 'searchControl',
 
       iconClick: () => {
         this.clearSearch();
       },
     };
 
-    // Add Button Config
     this.addProductButtonConfig = {
       label: 'Add Product',
       variant: 'flat',
@@ -117,7 +114,7 @@ export class ProductManagement implements OnInit {
   }
 
   private initializeSearch(): void {
-    this.searchControl.valueChanges
+    this.form.controls.searchControl.valueChanges
       .pipe(
         debounceTime(this.DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -139,11 +136,12 @@ export class ProductManagement implements OnInit {
 
   private initializeProductLoader(): void {
     this.filter
-      .pipe(
-        switchMap((filter) => {
+    .pipe(
+      switchMap((filter) => {
           this.loading.set(true);
-
-          return this.productService.getProducts(filter);
+          return this.productManagementService.getProducts(filter).pipe(
+            finalize(()=>this.loading.set(false))
+          );
         }),
 
         takeUntilDestroyed(this.destroyref)
@@ -153,12 +151,6 @@ export class ProductManagement implements OnInit {
         next: (result) => {
           this.dataSource.set(result.items);
           this.totalCount.set(result.totalCount);
-          this.loading.set(false);
-        },
-
-        error: () => {
-          this.loading.set(false);
-          this.toastr.error('Failed to load products.');
         },
       });
   }
@@ -167,7 +159,7 @@ export class ProductManagement implements OnInit {
     this.filter.next({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });
@@ -179,7 +171,7 @@ export class ProductManagement implements OnInit {
     this.filter.next({
       page: 1,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: sort.direction ? sort.active : undefined,
       ascending: sort.direction === '' ? undefined : sort.direction === 'asc',
     });
@@ -190,7 +182,7 @@ export class ProductManagement implements OnInit {
   }
 
   clearSearch(): void {
-    this.searchControl.setValue('');
+    this.form.controls.searchControl.setValue('');
   }
 
   openAddDialog(): void {
@@ -204,7 +196,6 @@ export class ProductManagement implements OnInit {
       })
 
       .afterClosed()
-
       .subscribe((result) => {
         if (!result?.saved) {
           return;
@@ -259,7 +250,7 @@ export class ProductManagement implements OnInit {
           return;
         }
 
-        this.productService.deleteProduct(product.id).subscribe({
+        this.productManagementService.deleteProduct(product.id).subscribe({
           next: () => {
             this.toastr.warning('Product deleted.');
 
@@ -272,9 +263,6 @@ export class ProductManagement implements OnInit {
             }
           },
 
-          error: () => {
-            this.toastr.error('Failed to delete product.');
-          },
         });
       });
   }
@@ -283,7 +271,7 @@ export class ProductManagement implements OnInit {
     this.filter.next({
       page: this.filter.value.page,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });

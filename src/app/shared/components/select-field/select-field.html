@@ -5,10 +5,6 @@
 >
   <mat-label>
     {{ config.label }}
-
-    @if (isRequired) {
-    <span class="required-star">*</span>
-    }
   </mat-label>
 
   @if (config.prefixIcon) {
@@ -19,7 +15,6 @@
 
   <mat-select
     [formControl]="config.control!"
-    (selectionChange)="markDirty()"
     (blur)="markTouched()"
   >
     @for (option of config.options; track option.value) {

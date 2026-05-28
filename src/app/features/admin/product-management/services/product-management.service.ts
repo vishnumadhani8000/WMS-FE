@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Product, ProductFilter, ProductFormValue } from '../models/product.model';
+import { Product, ProductFilter, ProductFormValue } from '../models/product-management.model';
 import { environment } from '../../../../../environments/environment';
 import { PaginatedResponse } from '../../../../core/models/paginated-response.model';
 import { ApiResponse } from '../../../../core/models/api-responce.model';
@@ -10,7 +10,7 @@ import { ApiResponse } from '../../../../core/models/api-responce.model';
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService {
+export class ProductManagementService {
   private readonly base = `${environment.baseUrl}/products`;
 
   constructor(private http: HttpClient) {}

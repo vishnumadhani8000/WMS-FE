@@ -67,7 +67,7 @@ export class CityDialogComponent implements OnInit{
       minlength: 2,
       maxlength: 100,
       trimStart: true,
-      control: this.form.controls.name,
+      formControlName:'name',
     };
 
     this.cancelButtonConfig = {
@@ -111,19 +111,13 @@ export class CityDialogComponent implements OnInit{
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.saving = false;
         this.toastr.success(
           this.isEdit ? 'City updated successfully.' : 'City added successfully.'
         );
         this.dialogRef.close({ saved: true });
       },
-      error: (err) => {
-        this.saving = false;
-        this.toastr.error(
-          err?.error?.message || (this.isEdit ? 'Failed to update city.' : 'Failed to add city.')
-        );
-      },
     });
+    this.saving = false;
   }
 
   cancel(): void {

@@ -1,11 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
-
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-
 import { SelectFieldConfig } from './select-field.config';
 
 @Component({
@@ -17,7 +15,7 @@ import { SelectFieldConfig } from './select-field.config';
 })
 export class SelectField {
   @Input({ required: true })
-  config!: SelectFieldConfig;
+  config: SelectFieldConfig;
 
   get isRequired(): boolean {
     return this.config.required || !!this.config.control?.hasValidator(Validators.required);
@@ -25,11 +23,6 @@ export class SelectField {
 
   markTouched(): void {
     this.config.control?.markAsTouched();
-  }
-
-  markDirty(): void {
-    this.config.control?.markAsDirty();
-    this.config.control?.updateValueAndValidity();
   }
 
   get errorMessage(): string {

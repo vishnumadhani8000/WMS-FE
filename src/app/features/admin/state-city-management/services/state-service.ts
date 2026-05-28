@@ -31,7 +31,6 @@ export class StateService {
       .get<ApiResponse<PaginatedResponse<State>>>(this.base, { params })
       .pipe(
         map((res) => {
-          if (!res.data) throw new Error('Failed to load states');
           return res.data;
         })
       );
@@ -42,7 +41,6 @@ export class StateService {
       .post<ApiResponse<State>>(this.base, form)
       .pipe(
         map((res) => {
-          if (!res.data) throw new Error('Failed to create state');
           return res.data;
         })
       );
@@ -53,7 +51,6 @@ export class StateService {
       .put<ApiResponse<State>>(`${this.base}/${id}`, form)
       .pipe(
         map((res) => {
-          if (!res.data) throw new Error('Failed to update state');
           return res.data;
         })
       );

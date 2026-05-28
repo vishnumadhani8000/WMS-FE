@@ -1,0 +1,137 @@
+<div class="orders-page">
+
+
+    <header class="orders-header">
+      <div class="orders-header__left">
+        <div class="orders-header__icon-wrap">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div>
+          <h1 class="orders-header__title">My Orders</h1>
+          @if (!loading() && orders().length > 0) {
+            <p class="orders-header__sub">
+              {{ totalOrders() }} order{{ totalOrders() !== 1 ? 's' : '' }} placed
+            </p>
+          }
+        </div>
+      </div>
+    </header>
+  
+
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate" class="orders-progress" />
+    }
+
+    @if (!loading() && orders().length === 0) {
+      <div class="orders-empty">
+        <div class="orders-empty__icon-wrap">
+          <mat-icon>inbox</mat-icon>
+        </div>
+        <span class="orders-empty__title">No orders yet</span>
+        <span class="orders-empty__sub">When you place an order, it will appear here.</span>
+      </div>
+    }
+
+    <div class="orders-list">
+      @for (order of orders(); track order.orderId) {
+        @let statusMeta = getStatusMeta(order.status);
+  
+        <div class="order-card">
+  
+          <div class="order-card__header">
+            <div class="order-card__meta">
+              <span class="order-card__id">Order #{{ order.orderId }}</span>
+              <span class="order-card__date">
+                <mat-icon class="order-card__date-icon">calendar_today</mat-icon>
+                {{ order.createdAt | date : 'MMM d, yyyy · h:mm a' }}
+              </span>
+            </div>
+            <span class="order-status {{ statusMeta.cssClass }}">
+              <mat-icon class="order-status__icon">{{ statusMeta.icon }}</mat-icon>
+              {{ statusMeta.label }}
+            </span>
+          </div>
+  
+          <div class="order-card__divider"></div>
+  
+        
+          <p class="order-items__label">Items</p>
+  
+          <div class="order-items">
+            @for (item of order.items; track item.orderItemId; let j = $index) {
+              <div class="order-item">
+                <div class="order-item__left">
+                  <span class="order-item__num">{{ j + 1 }}</span>
+                  <span class="order-item__name">{{ item.productName }}</span>
+                </div>
+                <div class="order-item__right">
+                  <span class="order-item__qty">
+                    <mat-icon class="order-item__qty-icon">close</mat-icon>
+                    {{ item.quantity }}
+                  </span>
+                  <!-- @if (getTotalProducts(item) === 0) {
+                    <span class="order-item__price order-item__price--free">Free</span>
+                  } @else { -->
+                    <span class="order-item__price">
+                      {{ getTotalProducts(item) | currency : 'INR' : 'symbol' : '1.0-0' }}
+                    </span>
+                  <!-- } -->
+                </div>
+              </div>
+            }
+          </div>
+  
+          <div class="order-card__divider"></div>
+  
+        
+          <div class="order-card__footer">
+  
+         
+            <div class="order-summary">
+              <div class="order-summary__pill">
+                <mat-icon>shopping_bag</mat-icon>
+                <div class="order-summary__pill-text">
+                  <span class="order-summary__label">Total Items</span>
+                  <span class="order-summary__value">{{ getTotalItems(order) }}</span>
+                </div>
+              </div>
+  
+              <div class="order-summary__pill order-summary__pill--accent">
+                <mat-icon>payments</mat-icon>
+                <div class="order-summary__pill-text">
+                  <span class="order-summary__label">Order Total</span>
+                  <span class="order-summary__value">
+                    <!-- @if (order.totalPrice === 0) { Free }
+                    @else { -->
+                        {{ order.totalPrice | currency : 'INR' : 'symbol' : '1.0-0' }} 
+                    <!-- } -->
+                  </span>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Notes -->
+            @if (order.notes) {
+              <div class="order-notes">
+                <mat-icon>sticky_note_2</mat-icon>
+                <span>{{ order.notes }}</span>
+              </div>
+            }
+  
+            <!-- Delivery address -->
+            <div class="order-address">
+              <div class="order-address__icon-wrap">
+                <mat-icon>location_on</mat-icon>
+              </div>
+              <div class="order-address__body">
+                <span class="order-address__label">Delivery Address</span>
+                <span class="order-address__text">{{ formatAddress(order) }}</span>
+              </div>
+            </div>
+  
+          </div>
+        </div>
+      }
+    </div>
+  
+  </div>

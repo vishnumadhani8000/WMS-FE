@@ -18,7 +18,10 @@ export const APP_ROUTES = {
 
     CUSTOMER: {
         ROOT: 'customer',
-        HOME: 'home',
+        PRODUCT: 'product',
+        CART:'cart',
+        ORDERS : 'my-orders',
+        PROFILE :'Profile'
     },
 
     CUSTOMER_AUTH: {

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -22,6 +22,8 @@ import { InputFieldConfig } from '../../../shared/components/input-field/input-f
 import { ButtonConfig } from '../../../shared/components/button/button.config';
 import { StateDialogComponent } from './components/state-dialog-component/state-dialog-component';
 import { CityDialogComponent } from './components/city-dialog-component/city-dialog-component';
+import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
   selector: 'app-state-city-management',
@@ -52,8 +54,7 @@ export class StateCityManagement implements OnInit {
   private readonly toastr = inject(ToastrService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly DEBOUNCE_MS = 400;
-  readonly pageSizeOptions = [5, 10, 25];
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   readonly stateColumns = ['index', 'name', 'actions'];
   readonly cityColumns = ['index', 'name', 'actions'];
@@ -71,8 +72,8 @@ export class StateCityManagement implements OnInit {
   statePage = signal(0);
   cityPage = signal(0);
 
-  statePageSize = 10;
-  cityPageSize = 10;
+  statePageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  cityPageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   stateSortBy: string | null = 'createdAt';
   stateSortAsc: boolean | null = false;
@@ -80,8 +81,17 @@ export class StateCityManagement implements OnInit {
   citySortBy: string | null = 'createdAt';
   citySortAsc: boolean | null = false;
 
-  stateSearchControl = new FormControl<string>('', { nonNullable: true });
-  citySearchControl = new FormControl<string>('', { nonNullable: true });
+  stateForm = new FormGroup({
+    stateSearchControl: new FormControl('', {
+      nonNullable: true,
+    }),
+  });
+  
+  cityForm = new FormGroup({
+    citySearchControl: new FormControl('', {
+      nonNullable: true,
+    }),
+  });
 
   stateSearchConfig: InputFieldConfig;
   citySearchConfig: InputFieldConfig;
@@ -101,7 +111,7 @@ export class StateCityManagement implements OnInit {
       placeholder: 'Search states...',
       prefixIcon: 'search',
       icon: 'close',
-      control: this.stateSearchControl,
+      formControlName: 'stateSearchControl',
 
       iconClick: () => {
         this.clearStateSearch();
@@ -114,7 +124,7 @@ export class StateCityManagement implements OnInit {
       placeholder: 'Search cities...',
       prefixIcon: 'search',
       icon: 'close',
-      control: this.citySearchControl,
+      formControlName: 'citySearchControl',
 
       iconClick: () => {
         this.clearCitySearch();
@@ -145,9 +155,9 @@ export class StateCityManagement implements OnInit {
   }
 
   private initializeSearch(): void {
-    this.stateSearchControl.valueChanges
+    this.stateForm.controls.stateSearchControl.valueChanges
       .pipe(
-        debounceTime(this.DEBOUNCE_MS),
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -157,9 +167,9 @@ export class StateCityManagement implements OnInit {
         this.loadStates();
       });
 
-    this.citySearchControl.valueChanges
+    this.cityForm.controls.citySearchControl.valueChanges
       .pipe(
-        debounceTime(this.DEBOUNCE_MS),
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -172,68 +182,58 @@ export class StateCityManagement implements OnInit {
 
   loadStates(): void {
     this.stateLoading.set(true);
-
+  
     this.stateService
       .getStates({
         page: this.statePage() + 1,
         pageSize: this.statePageSize,
-        search: this.stateSearchControl.value,
+        search: this.stateForm.controls.stateSearchControl.value,
         sortBy: this.stateSortBy ?? undefined,
         ascending: this.stateSortAsc ?? undefined,
       })
-
-      .pipe(takeUntilDestroyed(this.destroyRef))
-
+      .pipe(
+        finalize(() => this.stateLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (res) => {
           this.states.set(res.items);
           this.stateTotalCount.set(res.totalCount);
-          this.stateLoading.set(false);
-        },
-
-        error: () => {
-          this.stateLoading.set(false);
-
-          this.toastr.error('Failed to load states.');
         },
       });
   }
 
   loadCities(): void {
     const state = this.selectedState();
-
+  
     if (!state) {
       return;
     }
-
+  
     this.cityLoading.set(true);
-
+  
     this.cityService
       .getCities({
         stateId: state.id,
         page: this.cityPage() + 1,
         pageSize: this.cityPageSize,
-        search: this.citySearchControl.value,
+        search: this.cityForm.controls.citySearchControl.value,
         sortBy: this.citySortBy ?? undefined,
         ascending: this.citySortAsc ?? undefined,
       })
-
-      .pipe(takeUntilDestroyed(this.destroyRef))
-
+  
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.cityLoading.set(false))
+      )
+  
       .subscribe({
         next: (res) => {
           this.cities.set(res.items);
           this.cityTotalCount.set(res.totalCount);
-          this.cityLoading.set(false);
-        },
-
-        error: () => {
-          this.cityLoading.set(false);
-          this.toastr.error('Failed to load cities.');
         },
       });
   }
-
   onStateSortChange(sort: Sort): void {
     if (!sort.direction) {
       this.stateSortBy = null;
@@ -278,7 +278,7 @@ export class StateCityManagement implements OnInit {
     this.selectedState.set(state);
     this.cityPage.set(0);
     this.addCityButtonConfig.disabled = false;
-    this.citySearchControl.setValue('');
+    this.cityForm.controls.citySearchControl.setValue('');
     this.loadCities();
   }
 
@@ -324,7 +324,6 @@ export class StateCityManagement implements OnInit {
 
         disableClose: true,
       })
-      
 
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -353,7 +352,7 @@ export class StateCityManagement implements OnInit {
           stateId: state.id,
           stateName: state.name,
         },
-        disableClose : true
+        disableClose: true,
       })
 
       .afterClosed()
@@ -399,56 +398,78 @@ export class StateCityManagement implements OnInit {
   }
 
   deleteState(state: State): void {
-    if (!confirm(`Delete "${state.name}"?`)) {
-      return;
-    }
-
-    this.stateService
-      .deleteState(state.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('State deleted.');
-
-          if (this.selectedState()?.id === state.id) {
-            this.selectedState.set(null);
-            this.cities.set([]);
-          }
-
-          this.loadStates();
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Delete State',
+          message: `Are you sure you want to delete "${state.name}"? This will also delete all associated cities.`,
+          confirmText: 'Delete',
+          cancelText: 'Cancel',
+          type: 'warning',
         },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
-        error: () => {
-          this.toastr.error('Failed to delete state.');
-        },
+        this.stateService
+          .deleteState(state.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.toastr.success('State deleted.');
+
+              if (this.selectedState()?.id === state.id) {
+                this.selectedState.set(null);
+                this.cities.set([]);
+              }
+
+              this.loadStates();
+            },
+          });
       });
   }
 
   deleteCity(city: City): void {
-    if (!confirm(`Delete "${city.name}"?`)) {
-      return;
-    }
-
-    this.cityService
-      .deleteCity(city.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('City deleted.');
-          this.loadCities();
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Delete City',
+          message: `Are you sure you want to delete "${city.name}"?`,
+          confirmText: 'Delete',
+          cancelText: 'Cancel',
+          type: 'warning',
         },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
-        error: () => {
-          this.toastr.error('Failed to delete city.');
-        },
+        this.cityService
+          .deleteCity(city.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.toastr.success('City deleted.');
+              this.loadCities();
+            },
+          });
       });
   }
 
   clearStateSearch(): void {
-    this.stateSearchControl.setValue('');
+    this.stateForm.controls.stateSearchControl.setValue('');
   }
 
   clearCitySearch(): void {
-    this.citySearchControl.setValue('');
+    this.cityForm.controls.citySearchControl.setValue('');
   }
 }

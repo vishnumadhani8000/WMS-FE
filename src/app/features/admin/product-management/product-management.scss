@@ -115,7 +115,7 @@ $bp-md: 768px;
 // ── Table ──────────────────────────────────────────────────
 .pm-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 1000px;
   table-layout: fixed;
 
   // ── Column Widths ────────────────────────────────────────
@@ -132,6 +132,9 @@ $bp-md: 768px;
   }
 
   .mat-column-stock {
+    width: 8%;
+  }
+  .mat-column-price{
     width: 8%;
   }
 
@@ -190,14 +193,26 @@ $bp-md: 768px;
   }
 
   // ── Center Sortable Headers ──────────────────────────────
-  .mat-column-weightKg,
-  .mat-column-stock {
-    .mat-sort-header-container {
-      justify-content: center !important;
-    }
-
-    .mat-sort-header-content {
-      text-align: center;
+  ::ng-deep {
+    .mat-column-weightKg,
+    .mat-column-price,
+    .mat-column-stock{
+      
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        text-align: center !important;
+      }
+  
+      .mat-sort-header-container {
+        width: 100%;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+  
+      .mat-sort-header-content {
+        text-align: center !important;
+      }
     }
   }
 

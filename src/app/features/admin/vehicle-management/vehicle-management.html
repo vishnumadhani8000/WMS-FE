@@ -1,176 +1,160 @@
 <div class="vm-page">
-    <header class="vm-header">
-      <div class="vm-header__title-group">
-        <h1 class="vm-header__title">Vehicle Management</h1>
-      </div>
-  
-      <div class="vm-header__meta">
-        <span class="vm-header__count-badge">
-          <mat-icon class="badge-icon"> local_shipping </mat-icon>
-  
-          {{ totalCount() }}
-          {{ totalCount() === 1 ? 'Vehicle' : 'Vehicles' }}
-        </span>
-      </div>
-    </header>
-  
-    <section class="vm-toolbar">
-      <div class="vm-toolbar__search">
-        
-        <app-common-input
-          [config]="searchInputConfig" 
-          (iconClick)="clearSearch()"
-        >
-
-        </app-common-input>
-      </div>
-  
-      <app-common-button []
-     [config]="addVehicleButtonConfig"
-      >
-      </app-common-button>
-    </section>
-  
-    <div class="vm-card">
-  
-      <!-- Loading -->
-      @if (loading()) {
-      <mat-progress-bar mode="indeterminate" class="vm-progress"> </mat-progress-bar>
-      }
-  
-      <div class="vm-table-wrap">
-        <table
-          mat-table
-          [dataSource]="dataSource()"
-          class="vm-table"
-          matSort
-          (matSortChange)="onSortChange($event)"
-        >
-  
-          <!-- Index -->
-          <ng-container matColumnDef="index">
-            <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
-            <td mat-cell *matCellDef="let row; let i = index" class="col-index">
-              {{ rowIndex(i) }}
-            </td>
-          </ng-container>
-  
-          <!-- Name -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Vehicle Name</th>
-            <td mat-cell *matCellDef="let row">
-              <span
-                class="cell-text cell-name"
-                [matTooltip]="row.name"
-                [matTooltipDisabled]="row.name.length <= 30"
-                matTooltipPosition="above"
-              >
-                {{ row.name | truncate : 30 }}
-              </span>
-            </td>
-          </ng-container>
-  
-          <!-- Plate Number -->
-          <ng-container matColumnDef="plateNumber">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header="plateNumber">Plate Number</th>
-            <td mat-cell *matCellDef="let row">
-              <span class="cell-chip cell-plate">
-                {{ row.plateNumber }}
-              </span>
-            </td>
-          </ng-container>
-  
-          <!-- Capacity -->
-          <ng-container matColumnDef="capacityKg">
-            <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="capacityKg">
-              Capacity
-            </th>
-            <td mat-cell *matCellDef="let row" class="col-num">
-              <span class="cell-chip">
-                {{ row.capacityKg | number : '1.2-2' }} kg
-              </span>
-            </td>
-          </ng-container>
-  
-          <!-- Availability -->
-          <ng-container matColumnDef="isAvailable">
-            <th mat-header-cell *matHeaderCellDef class="col-num">
-              Status
-            </th>
-            <td mat-cell *matCellDef="let row" class="col-num">
-              <span
-                class="cell-chip"
-                [ngClass]="{
-                  'status-available': row.isAvailable,
-                  'status-unavailable': !row.isAvailable
-                }"
-              >
-                {{ row.isAvailable ? 'Available' : 'Unavailable' }}
-              </span>
-            </td>
-          </ng-container>
-  
-          <!-- Actions -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
-            <td mat-cell *matCellDef="let row" class="col-actions">
-              <button mat-icon-button class="action-btn" [matMenuTriggerFor]="actionMenu">
-                <mat-icon> more_vert </mat-icon>
-              </button>
-  
-              <mat-menu #actionMenu="matMenu" class="vm-action-menu">
-  
-                <!-- Edit -->
-                <button mat-menu-item (click)="openEditDialog(row)">
-                  <mat-icon> edit </mat-icon>
-                  <span> Edit </span>
-                </button>
-  
-                <!-- Delete -->
-                <button mat-menu-item class="delete-item" (click)="deleteVehicle(row)">
-                  <mat-icon> delete_outline </mat-icon>
-                  <span> Delete </span>
-                </button>
-  
-              </mat-menu>
-            </td>
-          </ng-container>
-  
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-            class="vm-header-row"
-          ></tr>
-  
-          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="vm-row"></tr>
-  
-          <tr class="mat-mdc-row" *matNoDataRow>
-            <td class="mat-mdc-cell vm-no-data" [attr.colspan]="displayedColumns.length">
-              @if (!loading()) {
-              <div class="vm-empty-inline">
-                <mat-icon> local_shipping </mat-icon>
-                <span> No vehicles found </span>
-              </div>
-              }
-            </td>
-          </tr>
-  
-        </table>
-      </div>
-  
-      <mat-divider></mat-divider>
-  
-      <mat-paginator
-        #paginator
-        class="vm-paginator"
-        [length]="totalCount()"
-        [pageSize]="this.filter.value.pageSize"
-        [pageSizeOptions]="pageSizeOptions"
-        [pageIndex]="this.filter.value.page -1"
-        showFirstLastButtons
-        (page)="onPageChange($event)"
-      >
-      </mat-paginator>
-  
+  <header class="vm-header">
+    <div class="vm-header__title-group">
+      <h1 class="vm-header__title">Vehicle Management</h1>
     </div>
+
+    <div class="vm-header__meta">
+      <span class="vm-header__count-badge">
+        <mat-icon class="badge-icon"> local_shipping </mat-icon>
+
+        {{ totalCount() }}
+        {{ totalCount() === 1 ? 'Vehicle' : 'Vehicles' }}
+      </span>
+    </div>
+  </header>
+
+  <section class="vm-toolbar">
+    <div class="vm-toolbar__search">
+      <form [formGroup]="form" class="vm-toolbar__search">
+      <app-common-input [config]="searchInputConfig">
+      </app-common-input>
+    </form>
+    </div>
+
+    <app-common-button [] [config]="addVehicleButtonConfig"> </app-common-button>
+  </section>
+
+  <div class="vm-card">
+    <!-- Loading -->
+    @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="vm-progress"> </mat-progress-bar>
+    }
+
+    <div class="vm-table-wrap">
+      <table
+        mat-table
+        [dataSource]="dataSource()"
+        class="vm-table"
+        matSort
+        (matSortChange)="onSortChange($event)"
+      >
+        <!-- Index -->
+        <ng-container matColumnDef="index">
+          <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
+          <td mat-cell *matCellDef="let row; let i = index" class="col-index">
+            {{ rowIndex(i) }}
+          </td>
+        </ng-container>
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Vehicle Name</th>
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="cell-text cell-name"
+              [matTooltip]="row.name"
+              [matTooltipDisabled]="row.name.length <= 30"
+              matTooltipPosition="above"
+            >
+              {{ row.name | truncate : 30 }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Plate Number -->
+        <ng-container matColumnDef="plateNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="plateNumber">Plate Number</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-chip cell-plate">
+              {{ row.plateNumber }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Capacity -->
+        <ng-container matColumnDef="capacityKg">
+          <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="capacityKg">
+            Capacity
+          </th>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span class="cell-chip"> {{ row.capacityKg | number : '1.2-2' }} kg </span>
+          </td>
+        </ng-container>
+
+        <!-- Availability -->
+        <ng-container matColumnDef="isAvailable">
+          <th mat-header-cell *matHeaderCellDef class="col-num">Status</th>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span
+              class="cell-chip"
+              [ngClass]="{
+                'status-available': row.isAvailable,
+                'status-unavailable': !row.isAvailable
+              }"
+            >
+              {{ row.isAvailable ? 'Available' : 'Unavailable' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
+          <td mat-cell *matCellDef="let row" class="col-actions">
+            <button mat-icon-button class="action-btn" [matMenuTriggerFor]="actionMenu">
+              <mat-icon> more_vert </mat-icon>
+            </button>
+
+            <mat-menu #actionMenu="matMenu" class="vm-action-menu">
+              <!-- Edit -->
+              <button mat-menu-item (click)="openEditDialog(row)">
+                <mat-icon> edit </mat-icon>
+                <span> Edit </span>
+              </button>
+
+              <!-- Delete -->
+              <button mat-menu-item class="delete-item" (click)="deleteVehicle(row)">
+                <mat-icon> delete_outline </mat-icon>
+                <span> Delete </span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+          class="vm-header-row"
+        ></tr>
+
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="vm-row"></tr>
+
+        <tr class="mat-mdc-row" *matNoDataRow>
+          <td class="mat-mdc-cell vm-no-data" [attr.colspan]="displayedColumns.length">
+            @if (!loading()) {
+            <div class="vm-empty-inline">
+              <mat-icon> local_shipping </mat-icon>
+              <span> No vehicles found </span>
+            </div>
+            }
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <mat-paginator
+      #paginator
+      class="vm-paginator"
+      [length]="totalCount()"
+      [pageSize]="this.filter.value.pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="this.filter.value.page - 1"
+      showFirstLastButtons
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
   </div>
+</div>

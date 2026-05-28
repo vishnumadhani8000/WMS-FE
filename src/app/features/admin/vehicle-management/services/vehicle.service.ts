@@ -1,19 +1,12 @@
 // vehicle.service.ts
 
 import { Injectable } from '@angular/core';
-
 import { HttpClient, HttpParams } from '@angular/common/http';
-
 import { Observable } from 'rxjs';
-
 import { map } from 'rxjs/operators';
-
 import { Vehicle, VehicleFilter, VehicleFormValue } from '../models/vehicle.model';
-
 import { environment } from '../../../../../environments/environment';
-
 import { PaginatedResponse } from '../../../../core/models/paginated-response.model';
-
 import { ApiResponse } from '../../../../core/models/api-responce.model';
 
 @Injectable({
@@ -30,13 +23,9 @@ export class VehicleService {
       .set('pageNumber', filter.page.toString())
       .set('pageSize', filter.pageSize.toString());
 
-    // Search
-
     if (filter.search?.trim()) {
       params = params.set('search', filter.search.trim());
     }
-
-    // Sorting
 
     if (filter.sortBy) {
       params = params.set('sortBy', filter.sortBy);
@@ -94,7 +83,7 @@ export class VehicleService {
     return this.http
       .delete<ApiResponse<void>>(`${this.base}/${id}`)
 
-      .pipe(map(() : void => undefined));
+      .pipe(map((): void => undefined));
   }
 
   getVehicleById(id: number): Observable<Vehicle> {
