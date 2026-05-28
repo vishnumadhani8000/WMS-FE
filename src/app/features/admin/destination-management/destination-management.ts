@@ -44,10 +44,10 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
     Button,
   ],
 
-  templateUrl: './state-city-management.html',
-  styleUrl: './state-city-management.scss',
+  templateUrl: './destination-management.html',
+  styleUrl: './destination-management.scss',
 })
-export class StateCityManagement implements OnInit {
+export class DestinationManagement implements OnInit {
   private readonly stateService = inject(StateService);
   private readonly cityService = inject(CityService);
   private readonly dialog = inject(MatDialog);

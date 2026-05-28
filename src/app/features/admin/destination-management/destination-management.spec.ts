@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StateCityManagement } from './state-city-management';
+import { DestinationManagement } from './destination-management';
 
 describe('CityManagement', () => {
-  let component: StateCityManagement;
-  let fixture: ComponentFixture<StateCityManagement>;
+  let component: DestinationManagement;
+  let fixture: ComponentFixture<DestinationManagement>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StateCityManagement]
+      imports: [DestinationManagement]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(StateCityManagement);
+    fixture = TestBed.createComponent(DestinationManagement);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

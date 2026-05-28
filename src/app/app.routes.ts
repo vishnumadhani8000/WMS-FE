@@ -41,8 +41,8 @@ export const routes: Routes = [
             {
                 path: APP_ROUTES.ADMIN.DESTINATION_MANAGEMENT,
                 loadComponent: () =>
-                    import('./features/admin/state-city-management/state-city-management.js')
-                        .then((m) => m.StateCityManagement),
+                    import('./features/admin/destination-management/destination-management.js')
+                        .then((m) => m.DestinationManagement),
 
             },
 
