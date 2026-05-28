@@ -110,9 +110,8 @@ export class AddAddressDialogComponent implements OnInit {
       type: 'text',
       placeholder: 'e.g. 123 Main Street, Apartment 4B',
       maxlength: 200,
-      subscriptSizing: 'dynamic',
       trimStart: true,
-      control: this.form.controls.addressLine,
+      formControlName: 'addressLine'
     };
 
     this.landmarkConfig = {
@@ -120,9 +119,8 @@ export class AddAddressDialogComponent implements OnInit {
       type: 'text',
       placeholder: 'e.g. Near Central Park',
       maxlength: 100,
-      subscriptSizing: 'dynamic',
       trimStart: true,
-      control: this.form.controls.landmark,
+      formControlName:'landmark',
     };
 
     this.pincodeConfig = {
@@ -130,8 +128,7 @@ export class AddAddressDialogComponent implements OnInit {
       type: 'text',
       placeholder: 'e.g. 400001',
       maxlength: 6,
-      subscriptSizing: 'dynamic',
-      control: this.form.controls.pincode,
+      formControlName: 'pincode'
     };
 
     this.stateConfig = {

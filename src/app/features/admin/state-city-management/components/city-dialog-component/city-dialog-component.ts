@@ -67,7 +67,7 @@ export class CityDialogComponent implements OnInit{
       minlength: 2,
       maxlength: 100,
       trimStart: true,
-      control: this.form.controls.name,
+      formControlName:'name',
     };
 
     this.cancelButtonConfig = {

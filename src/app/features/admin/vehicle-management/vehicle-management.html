@@ -16,8 +16,10 @@
 
   <section class="vm-toolbar">
     <div class="vm-toolbar__search">
+      <form [formGroup]="form" class="vm-toolbar__search">
       <app-common-input [config]="searchInputConfig">
       </app-common-input>
+    </form>
     </div>
 
     <app-common-button [] [config]="addVehicleButtonConfig"> </app-common-button>

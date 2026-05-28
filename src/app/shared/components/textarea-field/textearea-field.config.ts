@@ -1,12 +1,9 @@
-import { FormControl } from "@angular/forms";
+import { FormControl } from '@angular/forms';
 
 export interface TextareaFieldConfig {
-
   label: string;
 
-  control?: FormControl;
-
-  required?: boolean;
+  formControlName: string;
 
   placeholder?: string;
 
@@ -21,7 +18,7 @@ export interface TextareaFieldConfig {
   subscriptSizing?: 'fixed' | 'dynamic';
 
   readonly?: boolean;
-  
+
   trimStart?: boolean;
 
   maxlength?: number;

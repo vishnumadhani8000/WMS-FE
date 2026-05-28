@@ -1,6 +1,6 @@
 import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
@@ -69,13 +69,17 @@ export class VehicleManagement implements OnInit {
     'actions',
   ];
 
-  readonly pageSizeOptions =APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
   dataSource = signal<Vehicle[]>([]);
   totalCount = signal(0);
   loading = signal(false);
 
-  searchControl = new FormControl<string>('');
+  form = new FormGroup({
+    searchControl: new FormControl('', {
+      nonNullable: true,
+    }),
+  });
 
   searchInputConfig: InputFieldConfig;
   addVehicleButtonConfig: ButtonConfig;
@@ -89,17 +93,15 @@ export class VehicleManagement implements OnInit {
   });
 
   ngOnInit(): void {
-   
+
     this.searchInputConfig = {
       label: 'Search',
       type: 'text',
       placeholder: 'Search vehicles...',
       prefixIcon: 'search',
       icon: 'close',
-      subscriptSizing: 'dynamic',
       trimStart: true,
-
-      control: this.searchControl,
+      formControlName: 'searchControl',
 
       iconClick: () => {
         this.clearSearch();
@@ -122,7 +124,7 @@ export class VehicleManagement implements OnInit {
   }
 
   private initializeSearch(): void {
-    this.searchControl.valueChanges
+    this.form.controls.searchControl.valueChanges
       .pipe(
         debounceTime(this.DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -146,7 +148,7 @@ export class VehicleManagement implements OnInit {
       .pipe(
         switchMap((filter) => {
           this.loading.set(true);
-  
+
           return this.vehicleService.getVehicles(filter).pipe(
             finalize(() => this.loading.set(false))
           );
@@ -164,7 +166,7 @@ export class VehicleManagement implements OnInit {
     this.filter.next({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });
@@ -176,7 +178,7 @@ export class VehicleManagement implements OnInit {
     this.filter.next({
       page: 1,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: sort.direction ? sort.active : undefined,
       ascending: sort.direction === '' ? undefined : sort.direction === 'asc',
     });
@@ -187,7 +189,7 @@ export class VehicleManagement implements OnInit {
   }
 
   clearSearch(): void {
-    this.searchControl.setValue('');
+    this.form.controls.searchControl.setValue('');
   }
 
   openAddDialog(): void {
@@ -270,7 +272,7 @@ export class VehicleManagement implements OnInit {
     this.filter.next({
       page: this.filter.value.page,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });

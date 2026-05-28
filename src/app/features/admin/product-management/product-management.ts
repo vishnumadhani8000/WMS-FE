@@ -1,6 +1,6 @@
 import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, switchMap } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -65,8 +65,10 @@ export class ProductManagement implements OnInit {
   totalCount = signal(0);
   loading = signal(false);
 
-  searchControl = new FormControl<string>('', {
-    nonNullable: true,
+  form = new FormGroup({
+    searchControl: new FormControl('', {
+      nonNullable: true,
+    }),
   });
 
   searchInputConfig: InputFieldConfig;
@@ -88,10 +90,8 @@ export class ProductManagement implements OnInit {
       placeholder: 'Search products...',
       prefixIcon: 'search',
       icon: 'close',
-      subscriptSizing: 'dynamic',
       trimStart: true,
-
-      control: this.searchControl,
+      formControlName: 'searchControl',
 
       iconClick: () => {
         this.clearSearch();
@@ -114,7 +114,7 @@ export class ProductManagement implements OnInit {
   }
 
   private initializeSearch(): void {
-    this.searchControl.valueChanges
+    this.form.controls.searchControl.valueChanges
       .pipe(
         debounceTime(this.DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -159,7 +159,7 @@ export class ProductManagement implements OnInit {
     this.filter.next({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });
@@ -171,7 +171,7 @@ export class ProductManagement implements OnInit {
     this.filter.next({
       page: 1,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: sort.direction ? sort.active : undefined,
       ascending: sort.direction === '' ? undefined : sort.direction === 'asc',
     });
@@ -182,7 +182,7 @@ export class ProductManagement implements OnInit {
   }
 
   clearSearch(): void {
-    this.searchControl.setValue('');
+    this.form.controls.searchControl.setValue('');
   }
 
   openAddDialog(): void {
@@ -271,7 +271,7 @@ export class ProductManagement implements OnInit {
     this.filter.next({
       page: this.filter.value.page,
       pageSize: this.filter.value.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.filter.value.sortBy,
       ascending: this.filter.value.ascending,
     });

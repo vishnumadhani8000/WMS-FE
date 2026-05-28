@@ -5,7 +5,9 @@
 
   <section class="product-toolbar">
     <div class="product-search">
-      <app-common-input [config]="searchConfig"> </app-common-input>
+      <form [formGroup]="form">
+        <app-common-input [config]="searchConfig"></app-common-input>
+      </form>
     </div>
 
     <span class="product-count">

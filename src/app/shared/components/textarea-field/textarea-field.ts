@@ -1,78 +1,84 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { ControlContainer, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { TextareaFieldConfig } from './textearea-field.config';
 
-
-
 @Component({
   selector: 'app-common-textarea',
+
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-  ],
+
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+
   templateUrl: './textarea-field.html',
+
   styleUrl: './textarea-field.scss',
 })
 export class TextareaField {
   @Input({ required: true })
   config: TextareaFieldConfig;
 
+  constructor(private controlContainer: ControlContainer) {}
+
+  get control(): FormControl {
+    return this.controlContainer.control?.get(this.config.formControlName) as FormControl;
+  }
+
   get isRequired(): boolean {
-    return (
-      this.config.required ||
-      this.config.control.hasValidator(Validators.required)
-    );
+    return this.control.hasValidator(Validators.required);
   }
 
   handleInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    let value = input.value;
-    if (this.config.trimStart) {
-      value = value.trimStart();
+    if (!this.config.trimStart) {
+      return;
     }
 
-    this.config.control?.setValue(value, {
+    const input = event.target as HTMLTextAreaElement;
+
+    const value = input.value.trimStart();
+
+    this.control.setValue(value, {
       emitEvent: false,
     });
 
     input.value = value;
   }
-   
 
   get errorMessage(): string {
     if (this.config.customErrorMessage) {
       return this.config.customErrorMessage;
     }
 
-    if (!this.config.control.errors) {
+    const errors = this.control.errors;
+
+    if (!errors) {
       return '';
     }
 
-    const e = this.config.control.errors;
+    const firstKey = Object.keys(errors)[0];
+    const firstError = errors[firstKey];
 
-    if (e['required']) {
-      return `${this.config.label} is required.`;
+    // Custom validator message
+    if (firstError?.message) {
+      return firstError.message;
     }
 
-    if (e['minlength']) {
-      return `Minimum ${e['minlength'].requiredLength} characters required.`;
+    // Default validators
+    if (errors['required']) {
+      return `${this.config.label} is required`;
     }
 
-    if (e['maxlength']) {
-      return `Maximum ${e['maxlength'].requiredLength} characters allowed.`;
+    if (errors['minlength']) {
+      return `Minimum ${errors['minlength'].requiredLength} characters required`;
     }
 
-    const firstKey = Object.keys(e)[0];
+    if (errors['maxlength']) {
+      return `Maximum ${errors['maxlength'].requiredLength} characters allowed`;
+    }
 
-    return e[firstKey]?.message ?? 'Invalid field.';
+    return 'Invalid field';
   }
 }

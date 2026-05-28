@@ -1,82 +1,120 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
+
+import { ControlContainer, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
+
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { InputFieldConfig } from './input-field.config';
 
 @Component({
   selector: 'app-common-input',
+
   standalone: true,
+
   imports: [
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
     MatIconModule,
+    MatButtonModule,
   ],
+
   templateUrl: './input-field.html',
+
   styleUrl: './input-field.scss',
 })
 export class InputField {
   @Input({ required: true }) config: InputFieldConfig;
-
   showPassword = false;
+  constructor(private controlContainer: ControlContainer) {
+  }
 
-  get isRequired(): boolean {
-    return this.config.control.hasValidator(Validators.required);
+  get control(): FormControl {
+    return this.controlContainer.control?.get(this.config.formControlName) as FormControl;
   }
 
   get inputType(): string {
-    if (this.config.type !== 'password') return this.config.type;
+    if (this.config.type !== 'password') {
+      return this.config.type || 'text';
+    }
+
     return this.showPassword ? 'text' : 'password';
+  }
+
+  get isRequired(): boolean {
+    return this.control.hasValidator(Validators.required);
   }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
+
   handleInput(event: Event): void {
-
-    if(this.config.trimStart===undefined||this.config.trimStart===false){return;}
-    const input = event.target as HTMLInputElement;
-
-    let value = input.value;
-
-    if (this.config.trimStart === true) {
-      value = value.trimStart();
+    if (!this.config.trimStart) {
+      return;
     }
 
-      this.config.control?.setValue(value, {
-        emitEvent: false,
-      });
+    const input = event.target as HTMLInputElement;
+    const value = input.value.trimStart();
+    this.control.setValue(value, {
+      emitEvent: false,
+    });
 
     input.value = value;
   }
+
   handleIconClick(): void {
     this.config.iconClick?.();
   }
 
   get errorMessage(): string {
-    if (this.config.customErrorMessage) return this.config.customErrorMessage;
-    if (!this.config.control.errors) return '';
-
-    const e = this.config.control.errors;
-    if (e['required']) return `${this.config.label || 'This field'} is required.`;
-    if (e['whitespace']) return 'This field cannot be empty or spaces only.';
-    if (e['email']) return 'Please enter a valid email address.';
-    if (e['minlength']) return `Minimum ${e['minlength'].requiredLength} characters required.`;
-    if (e['maxlength']) return `Maximum ${e['maxlength'].requiredLength} characters allowed.`;
-    if (e['min']) return `Minimum value is ${e['min'].min}.`;
-    if (e['max']) return `Maximum value is ${e['max'].max}.`;
-    if (e['pattern']) {
-      return this.config.type === 'password'
-        ? 'Use uppercase, lowercase, number & special character.'
-        : `Invalid ${this.config.label?.toLowerCase() || 'format'}.`;
+ 
+  
+    const errors = this.control.errors;
+  
+    if (!errors) {
+      return '';
     }
-    const firstKey = Object.keys(e)[0];
-    return e[firstKey]?.message ?? 'Invalid field.';
+  
+    
+    const firstErrorKey = Object.keys(errors)[0];
+    const firstError = errors[firstErrorKey];
+  
+    if (firstError?.message) {
+      return firstError.message;
+    }
+
+    if (errors['required']) {
+      return `${this.config.label} is required`;
+    }
+  
+    if (errors['email']) {
+      return 'Invalid email';
+    }
+  
+    if (errors['minlength']) {
+      return `Minimum ${errors['minlength'].requiredLength} characters`;
+    }
+  
+    if (errors['maxlength']) {
+      return `Maximum ${errors['maxlength'].requiredLength} characters`;
+    }
+  
+    if (errors['min']) {
+      return `Minimum value is ${errors['min'].min}`;
+    }
+  
+    if (errors['max']) {
+      return `Maximum value is ${errors['max'].max}`;
+    }
+  
+    return 'Invalid field';
   }
 }

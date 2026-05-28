@@ -78,9 +78,8 @@ export class Login implements OnInit {
       placeholder: 'Enter your email',
       prefixIcon: 'email',
       maxlength: 50,
-      subscriptSizing: 'dynamic',
       trimStart: true,
-      control: this.form.controls.email,
+      formControlName:'email',
     };
 
 
@@ -90,9 +89,8 @@ export class Login implements OnInit {
       placeholder: 'Enter your password',
       prefixIcon: 'lock',
       maxlength: 50,
-      subscriptSizing: 'dynamic',
       trimStart: true,
-      control: this.form.controls.password,
+      formControlName :'password',
     };
 
 

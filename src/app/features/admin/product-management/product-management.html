@@ -16,7 +16,9 @@
 
   <section class="pm-toolbar">
     <div class="pm-toolbar__search">
-      <app-common-input [config]="searchInputConfig" />
+      <form [formGroup]="form" class="pm-toolbar__search">
+        <app-common-input [config]="searchInputConfig" />
+      </form>
     </div>
 
     <app-common-button [config]="addProductButtonConfig"/>

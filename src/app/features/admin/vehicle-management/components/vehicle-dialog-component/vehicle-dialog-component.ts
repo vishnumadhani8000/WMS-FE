@@ -135,7 +135,7 @@
         minlength: 2,
         maxlength: 100,
         trimStart: true,
-        control: this.form.controls.name,
+        formControlName: 'name',
       };
 
       // Plate Number Config
@@ -143,9 +143,8 @@
         label: 'Plate Number',
         type: 'text',
         placeholder: 'e.g. MH12AB1234',
-        subscriptSizing: 'dynamic',
         trimStart: true,
-        control: this.form.controls.plateNumber,
+        formControlName: 'plateNumber',
       };
 
       // Capacity Config
@@ -156,8 +155,7 @@
         min: 0.01,
         max: 100000,
         step: 0.01,
-        subscriptSizing: 'dynamic',
-        control: this.form.controls.capacityKg,
+        formControlName: 'capacityKg',
       };
       this.cancelButtonConfig = {
         label: 'Cancel',

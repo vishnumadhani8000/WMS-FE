@@ -1,176 +1,187 @@
 <div class="scm-page">
-    <header class="scm-header">
-      <h1 class="scm-header__title">City Management</h1>
-    </header>
-  
-    <div class="scm-layout">
-  
-      <!-- ── States Panel ── -->
-      <div class="scm-panel">
-        <div class="scm-panel__header">
-          <h2 class="scm-panel__title">States</h2>
-          <app-common-button [config]="addStateButtonConfig" />
-        </div>
-  
-        <div class="scm-panel__search">
-          <app-common-input [config]="stateSearchConfig" (iconClick)="clearStateSearch()" />
-        </div>
-  
-        <div class="scm-table-wrap">
-          @if (stateLoading()) {
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          }
-  
-          <table mat-table [dataSource]="states()" class="scm-table" matSort (matSortChange)="onStateSortChange($event)">
-  
-            <ng-container matColumnDef="index">
-              <th mat-header-cell *matHeaderCellDef>#</th>
-              <td mat-cell *matCellDef="let row; let i = index">{{ stateRowIndex(i) }}</td>
-            </ng-container>
-  
-            <ng-container matColumnDef="name" >
-              <th mat-header-cell *matHeaderCellDef mat-sort-header="name">STATE NAME</th>
-              <td mat-cell *matCellDef="let row">{{ row.name }}</td>
-            </ng-container>
-  
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="col-actions">ACTIONS</th>
-              <td mat-cell *matCellDef="let row" class="col-actions">
-                <button mat-icon-button [matMenuTriggerFor]="stateMenu" class="action-btn">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #stateMenu="matMenu">
-                  <button mat-menu-item (click)="openEditStateDialog(row)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Edit</span>
-                  </button>
-                  <button mat-menu-item class="delete-item" (click)="deleteState(row)">
-                    <mat-icon>delete_outline</mat-icon>
-                    <span>Delete</span>
-                  </button>
-                </mat-menu>
-              </td>
-            </ng-container>
-  
-            <tr mat-header-row *matHeaderRowDef="stateColumns"></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: stateColumns"
-              class="scm-row"
-              [class.scm-row--selected]="selectedState()?.id === row.id"
-              (click)="selectState(row)"
-            ></tr>
-  
-            <tr class="mat-mdc-row" *matNoDataRow>
-              <td class="mat-mdc-cell scm-no-data" colspan="3">
-                @if (!stateLoading()) {
-                  <div class="scm-empty">
-                    <mat-icon>location_on</mat-icon>
-                    <span>No states found</span>
-                  </div>
-                }
-              </td>
-            </tr>
-          </table>
-        </div>
-  
-        <mat-divider></mat-divider>
-  
-        <mat-paginator class="paginator"
-          [length]="stateTotalCount()"
-          [pageSize]="statePageSize"
-          [pageSizeOptions]="pageSizeOptions"
-          [pageIndex]="statePage()"
-          (page)="onStatePageChange($event)"
-          showFirstLastButtons
-        ></mat-paginator>
+  <header class="scm-header">
+    <h1 class="scm-header__title">City Management</h1>
+  </header>
+
+  <div class="scm-layout">
+    <!-- ── States Panel ── -->
+    <div class="scm-panel">
+      <div class="scm-panel__header">
+        <h2 class="scm-panel__title">States</h2>
+        <app-common-button [config]="addStateButtonConfig" />
       </div>
-  
-      <!-- ── Cities Panel ── -->
-      <div class="scm-panel">
-        <div class="scm-panel__header">
-          <h2 class="scm-panel__title">
-            @if (selectedState()) {
-              Cities — {{ selectedState()!.name }}
-            } @else {
-              Cities
-            }
-          </h2>
-          <app-common-button [config]="addCityButtonConfig" />
-        </div>
-  
-        <div class="scm-panel__search">
-          <app-common-input [config]="citySearchConfig" (iconClick)="clearCitySearch()" />
-        </div>
-  
-        <div class="scm-table-wrap">
-          @if (cityLoading()) {
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          }
-  
-          <table mat-table [dataSource]="cities()" class="scm-table" matSort (matSortChange)="onCitySortChange($event)">
-  
-            <ng-container matColumnDef="index">
-              <th mat-header-cell *matHeaderCellDef>#</th>
-              <td mat-cell *matCellDef="let row; let i = index">{{ cityRowIndex(i) }}</td>
-            </ng-container>
-              
-            <ng-container matColumnDef="name" >
-              <th mat-header-cell *matHeaderCellDef mat-sort-header="name">CITY NAME</th>
-              <td mat-cell *matCellDef="let row">{{ row.name }}</td>
-            </ng-container>
-  
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="col-actions">ACTIONS</th>
-              <td mat-cell *matCellDef="let row" class="col-actions">
-                <button mat-icon-button [matMenuTriggerFor]="cityMenu" class="action-btn">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #cityMenu="matMenu">
-                  <button mat-menu-item (click)="openEditCityDialog(row)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Edit</span>
-                  </button>
-                  <button mat-menu-item class="delete-item" (click)="deleteCity(row)">
-                    <mat-icon>delete_outline</mat-icon>
-                    <span>Delete</span>
-                  </button>
-                </mat-menu>
-              </td>
-            </ng-container>
-  
-            <tr mat-header-row *matHeaderRowDef="cityColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: cityColumns" class="scm-row"></tr>
-  
-            <tr class="mat-mdc-row" *matNoDataRow>
-              <td class="mat-mdc-cell scm-no-data" colspan="3">
-                @if (!cityLoading()) {
-                  <div class="scm-empty">
-                    @if (!selectedState()) {
-                      <mat-icon>touch_app</mat-icon>
-                      <span>Select a state to view cities</span>
-                    } @else {
-                      <mat-icon>location_city</mat-icon>
-                      <span>No cities found</span>
-                    }
-                  </div>
-                }
-              </td>
-            </tr>
-          </table>
-        </div>
-  
-        <mat-divider></mat-divider>
-  
-        <mat-paginator class="paginator"
-          [length]="cityTotalCount()"
-          [pageSize]="cityPageSize"
-          [pageSizeOptions]="pageSizeOptions"
-          [pageIndex]="cityPage()"
-          (page)="onCityPageChange($event)"
-          showFirstLastButtons
-        ></mat-paginator>
+
+      <div class="scm-panel__search">
+        <form [formGroup]="stateForm">
+          <app-common-input [config]="stateSearchConfig"> </app-common-input>
+        </form>
       </div>
-  
+
+      <div class="scm-table-wrap">
+        @if (stateLoading()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
+        <table
+          mat-table
+          [dataSource]="states()"
+          class="scm-table"
+          matSort
+          (matSortChange)="onStateSortChange($event)"
+        >
+          <ng-container matColumnDef="index">
+            <th mat-header-cell *matHeaderCellDef>#</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{ stateRowIndex(i) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">STATE NAME</th>
+            <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="col-actions">ACTIONS</th>
+            <td mat-cell *matCellDef="let row" class="col-actions">
+              <button mat-icon-button [matMenuTriggerFor]="stateMenu" class="action-btn">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #stateMenu="matMenu">
+                <button mat-menu-item (click)="openEditStateDialog(row)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item class="delete-item" (click)="deleteState(row)">
+                  <mat-icon>delete_outline</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="stateColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: stateColumns"
+            class="scm-row"
+            [class.scm-row--selected]="selectedState()?.id === row.id"
+            (click)="selectState(row)"
+          ></tr>
+
+          <tr class="mat-mdc-row" *matNoDataRow>
+            <td class="mat-mdc-cell scm-no-data" colspan="3">
+              @if (!stateLoading()) {
+              <div class="scm-empty">
+                <mat-icon>location_on</mat-icon>
+                <span>No states found</span>
+              </div>
+              }
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <mat-paginator
+        class="paginator"
+        [length]="stateTotalCount()"
+        [pageSize]="statePageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="statePage()"
+        (page)="onStatePageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+
+    <!-- ── Cities Panel ── -->
+    <div class="scm-panel">
+      <div class="scm-panel__header">
+        <h2 class="scm-panel__title">
+          @if (selectedState()) { Cities — {{ selectedState()!.name }}
+          } @else { Cities }
+        </h2>
+        <app-common-button [config]="addCityButtonConfig" />
+      </div>
+
+      <div class="scm-panel__search">
+        <form [formGroup]="cityForm">
+          <app-common-input [config]="citySearchConfig"> </app-common-input>
+        </form>
+      </div>
+
+      <div class="scm-table-wrap">
+        @if (cityLoading()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
+        <table
+          mat-table
+          [dataSource]="cities()"
+          class="scm-table"
+          matSort
+          (matSortChange)="onCitySortChange($event)"
+        >
+          <ng-container matColumnDef="index">
+            <th mat-header-cell *matHeaderCellDef>#</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{ cityRowIndex(i) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">CITY NAME</th>
+            <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="col-actions">ACTIONS</th>
+            <td mat-cell *matCellDef="let row" class="col-actions">
+              <button mat-icon-button [matMenuTriggerFor]="cityMenu" class="action-btn">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #cityMenu="matMenu">
+                <button mat-menu-item (click)="openEditCityDialog(row)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item class="delete-item" (click)="deleteCity(row)">
+                  <mat-icon>delete_outline</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="cityColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: cityColumns" class="scm-row"></tr>
+
+          <tr class="mat-mdc-row" *matNoDataRow>
+            <td class="mat-mdc-cell scm-no-data" colspan="3">
+              @if (!cityLoading()) {
+              <div class="scm-empty">
+                @if (!selectedState()) {
+                <mat-icon>touch_app</mat-icon>
+                <span>Select a state to view cities</span>
+                } @else {
+                <mat-icon>location_city</mat-icon>
+                <span>No cities found</span>
+                }
+              </div>
+              }
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <mat-paginator
+        class="paginator"
+        [length]="cityTotalCount()"
+        [pageSize]="cityPageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="cityPage()"
+        (page)="onCityPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
     </div>
   </div>
+</div>

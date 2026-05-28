@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -81,8 +81,17 @@ export class StateCityManagement implements OnInit {
   citySortBy: string | null = 'createdAt';
   citySortAsc: boolean | null = false;
 
-  stateSearchControl = new FormControl<string>('');
-  citySearchControl = new FormControl<string>('');
+  stateForm = new FormGroup({
+    stateSearchControl: new FormControl('', {
+      nonNullable: true,
+    }),
+  });
+  
+  cityForm = new FormGroup({
+    citySearchControl: new FormControl('', {
+      nonNullable: true,
+    }),
+  });
 
   stateSearchConfig: InputFieldConfig;
   citySearchConfig: InputFieldConfig;
@@ -102,7 +111,7 @@ export class StateCityManagement implements OnInit {
       placeholder: 'Search states...',
       prefixIcon: 'search',
       icon: 'close',
-      control: this.stateSearchControl,
+      formControlName: 'stateSearchControl',
 
       iconClick: () => {
         this.clearStateSearch();
@@ -115,7 +124,7 @@ export class StateCityManagement implements OnInit {
       placeholder: 'Search cities...',
       prefixIcon: 'search',
       icon: 'close',
-      control: this.citySearchControl,
+      formControlName: 'citySearchControl',
 
       iconClick: () => {
         this.clearCitySearch();
@@ -146,7 +155,7 @@ export class StateCityManagement implements OnInit {
   }
 
   private initializeSearch(): void {
-    this.stateSearchControl.valueChanges
+    this.stateForm.controls.stateSearchControl.valueChanges
       .pipe(
         debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -158,7 +167,7 @@ export class StateCityManagement implements OnInit {
         this.loadStates();
       });
 
-    this.citySearchControl.valueChanges
+    this.cityForm.controls.citySearchControl.valueChanges
       .pipe(
         debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -178,7 +187,7 @@ export class StateCityManagement implements OnInit {
       .getStates({
         page: this.statePage() + 1,
         pageSize: this.statePageSize,
-        search: this.stateSearchControl.value,
+        search: this.stateForm.controls.stateSearchControl.value,
         sortBy: this.stateSortBy ?? undefined,
         ascending: this.stateSortAsc ?? undefined,
       })
@@ -196,35 +205,35 @@ export class StateCityManagement implements OnInit {
 
   loadCities(): void {
     const state = this.selectedState();
-
+  
     if (!state) {
       return;
     }
-
+  
     this.cityLoading.set(true);
-
+  
     this.cityService
       .getCities({
         stateId: state.id,
         page: this.cityPage() + 1,
         pageSize: this.cityPageSize,
-        search: this.citySearchControl.value,
+        search: this.cityForm.controls.citySearchControl.value,
         sortBy: this.citySortBy ?? undefined,
         ascending: this.citySortAsc ?? undefined,
       })
-
-      .pipe(takeUntilDestroyed(this.destroyRef),
-            finalize(()=>this.cityLoading.set(false)))
-
+  
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.cityLoading.set(false))
+      )
+  
       .subscribe({
         next: (res) => {
           this.cities.set(res.items);
           this.cityTotalCount.set(res.totalCount);
         },
       });
-        this.cityLoading.set(false);
   }
-
   onStateSortChange(sort: Sort): void {
     if (!sort.direction) {
       this.stateSortBy = null;
@@ -269,7 +278,7 @@ export class StateCityManagement implements OnInit {
     this.selectedState.set(state);
     this.cityPage.set(0);
     this.addCityButtonConfig.disabled = false;
-    this.citySearchControl.setValue('');
+    this.cityForm.controls.citySearchControl.setValue('');
     this.loadCities();
   }
 
@@ -457,10 +466,10 @@ export class StateCityManagement implements OnInit {
   }
 
   clearStateSearch(): void {
-    this.stateSearchControl.setValue('');
+    this.stateForm.controls.stateSearchControl.setValue('');
   }
 
   clearCitySearch(): void {
-    this.citySearchControl.setValue('');
+    this.cityForm.controls.citySearchControl.setValue('');
   }
 }

@@ -83,7 +83,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       }),
 
       stock: new FormControl(p?.stock ?? null, {
-        validators: [Validators.required, Validators.min(0), Validators.max(1000000)],
+        validators: [Validators.required, Validators.min(0), Validators.max(1000000) , Validators.pattern(/^\d+$/) ],
       }),
 
       description: new FormControl(p?.description ?? '', {
@@ -101,9 +101,8 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       type: 'text',
       placeholder: 'e.g. Wireless Keyboard',
       maxlength: 100,
-      subscriptSizing: 'dynamic',
       trimStart: true,
-      control: this.form.controls.name,
+      formControlName:'name',
     };
 
     this.weightConfig = {
@@ -113,8 +112,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       min: 0.001,
       max: 9999,
       step: 0.001,
-      subscriptSizing: 'dynamic',
-      control: this.form.controls.weightKg,
+      formControlName:'weightKg',
     };
 
     this.stockConfig = {
@@ -124,8 +122,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       min: 0,
       max: 1000000,
       step: 1,
-      subscriptSizing: 'dynamic',
-      control: this.form.controls.stock,
+      formControlName:'stock',
     };
 
     this.descriptionConfig = {
@@ -134,7 +131,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       maxlength: 500,
       rows: 3,
       trimStart: true,
-      control: this.form.controls.description,
+      formControlName: 'description' ,
     };
     this.productPriceConfig = {
       label:'Price',
@@ -143,7 +140,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       min:1,
       max:10000000,
       step:1,
-      control:this.form.controls.price,
+      formControlName:'price',
     }
 
     this.cancelButtonConfig = {
@@ -223,4 +220,3 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     });
   }
 }
-  

@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 
@@ -68,13 +68,13 @@ export class Products implements OnInit {
   page = signal(0);
   sortBy = signal<string | null>(null);
   ascending = signal<boolean | null>(null);
-  pageSize:number= APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  searchConfig: InputFieldConfig;
 
-  searchControl = new FormControl<string>('', {
-    nonNullable: true,
+  form = new FormGroup({
+    searchControl: new FormControl('', { nonNullable: true }),
   });
 
-  searchConfig: InputFieldConfig;
 
   ngOnInit(): void {
     this.initializeConfigs();
@@ -89,7 +89,7 @@ export class Products implements OnInit {
       placeholder: 'Search products...',
       prefixIcon: 'search',
       icon: 'close',
-      control: this.searchControl,
+      formControlName: 'searchControl',
 
       iconClick: () => {
         this.clearSearch();
@@ -98,7 +98,7 @@ export class Products implements OnInit {
   }
 
   private initializeSearch(): void {
-    this.searchControl.valueChanges
+    this.form.controls.searchControl.valueChanges
       .pipe(
         debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
@@ -116,7 +116,7 @@ export class Products implements OnInit {
     this.productService.getAll({
       page: this.page() + 1,
       pageSize: this.pageSize,
-      search: this.searchControl.value,
+      search: this.form.controls.searchControl.value,
       sortBy: this.sortBy() ?? undefined,
       ascending: this.ascending() ?? undefined,
     })
@@ -193,6 +193,6 @@ export class Products implements OnInit {
     this.loadProducts();
   }
   clearSearch(): void {
-    this.searchControl.setValue('');
+    this.form.controls.searchControl.setValue('');
   }
 }
