@@ -49,9 +49,9 @@ export class InputField {
       value = value.trimStart();
     }
 
-    this.config.control?.setValue(value, {
-      emitEvent: false,
-    });
+      this.config.control?.setValue(value, {
+        emitEvent: false,
+      });
 
     input.value = value;
   }

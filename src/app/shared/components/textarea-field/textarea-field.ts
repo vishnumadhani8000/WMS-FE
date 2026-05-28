@@ -24,7 +24,7 @@ import { TextareaFieldConfig } from './textearea-field.config';
 })
 export class TextareaField {
   @Input({ required: true })
-  config!: TextareaFieldConfig;
+  config: TextareaFieldConfig;
 
   get isRequired(): boolean {
     return (

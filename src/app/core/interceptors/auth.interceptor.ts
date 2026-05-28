@@ -32,13 +32,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
         case 400:
           toastr.error(
-            error.error?.message || 'Bad Request'
+            error.error?.Message || 'Bad Request'
           );
           break;
 
         case 401:
           toastr.error(
-            error.error?.message || 'Unauthorized'
+            error.error?.Message || 'Unauthorized'
           );
 
           authService.logout();
@@ -46,25 +46,25 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
         case 403:
           toastr.error(
-            error.error?.message || 'Access Denied'
+            error.error?.Message || 'Access Denied'
           );
           break;
 
         case 404:
           toastr.error(
-            error.error?.message || 'Resource Not Found'
+            error.error?.Message || 'Resource Not Found'
           );
           break;
 
         case 500:
           toastr.error(
-            error.error?.message || 'Internal Server Error'
+            error.error?.Message || 'Internal Server Error'
           );
           break;
 
         default:
           toastr.error(
-            error.error?.message || 'Something went wrong'
+            error.error?.Message || 'Something went wrong'
           );
           break;
       }

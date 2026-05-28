@@ -99,7 +99,7 @@ export class AddAddressDialogComponent implements OnInit {
       }),
     });
 
-    this.form.controls.stateId.valueChanges.pipe(takeUntilDestroyed()).subscribe((stateId) => {
+    this.form.controls.stateId.valueChanges.pipe(takeUntilDestroyed(this.destroyref)).subscribe((stateId) => {
           this.loadCities(stateId);
     });
   }
@@ -108,7 +108,7 @@ export class AddAddressDialogComponent implements OnInit {
     this.addressLineConfig = {
       label: 'Address Line',
       type: 'text',
-      // placeholder: 'e.g. 123 Main Street, Apartment 4B',
+      placeholder: 'e.g. 123 Main Street, Apartment 4B',
       maxlength: 200,
       subscriptSizing: 'dynamic',
       trimStart: true,
