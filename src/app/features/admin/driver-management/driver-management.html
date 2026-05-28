@@ -1,0 +1,131 @@
+<div class="dm-page">
+    <header class="dm-header">
+      <div class="dm-header__content">
+        <h1 class="dm-header__title">Driver Management</h1>
+        <p class="dm-header__subtitle">Manage your drivers, licences and availability</p>
+      </div>
+      <app-common-button [config]="addButtonConfig" />
+    </header>
+  
+    <div class="dm-panel">
+      <div class="dm-panel__search">
+        <form [formGroup]="searchForm">
+          <app-common-input [config]="searchConfig" />
+        </form>
+      </div>
+  
+      <div class="dm-table-wrap">
+        @if (loading) {
+          <mat-progress-bar mode="indeterminate" />
+        }
+  
+        <table
+          mat-table
+          [dataSource]="drivers"
+          class="dm-table"
+          matSort
+          (matSortChange)="onSortChange($event)"
+        >
+          <!-- Index -->
+          <ng-container matColumnDef="index">
+            <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
+            <td mat-cell *matCellDef="let row; let i = index" class="col-index">
+              {{ rowIndex(i) }}
+            </td>
+          </ng-container>
+  
+          <!-- Name -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">DRIVER NAME</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="driver-name">
+                <div class="driver-avatar">{{ row.name.charAt(0).toUpperCase() }}</div>
+                <span>{{ row.name }}</span>
+              </div>
+            </td>
+          </ng-container>
+  
+          <!-- Phone -->
+          <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="phone">PHONE</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="phone-text">{{ row.phone }}</span>
+            </td>
+          </ng-container>
+  
+          <!-- Licence No -->
+          <ng-container matColumnDef="licenceNo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="licenceNo">LICENCE NO.</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="licence-badge">{{ row.licenceNo }}</span>
+            </td>
+          </ng-container>
+  
+          <!-- Availability -->
+          <ng-container matColumnDef="isAvailable">
+            <th mat-header-cell *matHeaderCellDef>STATUS</th>
+            <td mat-cell *matCellDef="let row">
+              <span
+                class="status-chip"
+                [class.status-chip--available]="row.isAvailable"
+                [class.status-chip--unavailable]="!row.isAvailable"
+              >
+                <span class="status-dot"></span>
+                {{ row.isAvailable ? 'Available' : 'Unavailable' }}
+              </span>
+            </td>
+          </ng-container>
+  
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="col-actions">ACTIONS</th>
+            <td mat-cell *matCellDef="let row" class="col-actions">
+              <button mat-icon-button [matMenuTriggerFor]="driverMenu" class="action-btn">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #driverMenu="matMenu">
+                <button mat-menu-item (click)="openEditDialog(row)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item class="delete-item" (click)="deleteDriver(row)">
+                  <mat-icon>delete_outline</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            class="dm-row"
+          ></tr>
+  
+          <tr class="mat-mdc-row" *matNoDataRow>
+            <td class="mat-mdc-cell dm-no-data" colspan="6">
+              @if (!loading) {
+                <div class="dm-empty">
+                  <mat-icon>directions_car</mat-icon>
+                  <span>No drivers found</span>
+                </div>
+              }
+            </td>
+          </tr>
+        </table>
+      </div>
+  
+      <mat-divider />
+  
+      <mat-paginator
+        class="paginator"
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="page"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      />
+    </div>
+  </div>

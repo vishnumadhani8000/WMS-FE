@@ -27,6 +27,14 @@ export const routes: Routes = [
             },
 
             {
+                path : APP_ROUTES.ADMIN.DRIVER_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/driver-management/driver-management.js')
+                    .then((m)=>m.DriverManagement),
+                
+            },
+
+            {
                 path: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
                 loadComponent: () =>
                     import('./features/admin/product-management/product-management.js')

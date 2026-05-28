@@ -106,6 +106,8 @@
   }
 
 // ── Address card ──────────────────────────────
+
+
 .address-card {
   display: flex;
   align-items: flex-start;
@@ -131,6 +133,27 @@
   background: rgba(69, 64, 225, 0.04);
   box-shadow: 0 0 0 3px rgba(69, 64, 225, 0.08);
 }
+}
+.address-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.delete-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn mat-icon {
+  font-size: 20px;
 }
 
 .radio-outer {

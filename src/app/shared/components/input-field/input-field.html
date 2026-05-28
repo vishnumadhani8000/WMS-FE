@@ -13,7 +13,7 @@
     matInput
     [formControl]="control"
     [type]="inputType"
-    [placeholder]="config.placeholder || ''"
+    [placeholder]="config.placeholder || config.label"
     [readonly]="config.readonly"
     [attr.minlength]="config.minlength"
     [attr.maxlength]="config.maxlength"

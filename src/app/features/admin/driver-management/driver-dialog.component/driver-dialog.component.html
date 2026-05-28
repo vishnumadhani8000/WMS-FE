@@ -1,0 +1,50 @@
+<div class="dialog-wrapper">
+    <!-- Header -->
+    <div class="dialog-header">
+      <div class="dialog-header__content">
+        <h2 class="dialog-title">{{ title }}</h2>
+        <p class="dialog-subtitle">{{ subtitle }}</p>
+      </div>
+      <app-common-button [config]="closeButtonConfig" />
+    </div>
+  
+    <mat-divider />
+  
+    <!-- Body -->
+    <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
+  
+      <div class="field-group">
+        <app-common-input [config]="nameConfig" />
+      </div>
+  
+      <div class="two-col">
+        <div class="field-group">
+          <app-common-input [config]="phoneConfig" />
+        </div>
+        <div class="field-group">
+          <app-common-input [config]="licenceConfig" />
+        </div>
+      </div>
+  
+      <div class="field-group">
+        <label class="field-label">Availability</label>
+        <div class="toggle-row">
+          <mat-slide-toggle formControlName="isAvailable" color="primary">
+            <span class="toggle-text" [class.toggle-text--on]="form.controls.isAvailable.value"
+                                     [class.toggle-text--off]="!form.controls.isAvailable.value">
+              {{ form.controls.isAvailable.value ? 'Available' : 'Unavailable' }}
+            </span>
+          </mat-slide-toggle>
+        </div>
+      </div>
+  
+    </form>
+  
+    <mat-divider />
+  
+    <!-- Footer -->
+    <div class="dialog-footer">
+      <app-common-button [config]="cancelButtonConfig" />
+      <app-common-button [config]="submitButtonConfig" />
+    </div>
+  </div>

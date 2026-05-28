@@ -64,11 +64,6 @@ export class SelectAddressDialog implements OnInit {
 
   selectAddress(id: number): void {
     this.selectedAddressId = id;
-
-    this.continueButtonConfig = {
-      ...this.continueButtonConfig,
-      disabled: false,
-    };
   }
 
   openAddAddress(): void {
@@ -76,10 +71,18 @@ export class SelectAddressDialog implements OnInit {
       action: 'add-new',
     } as SelectAddressDialogResult);
   }
+  deleteAddress(event: Event,address: AddressData ): void {
+  
+    event.stopPropagation();
+  
+    console.log(address);
+    
+  
+    // call delete api here
+  }
 
   confirm(): void {
     const address = this.addresses.find((a) => a.addressId === this.selectedAddressId);
-
     if (!address) return;
 
     this.dialogRef.close({
@@ -87,6 +90,7 @@ export class SelectAddressDialog implements OnInit {
       address,
     } as SelectAddressDialogResult);
   }
+  
 
   cancel(): void {
     this.dialogRef.close({
