@@ -1,6 +1,11 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
@@ -10,6 +15,10 @@ import {
   SelectAddressDialogResult,
 } from './models/SelectAddressDialogData.model';
 import { AddressData } from './models/addresh.model';
+import { CartService } from '../cart/Services/cart.service';
+import { ToastrService } from 'ngx-toastr';
+import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { AddressService } from './services/address.service';
 
 @Component({
   selector: 'app-select-address-dialog',
@@ -19,7 +28,15 @@ import { AddressData } from './models/addresh.model';
   styleUrl: './select-address-dialog.scss',
 })
 export class SelectAddressDialog implements OnInit {
-  private dialogRef = inject(MatDialogRef<SelectAddressDialog>);
+  constructor(
+    private readonly dialogRef: MatDialogRef<SelectAddressDialog>,
+    private readonly dialog: MatDialog,
+    private readonly addressService: AddressService,
+    private readonly toastr: ToastrService,
+  
+    @Inject(MAT_DIALOG_DATA)
+    public data: SelectAddressDialogData
+  ) {}
 
   selectedAddressId: number | null = null;
   addresses: AddressData[] = [];
@@ -28,10 +45,7 @@ export class SelectAddressDialog implements OnInit {
   continueButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public data: SelectAddressDialogData
-  ) {}
+
 
   ngOnInit(): void {
     this.addresses = [...(this.data.addresses ?? [])];
@@ -71,16 +85,42 @@ export class SelectAddressDialog implements OnInit {
       action: 'add-new',
     } as SelectAddressDialogResult);
   }
-  deleteAddress(event: Event,address: AddressData ): void {
-  
+  deleteAddress(event: Event, address: AddressData): void {
     event.stopPropagation();
-  
-    console.log(address);
-    
-  
-    // call delete api here
-  }
 
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Delete Address',
+          message: 'Are you sure you want to delete this address?',
+          confirmText: 'Delete',
+          cancelText: 'Cancel',
+          type: 'warning',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.addressService.deleteAddress(address.addressId).subscribe({
+          next: (res) => {
+            if (!res.isSuccess) {
+              return;
+            }
+
+            this.toastr.success(res.message);
+
+            this.dialogRef.close({
+              action: 'delete',
+            } as SelectAddressDialogResult);
+          },
+        });
+      });
+  }
   confirm(): void {
     const address = this.addresses.find((a) => a.addressId === this.selectedAddressId);
     if (!address) return;
@@ -90,7 +130,6 @@ export class SelectAddressDialog implements OnInit {
       address,
     } as SelectAddressDialogResult);
   }
-  
 
   cancel(): void {
     this.dialogRef.close({

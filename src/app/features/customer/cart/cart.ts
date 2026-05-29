@@ -230,6 +230,10 @@ export class Cart implements OnInit {
         if (result?.action === 'add-new') {
           this.openAddAddressDialog(orderItems);
           return;
+        } 
+        if(result?.action === 'delete'){
+          this.placeOrder();
+          return;
         }
 
         if (!result?.saved || !result.address) {

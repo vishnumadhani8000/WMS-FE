@@ -1,50 +1,63 @@
 <div class="dialog-wrapper">
-    <!-- Header -->
-    <div class="dialog-header">
-      <div class="dialog-header__content">
-        <h2 class="dialog-title">{{ title }}</h2>
-        <p class="dialog-subtitle">{{ subtitle }}</p>
-      </div>
-      <app-common-button [config]="closeButtonConfig" />
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="dialog-header__content">
+      <h2 class="dialog-title">
+        {{ title }}
+      </h2>
+
+      <p class="dialog-subtitle">
+        @if (isEdit) { Update driver details and save changes. } @else { Fill in the details to
+        register a new driver. }
+      </p>
     </div>
-  
-    <mat-divider />
-  
-    <!-- Body -->
-    <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-  
-      <div class="field-group">
-        <app-common-input [config]="nameConfig" />
-      </div>
-  
-      <div class="two-col">
-        <div class="field-group">
-          <app-common-input [config]="phoneConfig" />
-        </div>
-        <div class="field-group">
-          <app-common-input [config]="licenceConfig" />
-        </div>
-      </div>
-  
-      <div class="field-group">
-        <label class="field-label">Availability</label>
-        <div class="toggle-row">
-          <mat-slide-toggle formControlName="isAvailable" color="primary">
-            <span class="toggle-text" [class.toggle-text--on]="form.controls.isAvailable.value"
-                                     [class.toggle-text--off]="!form.controls.isAvailable.value">
-              {{ form.controls.isAvailable.value ? 'Available' : 'Unavailable' }}
-            </span>
-          </mat-slide-toggle>
-        </div>
-      </div>
-  
-    </form>
-  
-    <mat-divider />
-  
-    <!-- Footer -->
-    <div class="dialog-footer">
-      <app-common-button [config]="cancelButtonConfig" />
-      <app-common-button [config]="submitButtonConfig" />
-    </div>
+
+    <app-common-button [config]="closeButtonConfig" />
   </div>
+
+  <mat-divider />
+
+  <!-- Form -->
+  <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
+    <!-- Driver Name -->
+    <div class="field-group">
+      <app-common-input [config]="nameConfig" />
+    </div>
+
+    <!-- Phone -->
+    <div class="field-group">
+      <app-common-input [config]="phoneConfig" />
+    </div>
+
+    <!-- Licence Number -->
+    <div class="field-group">
+      <app-common-input [config]="licenceConfig" />
+    </div>
+
+    <!-- Availability -->
+    <div class="field-group toggle-group">
+      <div class="toggle-label-wrap">
+        <span class="toggle-label"> Availability </span>
+
+        <span class="toggle-hint">
+          Mark whether this driver is currently available for delivery.
+        </span>
+      </div>
+
+      <mat-slide-toggle formControlName="isAvailable" color="primary" class="availability-toggle">
+        <span class="toggle-value-label">
+          {{ form.get('isAvailable')?.value ? 'Available' : 'Unavailable' }}
+        </span>
+      </mat-slide-toggle>
+    </div>
+  </form>
+
+  <mat-divider />
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <app-common-button [config]="cancelButtonConfig" />
+
+    <app-common-button [config]="submitButtonConfig" />
+  </div>
+</div>

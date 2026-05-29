@@ -180,9 +180,13 @@ export class DriverDialogComponent implements OnInit {
     };
 
     this.closeButtonConfig = {
+      ariaLabel: 'Close',
       prefixIcon: 'close',
-      variant: 'icon',
-      clicked: () => this.cancel(),
+      variant: 'stroked',
+
+      clicked: () => {
+        this.cancel();
+      },
     };
   }
 

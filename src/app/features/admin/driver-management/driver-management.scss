@@ -1,5 +1,6 @@
 @use 'styles/variables' as *;
 
+// ── Breakpoints ─────────────────────────────────────────────
 $bp-sm: 480px;
 $bp-md: 768px;
 
@@ -54,10 +55,13 @@ $bp-md: 768px;
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
+
     border: 1px solid $border;
     border-radius: 999px;
+
     background: $white;
     box-shadow: $shadow-sm;
+
     font-size: $fs-body2;
     font-weight: $fw-semibold;
     color: $text-muted;
@@ -113,42 +117,70 @@ $bp-md: 768px;
 // ── Table ───────────────────────────────────────────────────
 .dm-table {
   width: 100%;
-  min-width: 800px;
+  min-width: 900px;
   table-layout: fixed;
 
-  .mat-column-index     { width: 5%; }
-  .mat-column-name      { width: 22%; }
-  .mat-column-phone     { width: 16%; }
-  .mat-column-licenceNo { width: 22%; }
-  .mat-column-isAvailable { width: 14%; }
-  .mat-column-actions   { width: 8%; }
+  // ── Column Widths ─────────────────────────────────────────
+  .mat-column-index {
+    width: 5%;
+  }
 
+  .mat-column-name {
+    width: 20%;
+  }
+
+  .mat-column-phone {
+    width: 18%;
+  }
+
+  .mat-column-licenceNo {
+    width: 22%;
+  }
+
+  .mat-column-isAvailable {
+    width: 15%;
+  }
+
+  .mat-column-actions {
+    width: 8%;
+  }
+
+  // ── Header Row ────────────────────────────────────────────
   .mat-mdc-header-row {
     background: $surface-soft;
     height: 56px;
   }
 
+  // ── Header Cells ──────────────────────────────────────────
   th.mat-mdc-header-cell {
     padding: 0 16px;
+
     color: $text-muted;
     font-size: $fs-caption;
     font-weight: $fw-bold;
+
     text-transform: uppercase;
     letter-spacing: 0.08em;
     white-space: nowrap;
+
     border-bottom: 2px solid $border !important;
     vertical-align: middle;
   }
 
+  // ── Data Cells ────────────────────────────────────────────
   td.mat-mdc-cell {
     height: 52px;
     padding: 0 16px;
+
     border-bottom: 1px solid $border;
+
     color: $text-main;
     font-size: $fs-body2;
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
     vertical-align: middle;
   }
 
@@ -156,12 +188,41 @@ $bp-md: 768px;
     border-bottom: none;
   }
 
+  // ── Center Columns ────────────────────────────────────────
   .col-index,
   .col-num,
   .col-actions {
     text-align: center !important;
   }
 
+  // ── Center Status Header ──────────────────────────────────
+  ::ng-deep {
+    .mat-column-isAvailable {
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        text-align: center !important;
+      }
+
+      .mat-sort-header-container {
+        width: 100%;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+    }
+  }
+
+  // ── Action Button Alignment ───────────────────────────────
+  .col-actions {
+    .action-btn {
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // ── Hover Effect ──────────────────────────────────────────
   .mat-mdc-row {
     transition: background 0.18s ease;
 
@@ -184,27 +245,6 @@ $bp-md: 768px;
   }
 }
 
-// ── Driver Name Cell ────────────────────────────────────────
-.driver-name {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.driver-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(69, 64, 225, 0.12);
-  color: #4540e1;
-  font-size: 13px;
-  font-weight: $fw-semibold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
 // ── Cell Text ───────────────────────────────────────────────
 .cell-text {
   font-size: $fs-body2;
@@ -217,21 +257,26 @@ $bp-md: 768px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   min-width: 72px;
   padding: 6px 12px;
+
   border-radius: 999px;
+
   font-size: $fs-body2;
   font-weight: $fw-medium;
 }
 
+// ── Licence Badge ───────────────────────────────────────────
 .cell-plate {
   background: $surface-soft;
   border: 1px solid $border;
   color: $text-main;
+
   font-family: monospace;
   font-size: 13px;
-  letter-spacing: 0.06em;
   font-weight: $fw-semibold;
+  letter-spacing: 0.06em;
 }
 
 // ── Status ──────────────────────────────────────────────────
@@ -245,7 +290,7 @@ $bp-md: 768px;
   color: $error;
 }
 
-// ── Action Button ───────────────────────────────────────────
+// ── Action Button ──────────────────────────────
 .action-btn {
   background: none;
   border: none;
@@ -256,7 +301,7 @@ $bp-md: 768px;
   }
 }
 
-// ── Action Menu ─────────────────────────────────────────────
+// ── Menu ───────────────────────────────────
 ::ng-deep .dm-action-menu {
   .mat-mdc-menu-content {
     padding: 6px;
@@ -265,9 +310,11 @@ $bp-md: 768px;
   .mat-mdc-menu-item {
     min-height: 42px;
     border-radius: 10px;
+
     font-size: $fs-body2;
     font-weight: $fw-medium;
     color: $text-main;
+
     transition: background 0.18s ease;
 
     &:hover {
@@ -281,12 +328,12 @@ $bp-md: 768px;
   }
 }
 
-// ── Progress ────────────────────────────────────────────────
+// ── Progress ────────────────────────────
 .dm-progress {
   height: 3px;
 }
 
-// ── Paginator ───────────────────────────────────────────────
+// ── Paginator ──────────────────────────────
 .dm-paginator {
   border-top: 1px solid $border;
   background: $white;
@@ -326,6 +373,7 @@ $bp-md: 768px;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+
   color: $text-muted;
 
   mat-icon {

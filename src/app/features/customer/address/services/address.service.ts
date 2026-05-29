@@ -2,6 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { ApiResponse } from '../../../../core/models/api-responce.model';
+import { AddressData } from '../models/addresh.model';
+
 
 export interface StateOption {
   label: string;
@@ -61,9 +64,14 @@ export class AddressService {
       );
   }
   createAddress(body: any) {
-    return this.http.post<any>(
+    return this.http.post<ApiResponse<AddressData>>(
       `${environment.baseUrl}/user-addresses`,
       body
+    );
+  }
+  deleteAddress(addressId: number) {
+    return this.http.delete<ApiResponse<boolean>>(
+      `${environment.baseUrl}/user-addresses/${addressId}`
     );
   }
 }
