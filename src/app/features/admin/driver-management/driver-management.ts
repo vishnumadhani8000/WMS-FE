@@ -50,10 +50,15 @@ import { DriverDialogComponent } from './driver-dialog.component/driver-dialog.c
   styleUrl: './driver-management.scss',
 })
 export class DriverManagement implements OnInit {
-  private readonly driverService = inject(DriverService);
-  private readonly dialog = inject(MatDialog);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
+
+
+constructor(
+  private readonly driverService: DriverService,
+  private readonly dialog: MatDialog,
+  private readonly toastr: ToastrService,
+  private readonly destroyRef: DestroyRef
+){}
+  
 
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
   readonly displayedColumns = ['index', 'name', 'phone', 'licenceNo', 'isAvailable', 'actions'];

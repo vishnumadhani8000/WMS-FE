@@ -1,8 +1,6 @@
-import { Component, Inject, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProductManagementService } from '../../services/product-management.service';
@@ -14,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import { TextareaField } from '../../../../../shared/components/textarea-field/textarea-field';
 import { TextareaFieldConfig } from '../../../../../shared/components/textarea-field/textearea-field.config';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ProductForm {
   name: FormControl<string>;
@@ -40,11 +39,18 @@ interface ProductForm {
   templateUrl: './product-dialog-component.html',
   styleUrl: './product-dialog-component.scss',
 })
-export class ProductDialogComponent implements OnInit, OnDestroy {
-  private productManagementService = inject(ProductManagementService);
-  private dialogRef = inject(MatDialogRef<ProductDialogComponent>);
-  private toastr = inject(ToastrService);
-  private destroy = new Subject<void>();
+export class ProductDialogComponent implements OnInit {
+
+  constructor(
+    private productManagementService: ProductManagementService,
+    private dialogRef: MatDialogRef<ProductDialogComponent>,
+    private toastr: ToastrService,
+    private destroyref : DestroyRef,
+    
+    @Inject(MAT_DIALOG_DATA) public data: ProductDialogData
+  ) {}
+
+
   saving = false;
   form: FormGroup<ProductForm>;
   productNameConfig: InputFieldConfig;
@@ -55,11 +61,6 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
   productPriceConfig:InputFieldConfig;
-
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public data: ProductDialogData
-  ) {}
 
   get isEdit(): boolean {
     return this.data.mode === 'edit';
@@ -176,10 +177,6 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     };
   }
 
-  ngOnDestroy(): void {
-    this.destroy.next();
-    this.destroy.complete();
-  }
 
   submit(): void {
     if (this.form.invalid || this.saving) {
@@ -201,7 +198,7 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     const request = this.isEdit
       ? this.productManagementService.updateProduct(this.data.product.id, payload)
       : this.productManagementService.createProduct(payload);
-    request.pipe(takeUntil(this.destroy)).subscribe({
+    request.pipe(takeUntilDestroyed(this.destroyref)).subscribe({
       next: (product) => {
         this.saving = false;
 

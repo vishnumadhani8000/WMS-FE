@@ -38,7 +38,7 @@ export class AdminSidebar {
     {
       title: 'Order Management',
       icon: 'shopping_cart',
-      route: '/order-management'
+      route: '/admin/order-management'
     },
     {
       title: 'Destination Management',

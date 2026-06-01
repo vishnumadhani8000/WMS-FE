@@ -1,0 +1,310 @@
+@use 'styles/variables' as *;
+
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+
+// ── Page ───────────────────────────────────────────
+.od-page {
+  padding: 28px;
+  background: $page-bg;
+  min-height: 100%;
+
+  @media (max-width: $bp-md) {
+    padding: 16px;
+  }
+
+  @media (max-width: $bp-sm) {
+    padding: 12px;
+  }
+}
+
+// ── Header ─────────────────────────────────────────
+.od-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $fs-h5;
+    font-weight: $fw-bold;
+    color: $text-main;
+  }
+
+  &__sub {
+    margin: 0;
+    font-size: $fs-caption;
+    color: $text-muted;
+  }
+
+  &__right,
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: $bp-md) {
+    &__right {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}
+
+// ── Status Badge ──────────────────────────────────
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  &.status-pending {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+  }
+
+  &.status-accepted {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+  }
+
+  &.status-dispatched {
+    background: rgba(168, 85, 247, 0.12);
+    color: #7c3aed;
+  }
+  &.status-transit {
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284c7;
+  }
+
+  &.status-delivered {
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+  }
+
+  &.status-cancelled {
+    background: $error-light;
+    color: $error;
+  }
+}
+
+// ── Layout ────────────────────────────────────────
+.od-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.od-top-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: $bp-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: $bp-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Cards ─────────────────────────────────────────
+.od-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+
+  &--summary {
+    background: linear-gradient(135deg, rgba(69, 64, 225, 0.03), $white);
+  }
+
+  &--full {
+    width: 100%;
+  }
+}
+
+.od-card__header,
+.od-card__body {
+  padding: 16px 20px;
+}
+
+.od-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.od-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.od-card__icon {
+  font-size: 20px;
+  color: $primary;
+}
+
+.od-card__title {
+  margin: 0;
+  flex: 1;
+  font-size: $fs-body1;
+  font-weight: $fw-semibold;
+  color: $text-main;
+}
+
+.items-count {
+  padding: 3px 10px;
+  border: 1px solid $border;
+  border-radius: 999px;
+  background: $surface-soft;
+  font-size: $fs-caption;
+  color: $text-muted;
+}
+
+// ── Info ──────────────────────────────────────────
+.info-row,
+.summary-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.info-label,
+.summary-stat__label {
+  color: $text-muted;
+  font-size: $fs-body2;
+}
+
+.info-value,
+.summary-stat__value {
+  color: $text-main;
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+  text-align: right;
+}
+
+.notes-value {
+  font-style: italic;
+  color: $text-muted;
+}
+
+.summary-stat--total {
+  margin-top: 4px;
+
+  .summary-stat__label {
+    font-weight: $fw-semibold;
+    color: $text-main;
+  }
+
+  .summary-stat__value {
+    font-size: $fs-h6;
+    font-weight: $fw-bold;
+    color: $primary;
+  }
+}
+
+// ── Table ─────────────────────────────────────────
+.od-table-wrap {
+  overflow-x: auto;
+}
+
+.od-table {
+  width: 100%;
+  min-width: 560px;
+
+  .mat-mdc-header-row {
+    background: $surface-soft;
+  }
+
+  th.mat-mdc-header-cell {
+    padding: 0 16px;
+    font-size: $fs-caption;
+    font-weight: $fw-bold;
+    color: $text-muted;
+    border-bottom: 2px solid $border !important;
+  }
+
+  td.mat-mdc-cell {
+    padding: 0 16px;
+    height: 56px;
+    font-size: $fs-body1;
+    color: $text-main;
+    border-bottom: 1px solid $border;
+  }
+
+  .mat-mdc-row:last-child td {
+    border-bottom: none;
+  }
+
+  .col-index,
+  .col-num {
+    text-align: center !important;
+  }
+
+  .col-index {
+    width: 48px;
+  }
+}
+
+.od-item-row:hover {
+  background: $hover-bg;
+}
+
+// ── Product ───────────────────────────────────────
+.product-name {
+  font-weight: $fw-medium;
+  color: $text-main;
+}
+
+// ── Footer ────────────────────────────────────────
+.od-table-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 22px;
+  padding: 14px 20px;
+  background: $surface-soft;
+  border-top: 2px solid $border;
+
+  &__label {
+    font-size: $fs-body2;
+    font-weight: $fw-semibold;
+    color: $text-muted;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    font-size: $fs-h6;
+    font-weight: $fw-bold;
+    color: $primary;
+  }
+}

@@ -53,6 +53,19 @@ export const routes: Routes = [
                         .then((m) => m.DestinationManagement),
 
             },
+            {
+                path: APP_ROUTES.ADMIN.ORDER_MANAGEMENT,
+                loadComponent :()=>
+                    import('./features/admin/order-management/order-management')
+                        .then((m)=>m.OrderManagement)
+ 
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.ORDER_MANAGEMENT}/${APP_ROUTES.ADMIN.ORDER_DETAIL}/:id`,
+                loadComponent: () =>
+                    import('./features/admin/order-management/components/order-detail.component/order-detail.component')
+                        .then((m) => m.OrderDetailComponent)
+            },
 
             {
                 path: '**',

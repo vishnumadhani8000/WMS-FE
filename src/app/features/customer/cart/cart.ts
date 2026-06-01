@@ -146,13 +146,19 @@ export class Cart implements OnInit {
 
   private updateQuantity(item: CartItem, quantity: number): void {
     this.quantityLoading.set(true);
-
+  
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({});
-      this.quantityLoading.set(false);
-      this.loadCart();
+      .subscribe({
+        next: () => {
+          this.loadCart();
+        },
+  
+        complete: () => {
+          this.quantityLoading.set(false);
+        }
+      });
   }
 
   confirmDelete(item: CartItem): void {

@@ -12,6 +12,7 @@ export const APP_ROUTES = {
         VEHICLE_MANAGEMENT: 'vehicle-management',
         PRODUCT_MANAGEMENT: 'product-management',
         ORDER_MANAGEMENT: 'order-management',
+        ORDER_DETAIL : 'order-details',
         DESTINATION_MANAGEMENT: 'destination-management',
         TRACKING: 'tracking',
     },

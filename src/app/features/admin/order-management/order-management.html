@@ -1,0 +1,232 @@
+<div class="om-page">
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header class="om-header">
+    <div class="om-header__title-group">
+      <h1 class="om-header__title">Order Management</h1>
+    </div>
+
+    <div class="om-header__meta">
+      <span class="om-header__count-badge">
+        <mat-icon class="badge-icon">receipt_long</mat-icon>
+        {{ totalCount }} {{ totalCount === 1 ? 'Order' : 'Orders' }}
+      </span>
+    </div>
+  </header>
+
+  <!-- ── Toolbar ────────────────────────────────────────── -->
+  <section class="om-toolbar">
+    <div class="om-toolbar__search">
+      <form [formGroup]="searchForm">
+        <app-common-input [config]="searchConfig" />
+      </form>
+    </div>
+
+    <div class="om-toolbar__actions">
+      <mat-button-toggle-group
+        class="om-view-toggle"
+        [value]="activeView"
+        (change)="onViewChange($event.value)"
+        hideSingleSelectionIndicator
+      >
+        <mat-button-toggle value="all">
+          <mat-icon>list_alt</mat-icon>
+          All Orders
+        </mat-button-toggle>
+        <mat-button-toggle value="pending">
+          <mat-icon>pending_actions</mat-icon>
+          Pending Orders
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </section>
+
+  <!-- ── Card ──────────────────────────────────────────── -->
+  <div class="om-card">
+    @if (loading) {
+    <mat-progress-bar mode="indeterminate" class="om-progress" />
+    }
+
+    <div class="om-table-wrap">
+      <table
+        mat-table
+        [dataSource]="orders"
+        class="om-table"
+        matSort
+        (matSortChange)="onSortChange($event)"
+      >
+        <!-- Index -->
+        <ng-container matColumnDef="index">
+          <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
+          <td mat-cell *matCellDef="let row; let i = index" class="col-index">
+            {{ rowIndex(i) }}
+          </td>
+        </ng-container>
+
+        <!-- Order ID -->
+        <ng-container matColumnDef="orderId">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="orderId">Order ID</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-text">{{ row.orderId }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Customer Name -->
+        <ng-container matColumnDef="customerName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="customerName">Customer</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-text">{{ row.customerName }}</span>
+          </td>
+        </ng-container>
+
+        <!--  -->
+        <ng-container matColumnDef="totalWeightKg">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="totalWeightKg">Weight/kg</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-text">{{ row.totalWeightKg }}</span>
+          </td>
+        </ng-container>
+
+        <!-- City -->
+        <ng-container matColumnDef="cityName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="cityName">City</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-text">{{ row.cityName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- State -->
+        <ng-container matColumnDef="stateName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="stateName">State</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-text">{{ row.stateName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Total Items -->
+        <ng-container matColumnDef="totalItems">
+          <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="totalItems">
+            Items
+          </th>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span class="cell-text">{{ row.totalItems }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Total Amount -->
+        <ng-container matColumnDef="totalAmount">
+          <th mat-header-cell *matHeaderCellDef class="col-num" mat-sort-header="totalAmount">
+            Amount
+          </th>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span class="cell-text">₹{{ row.totalPrice }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="orderStatus">
+          <th mat-header-cell *matHeaderCellDef class="col-num">Status</th>
+          <td mat-cell *matCellDef="let row" class="col-num">
+            <span
+              class="cell-chip status-chip"
+              [ngClass]="{
+                'status-pending': isPending(row),
+                'status-accepted': isAccepted(row),
+                'status-dispatched': isDispatched(row),
+                'status-transit': isInTransit(row),
+                'status-delivered': isDelivered(row),
+                'status-cancelled': isCancelled(row)
+              }"
+            >
+              {{ row.status ?? '-' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Created At -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="createdAt">Date</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="cell-text">{{ row.createdAt | date : 'dd MMM y' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
+          <td mat-cell *matCellDef="let row" class="col-actions">
+            @if (isActionable(row)) {
+            <button
+              mat-icon-button
+              class="action-btn"
+              [matMenuTriggerFor]="orderMenu"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #orderMenu="matMenu" class="om-action-menu">
+              @if (isAccepted(row)) {
+              <button mat-menu-item (click)="completeOrder(row)">
+                <mat-icon>task_alt</mat-icon>
+                <span>Complete</span>
+              </button>
+              } @else {
+              <button mat-menu-item (click)="acceptOrder(row)">
+                <mat-icon>check_circle_outline</mat-icon>
+                <span>Accept Order</span>
+              </button>
+              }
+
+              <!-- Cancel available for both Pending and Accepted -->
+              <button mat-menu-item class="delete-item" (click)="cancelOrder(row)">
+                <mat-icon>cancel</mat-icon>
+                <span>Cancel Order</span>
+              </button>
+            </mat-menu>
+            } @else {
+            <span
+              class="action-disabled"
+              [matTooltip]="isDelivered(row) ? 'Order completed' : 'Order cancelled'"
+            >
+              <mat-icon>block</mat-icon>
+            </span>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="om-row"
+          [class.om-row--completed]="isDelivered(row)"
+          [class.om-row--cancelled]="isCancelled(row)"
+          (click)="viewOrder(row)"
+        ></tr>
+
+        <tr class="mat-mdc-row" *matNoDataRow>
+          <td class="mat-mdc-cell om-no-data" [attr.colspan]="displayedColumns.length">
+            @if (!loading) {
+            <div class="om-empty-inline">
+              <mat-icon>receipt_long</mat-icon>
+              <span>No orders found</span>
+            </div>
+            }
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-divider />
+
+    <mat-paginator
+      class="om-paginator"
+      [length]="totalCount"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="page"
+      showFirstLastButtons
+      (page)="onPageChange($event)"
+    />
+  </div>
+</div>

@@ -1,11 +1,10 @@
 @use 'styles/variables' as *;
 
-// ── Breakpoints ─────────────────────────────────────────────
 $bp-sm: 480px;
 $bp-md: 768px;
 
-// ── Page ────────────────────────────────────────────────────
-.dm-page {
+// ── Page ─────────────────────────────────────────────
+.om-page {
   padding: 28px;
   background: $page-bg;
 
@@ -14,8 +13,8 @@ $bp-md: 768px;
   }
 }
 
-// ── Header ──────────────────────────────────────────────────
-.dm-header {
+// ── Header ─────────────────────────────────────────
+.om-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -55,13 +54,10 @@ $bp-md: 768px;
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
-
     border: 1px solid $border;
     border-radius: 999px;
-
     background: $white;
     box-shadow: $shadow-sm;
-
     font-size: $fs-body2;
     font-weight: $fw-semibold;
     color: $text-muted;
@@ -75,7 +71,7 @@ $bp-md: 768px;
 }
 
 // ── Toolbar ─────────────────────────────────────────────────
-.dm-toolbar {
+.om-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -84,21 +80,71 @@ $bp-md: 768px;
   margin-bottom: 24px;
 
   &__search {
-    width: 420px;
+    width: 380px;
     max-width: 100%;
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+  }
+
   @media (max-width: $bp-md) {
+    flex-direction: column;
     align-items: stretch;
 
     &__search {
       width: 100%;
     }
+
+    &__actions {
+      justify-content: flex-end;
+    }
+  }
+}
+
+// ── Toggle ──────────────────────────────────────────────────
+.om-view-toggle {
+  border-radius: 10px !important;
+  overflow: hidden;
+  border: 1px solid $border !important;
+  box-shadow: $shadow-sm;
+
+  ::ng-deep {
+    .mat-button-toggle {
+      background: $white;
+      color: $text-muted;
+      border: none !important;
+      transition: 0.2s ease;
+
+      .mat-button-toggle-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 12px;
+        height: 40px;
+      }
+
+      mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+      }
+    }
+
+    .mat-button-toggle-checked {
+      background: $primary !important;
+      color: $white !important;
+    }
+
+    .mat-button-toggle + .mat-button-toggle {
+      border-left: 1px solid $border !important;
+    }
   }
 }
 
 // ── Card ────────────────────────────────────────────────────
-.dm-card {
+.om-card {
   background: $surface-soft;
   border: 1px solid $border;
   border-radius: 18px;
@@ -108,96 +154,84 @@ $bp-md: 768px;
 }
 
 // ── Table Wrapper ───────────────────────────────────────────
-.dm-table-wrap {
+.om-table-wrap {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 // ── Table ───────────────────────────────────────────────────
-.dm-table {
+.om-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 1300px;
   table-layout: fixed;
 
-  // ── Column Widths ─────────────────────────────────────────
-  .mat-column-index {
-    width: 5%;
-  }
+  .mat-column-index        { width: 4%; }
+  .mat-column-orderId      { width: 8%; }
+  .mat-column-customerName { width: 16%; }
+  .mat-column-totalWeightKg { width: 8%; }
+  .mat-column-cityName     { width: 10%; }
+  .mat-column-stateName    { width: 10%; }
+  .mat-column-totalItems   { width: 7%; }
+  .mat-column-totalAmount  { width: 9%; }
+  .mat-column-orderStatus  { width: 11%; }
+  .mat-column-createdAt    { width: 10%; }
+  .mat-column-actions      { width: 7%; }
 
-  .mat-column-name {
-    width: 20%;
-  }
-
-  .mat-column-phone {
-    width: 18%;
-  }
-
-  .mat-column-licenceNo {
-    width: 22%;
-  }
-
-  .mat-column-isAvailable {
-    width: 15%;
-  }
-
-  .mat-column-actions {
-    width: 8%;
-  }
-
-  // ── Header Row ──────────────────────────────────────
   .mat-mdc-header-row {
     background: $surface-soft;
     height: 56px;
   }
 
-  // ── Header Cells ────────────────────────────────────
   th.mat-mdc-header-cell {
     padding: 0 16px;
-
     color: $text-muted;
     font-size: $fs-caption;
     font-weight: $fw-bold;
-
     text-transform: uppercase;
     letter-spacing: 0.08em;
     white-space: nowrap;
-
     border-bottom: 2px solid $border !important;
     vertical-align: middle;
   }
 
-  // ── Data Cells ───────────────────────────────────────
   td.mat-mdc-cell {
-    height: 52px;
+    height: 60px;
     padding: 0 16px;
-
     border-bottom: 1px solid $border;
-
     color: $text-main;
-    font-size: $fs-body2;
-
+    font-size: $fs-body1;
+    vertical-align: middle;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
 
-    vertical-align: middle;
+  .mat-mdc-row {
+    cursor: pointer;
+    transition: background 0.18s ease;
+
+    &:hover {
+      background: $hover-bg;
+    }
   }
 
   .mat-mdc-row:last-child td {
     border-bottom: none;
   }
 
-  // ── Center Columns ────────────────────────────────────────
   .col-index,
   .col-num,
   .col-actions {
     text-align: center !important;
   }
 
-  // ── Center Status Header ──────────────────────────────────
   ::ng-deep {
-    .mat-column-isAvailable {
+    .mat-column-totalItems,
+    .mat-column-totalAmount,
+    .mat-column-orderStatus,
+    .mat-column-actions {
+
       th.mat-mdc-header-cell,
       td.mat-mdc-cell {
         text-align: center !important;
@@ -211,45 +245,38 @@ $bp-md: 768px;
       }
     }
   }
+}
 
-  // ── Action Button Alignment ───────────────────────────────
-  .col-actions {
-    .action-btn {
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+// ── Row States ──────────────────────────────────────────────
+.om-row {
+
+  &--completed {
+    td.mat-mdc-cell {
+      color: $text-muted;
     }
   }
 
-  // ── Hover Effect ──────────────────────────────────────────
-  .mat-mdc-row {
-    transition: background 0.18s ease;
-
-    &:hover {
-      background: $hover-bg;
+  &--cancelled {
+    td.mat-mdc-cell {
+      color: $text-muted;
     }
-  }
-
-  .mat-mdc-row:hover,
-  .mat-mdc-row:hover .mdc-data-table__row,
-  .mat-mdc-row .mdc-data-table__row:hover::before {
-    background-color: $hover-bg !important;
-    --mat-table-row-item-outline-color: transparent;
-  }
-
-  .mat-mdc-row .mdc-data-table__row::before,
-  .mat-mdc-row::before {
-    background-color: transparent !important;
-    opacity: 0 !important;
   }
 }
 
-// ── Cell Text ───────────────────────────────────────────────
+// ── Cell ────────────────────────────────────────────────────
 .cell-text {
-  font-size: $fs-body2;
+  display: block;
+  font-size: $fs-body1;
   font-weight: $fw-medium;
   color: $text-main;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-sub {
+  display: block;
+  font-size: 11px;
+  color: $text-muted;
 }
 
 // ── Chips ───────────────────────────────────────────────────
@@ -257,52 +284,76 @@ $bp-md: 768px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  min-width: 72px;
-  padding: 6px 12px;
-
+  padding: 5px 12px;
   border-radius: 999px;
-
   font-size: $fs-body2;
   font-weight: $fw-medium;
 }
 
-// ── Licence Badge ───────────────────────────────────────────
-.cell-plate {
-  background: $surface-soft;
-  border: 1px solid $border;
-  color: $text-main;
-
-  font-family: monospace;
-  font-size: 13px;
-  font-weight: $fw-semibold;
-  letter-spacing: 0.06em;
+.status-chip {
+  min-width: 95px;
 }
 
-// ── Status ──────────────────────────────────────────────────
-.status-available {
-  background: $success-light;
-  color: $success;
+// ── Status Colors ───────────────────────────────────────
+.status-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
 }
 
-.status-unavailable {
-  background: $error-light;
-  color: $error;
+.status-accepted {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
 }
 
-// ── Action Button ──────────────────────────────
+.status-dispatched {
+  background: rgba(168, 85, 247, 0.12);
+  color: #7c3aed;
+}
+
+.status-transit {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+}
+
+.status-delivered {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+// ── Action Button ────────────────────────
 .action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  transition: 0.2s ease;
 
   mat-icon {
     font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
   }
 }
 
-// ── Menu ───────────────────────────────────
-::ng-deep .dm-action-menu {
+// only disable 3 dot
+.action-btn-disabled {
+  opacity: 0.4;
+  font-size: 10px;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+// ── Action Menu ─────────────────────────────────────────────
+::ng-deep .om-action-menu {
+
   .mat-mdc-menu-content {
     padding: 6px;
   }
@@ -310,31 +361,34 @@ $bp-md: 768px;
   .mat-mdc-menu-item {
     min-height: 42px;
     border-radius: 10px;
-
     font-size: $fs-body2;
     font-weight: $fw-medium;
     color: $text-main;
-
     transition: background 0.18s ease;
 
     &:hover {
       background: $hover-bg;
     }
 
+
+  }
+
+  .delete-item {
+    color: $error;
+
     mat-icon {
-      margin-right: 12px;
-      font-size: 18px;
+      color: $error;
     }
   }
 }
 
-// ── Progress ────────────────────────────
-.dm-progress {
+// ── Progress ───────────────────────────────────────
+.om-progress {
   height: 3px;
 }
 
-// ── Paginator ──────────────────────────────
-.dm-paginator {
+// ── Paginator ─────────────────────────────────────
+.om-paginator {
   border-top: 1px solid $border;
   background: $white;
 
@@ -343,12 +397,9 @@ $bp-md: 768px;
     padding: 0 16px;
   }
 
-  ::ng-deep .mat-mdc-select-trigger {
-    font-weight: $fw-semibold;
-  }
-
   @media (max-width: $bp-sm) {
     ::ng-deep {
+
       .mat-mdc-paginator-page-size {
         display: none;
       }
@@ -362,18 +413,17 @@ $bp-md: 768px;
 }
 
 // ── Empty State ─────────────────────────────────────────────
-.dm-no-data {
+.om-no-data {
   text-align: center !important;
   padding: 48px 16px !important;
   border-bottom: none !important;
 }
 
-.dm-empty-inline {
+.om-empty-inline {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-
   color: $text-muted;
 
   mat-icon {
