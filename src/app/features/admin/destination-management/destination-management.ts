@@ -350,7 +350,7 @@ export class DestinationManagement implements OnInit {
         data: {
           mode: 'add',
           stateId: state.id,
-          stateName: state.name,
+          stateName: state.name, 
         },
         disableClose: true,
       })
@@ -379,8 +379,6 @@ export class DestinationManagement implements OnInit {
 
         data: {
           mode: 'edit',
-          stateId: state.id,
-          stateName: state.name,
           city,
         },
         disableClose: true,
@@ -389,7 +387,7 @@ export class DestinationManagement implements OnInit {
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        if (!res?.saved) {
+        if (!res.saved) {
           return;
         }
 

@@ -15,7 +15,7 @@ import { ApiResponse } from '../../../../core/models/api-responce.model';
 export class VehicleService {
   private readonly base = `${environment.baseUrl}/vehicles`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getVehicles(filter: VehicleFilter): Observable<PaginatedResponse<Vehicle>> {
     let params = new HttpParams()

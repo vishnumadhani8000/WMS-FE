@@ -48,7 +48,7 @@ export class AdminSidebar {
     {
       title: 'Tracker',
       icon: 'track_changes',
-      route: '/tracker'
+      route: '/admin/tracker'
     }
   ];
 

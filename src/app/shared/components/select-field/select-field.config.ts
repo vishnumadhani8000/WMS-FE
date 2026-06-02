@@ -23,4 +23,4 @@ export interface SelectFieldConfig {
   subscriptSizing?: 'fixed' | 'dynamic';
 
   customErrorMessage?: string;
-}
+} 

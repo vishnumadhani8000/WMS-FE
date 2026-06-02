@@ -43,10 +43,12 @@ import { SelectAddressDialogResult } from '../address/models/SelectAddressDialog
   ],
 })
 export class Cart implements OnInit {
-  private readonly cartService = inject(CartService);
-  private readonly toastr = inject(ToastrService);
-  private readonly dialog = inject(MatDialog);
-  private readonly destroyRef = inject(DestroyRef);
+  constructor(
+    private readonly cartService: CartService,
+    private readonly toastr: ToastrService,
+    private readonly dialog: MatDialog,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   readonly displayedColumns = ['index', 'name', 'description', 'weight', 'quantity', 'actions'];
 
@@ -121,10 +123,9 @@ export class Cart implements OnInit {
           this.cartId.set(res.data.cartId);
           this.cartItems.set(res.data.items ?? []);
           this.totalWeightKg.set(res.data.totalWeightKg ?? 0);
-
         },
       });
-      this.loading.set(false);
+    this.loading.set(false);
   }
 
   increment(item: CartItem): void {
@@ -146,7 +147,7 @@ export class Cart implements OnInit {
 
   private updateQuantity(item: CartItem, quantity: number): void {
     this.quantityLoading.set(true);
-  
+
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -154,10 +155,10 @@ export class Cart implements OnInit {
         next: () => {
           this.loadCart();
         },
-  
+
         complete: () => {
           this.quantityLoading.set(false);
-        }
+        },
       });
   }
 
@@ -221,7 +222,10 @@ export class Cart implements OnInit {
       });
   }
 
-  private openSelectAddressDialog(addresses: CheckoutAddress[], orderItems: CheckoutOrderItem[]): void {
+  private openSelectAddressDialog(
+    addresses: CheckoutAddress[],
+    orderItems: CheckoutOrderItem[]
+  ): void {
     this.dialog
       .open(SelectAddressDialog, {
         width: '800px',
@@ -236,8 +240,8 @@ export class Cart implements OnInit {
         if (result?.action === 'add-new') {
           this.openAddAddressDialog(orderItems);
           return;
-        } 
-        if(result?.action === 'delete'){
+        }
+        if (result?.action === 'delete') {
           this.placeOrder();
           return;
         }
@@ -265,7 +269,6 @@ export class Cart implements OnInit {
         }
         console.log(result.address);
         this.openConfirmOrderDialog(result.address, orderItems);
-
       });
   }
 

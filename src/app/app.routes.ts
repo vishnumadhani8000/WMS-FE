@@ -66,6 +66,12 @@ export const routes: Routes = [
                     import('./features/admin/order-management/components/order-detail.component/order-detail.component')
                         .then((m) => m.OrderDetailComponent)
             },
+            {
+                path: `${APP_ROUTES.ADMIN.TRACKER}`,
+                loadComponent: () =>
+                    import('./features/admin/tracker/tracker.js')
+                        .then((m) => m.Tracker),
+            },
 
             {
                 path: '**',

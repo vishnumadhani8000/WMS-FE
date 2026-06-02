@@ -14,7 +14,7 @@ export const APP_ROUTES = {
         ORDER_MANAGEMENT: 'order-management',
         ORDER_DETAIL : 'order-details',
         DESTINATION_MANAGEMENT: 'destination-management',
-        TRACKING: 'tracking',
+        TRACKER: 'tracker',
     },
 
     CUSTOMER: {

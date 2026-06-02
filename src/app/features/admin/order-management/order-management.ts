@@ -64,7 +64,7 @@ export class OrderManagement implements OnInit {
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
   readonly displayedColumns = [
     'index', 'orderId', 'customerName', 'totalWeightKg',
-    'cityName', 'stateName', 'totalItems', 'totalAmount',
+    'cityName', 'stateName', 'totalItems', 'totalPrice',
     'orderStatus', 'createdAt', 'actions',
   ];
 

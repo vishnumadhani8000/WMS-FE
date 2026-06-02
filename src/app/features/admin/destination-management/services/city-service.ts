@@ -48,9 +48,9 @@ export class CityService {
       );
   }
 
-  updateCity(id: number, form: CityFormValue): Observable<City> {
+  updateCity(id: number, name: string): Observable<City> {
     return this.http
-      .put<ApiResponse<City>>(`${this.base}/${id}`, form)
+      .put<ApiResponse<City>>(`${this.base}/${id}`, {name})
       .pipe(
         map((res) => {
           return res.data;

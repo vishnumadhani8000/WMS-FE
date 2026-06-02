@@ -104,9 +104,11 @@ export class CityDialogComponent implements OnInit{
 
     this.saving = true;
     const value = this.form.getRawValue();
+    console.log(value);
+    console.log(this.data.stateId);
 
     const request = this.isEdit
-      ? this.cityService.updateCity(this.data.city.id, { ...value, stateId: this.data.stateId })
+      ? this.cityService.updateCity(this.data.city.id,value.name)
       : this.cityService.createCity({ ...value, stateId: this.data.stateId });
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

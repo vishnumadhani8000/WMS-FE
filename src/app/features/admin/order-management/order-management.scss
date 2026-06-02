@@ -173,7 +173,7 @@ $bp-md: 768px;
   .mat-column-cityName     { width: 10%; }
   .mat-column-stateName    { width: 10%; }
   .mat-column-totalItems   { width: 7%; }
-  .mat-column-totalAmount  { width: 9%; }
+  .mat-column-totalPrice  { width: 9%; }
   .mat-column-orderStatus  { width: 11%; }
   .mat-column-createdAt    { width: 10%; }
   .mat-column-actions      { width: 7%; }
@@ -228,7 +228,7 @@ $bp-md: 768px;
 
   ::ng-deep {
     .mat-column-totalItems,
-    .mat-column-totalAmount,
+    .mat-column-totalPrice,
     .mat-column-orderStatus,
     .mat-column-actions {
 
