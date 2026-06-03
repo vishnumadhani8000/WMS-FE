@@ -32,6 +32,8 @@ export interface InputFieldConfig {
   readonly?: boolean;
 
   trimStart?: boolean;
+    
+  disabled?: boolean;
 
   iconClick?: () => void;
 }

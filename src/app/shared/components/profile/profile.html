@@ -1,0 +1,29 @@
+<div class="profile-wrapper">
+  <div class="profile-header">
+    <div>
+      <h2 class="profile-title">My Profile</h2>
+
+      <p class="profile-subtitle">View your account information.</p>
+    </div>
+  </div>
+
+  <div class="profile-card">
+    <form [formGroup]="form">
+      <div class="dialog-body">
+        <app-common-input [config]="nameConfig"> </app-common-input>
+
+        <app-common-input [config]="emailConfig"> </app-common-input>
+
+        <app-common-input [config]="phoneConfig"> </app-common-input>
+
+        <app-common-input [config]="roleConfig"> </app-common-input>
+      </div>
+    </form>
+
+    <div class="actions">
+      <app-common-button [config]="passwordButtonConfig"> </app-common-button>
+
+      <app-common-button [config]="editButtonConfig"> </app-common-button>
+    </div>
+  </div>
+</div>

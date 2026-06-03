@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, computed, signal } from '@angular/core';
+import { Component, Inject, OnInit, Signal, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,18 +25,14 @@ import { AvailableDriverDto, AvailableVehicleDto, MakeShipmentDialogData, MakeSh
 export class MakeShipmentDialog implements OnInit {
   selectedDriverId  = signal<number | null>(null);
   selectedVehicleId = signal<number | null>(null);
+  disabledConfirmButton = computed(() =>
+    this.selectedDriverId() === null ||
+    this.selectedVehicleId() === null
+  );
 
-  // Computed so disabled updates automatically when selections change
-  confirmButtonConfig = computed<ButtonConfig>(() => ({
-    label:      'Confirm Shipment',
-    variant:    'flat',
-    color:      'primary',
-    prefixIcon: 'local_shipping',
-    disabled:   this.selectedDriverId() === null || this.selectedVehicleId() === null,
-    clicked:    () => this.confirm(),
-  }));
 
-  cancelButtonConfig!: ButtonConfig;
+  confirmButtonConfig: Signal<ButtonConfig>;
+  cancelButtonConfig: ButtonConfig;
 
   constructor(
     private readonly dialogRef: MatDialogRef<MakeShipmentDialog, MakeShipmentDialogResult>,
@@ -44,6 +40,16 @@ export class MakeShipmentDialog implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.confirmButtonConfig = computed<ButtonConfig>(() => ({
+      label: 'Confirm Shipment',
+      variant: 'flat',
+      color: 'primary',
+      prefixIcon: 'local_shipping',
+      disabled:
+        this.selectedDriverId() === null ||
+        this.selectedVehicleId() === null,
+      clicked: () => this.confirm(),
+    }));
     this.cancelButtonConfig = {
       label:   'Cancel',
       variant: 'stroked',

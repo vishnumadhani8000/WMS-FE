@@ -1,0 +1,51 @@
+@use 'styles/variables' as *;
+
+.profile-wrapper {
+  padding: 24px;
+}
+
+.profile-card {
+  background: $surface;
+  border-radius: 20px;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+.profile-header {
+  padding: 24px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(69, 64, 225, 0.06),
+      rgba(69, 64, 225, 0.02)
+    );
+}
+
+.profile-title {
+  margin: 0;
+  font-size: $fs-h5;
+  font-weight: $fw-semibold;
+}
+
+.profile-subtitle {
+  margin-top: 6px;
+  color: $text-muted;
+}
+
+.dialog-body {
+  padding: 24px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  padding: 24px;
+}

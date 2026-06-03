@@ -15,6 +15,7 @@ export const APP_ROUTES = {
         ORDER_DETAIL : 'order-details',
         DESTINATION_MANAGEMENT: 'destination-management',
         TRACKER: 'tracker',
+        PROFILE: 'profile'
     },
 
     CUSTOMER: {
@@ -22,7 +23,7 @@ export const APP_ROUTES = {
         PRODUCT: 'product',
         CART:'cart',
         ORDERS : 'my-orders',
-        PROFILE :'Profile'
+        PROFILE :'profile'
     },
 
     CUSTOMER_AUTH: {

@@ -42,6 +42,8 @@ export class CustomerHeader {
   onEscape(): void {
     this.closeMenu();
   }
+  
+  
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {

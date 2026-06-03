@@ -72,6 +72,13 @@ export const routes: Routes = [
                     import('./features/admin/tracker/tracker.js')
                         .then((m) => m.Tracker),
             },
+            {
+                path:APP_ROUTES.ADMIN.PROFILE ,
+                loadComponent:()=> 
+                    import('./shared/components/profile/profile.js')
+                        .then((m) => m.Profile),
+            },
+
 
             {
                 path: '**',
@@ -108,7 +115,16 @@ export const routes: Routes = [
                 loadComponent:()=> 
                     import('./features/customer/my-order/my-order.js')
                 .then((m)=>m.MyOrders)
-            }
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.PROFILE,
+                loadComponent:()=> 
+                    import('./shared/components/profile/profile.js')
+                .then((m)=>m.Profile)
+            },
+            
+
+            
 
         ]
 

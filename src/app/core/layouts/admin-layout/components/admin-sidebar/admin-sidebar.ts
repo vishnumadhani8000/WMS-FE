@@ -49,7 +49,12 @@ export class AdminSidebar {
       title: 'Tracker',
       icon: 'track_changes',
       route: '/admin/tracker'
-    }
+    },
+    {
+      title: 'Shipment Management',
+      icon: 'local_shipping',
+      route: '/admin/shipment-management'
+    },
   ];
 
   closeSidebar() {

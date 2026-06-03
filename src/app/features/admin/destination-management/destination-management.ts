@@ -147,7 +147,7 @@ export class DestinationManagement implements OnInit {
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'add',
-      disabled: !this.selectedState(),
+      disabled:true,
       clicked: () => {
         this.openAddCityDialog();
       },

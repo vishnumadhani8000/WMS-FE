@@ -17,7 +17,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { VehicleService } from '../../services/vehicle.service';
-import { VehicleDialogData } from '../../models/vehicle.model';
+import { VehicleDialogData, VehicleForm } from '../../models/vehicle.model';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
@@ -51,12 +51,7 @@ export function plateNumberValidator(): ValidatorFn {
 }
 
 // Typed Form
-interface VehicleForm {
-  name: FormControl<string>;
-  plateNumber: FormControl<string>;
-  capacityKg: FormControl<number | null>;
-  isAvailable: FormControl<boolean>;
-}
+
 
 @Component({
   selector: 'app-vehicle-dialog',

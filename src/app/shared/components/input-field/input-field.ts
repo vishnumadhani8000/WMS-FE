@@ -30,6 +30,11 @@ export class InputField {
   showPassword = false;
   constructor(private controlContainer: ControlContainer) {
   }
+  ngOnInit(): void {
+    if (this.config.disabled) {
+      this.control.disable({ emitEvent: false });
+    }
+  }
 
   get control(): FormControl {
     return this.controlContainer.control?.get(this.config.formControlName) as FormControl;

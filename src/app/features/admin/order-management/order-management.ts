@@ -3,12 +3,13 @@ import {
   OnInit,
   inject,
   DestroyRef,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,7 +22,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { InputField } from '../../../shared/components/input-field/input-field';
-import { Button } from '../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
@@ -86,6 +86,8 @@ export class OrderManagement implements OnInit {
 
   searchConfig: InputFieldConfig;
   
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator;
 
   ngOnInit(): void {
     this.searchConfig = {
@@ -138,7 +140,7 @@ export class OrderManagement implements OnInit {
 
   onViewChange(view: OrderView): void {
     this.activeView = view;
-    this.page = 0;
+    this.paginator?.firstPage();
     this.loadOrders();
   }
 

@@ -15,12 +15,14 @@
     [type]="inputType"
     [placeholder]="config.placeholder || config.label"
     [readonly]="config.readonly"
+    [class.readonly-input]="config.readonly"
     [attr.minlength]="config.minlength"
     [attr.maxlength]="config.maxlength"
     [attr.min]="config.min"
     [attr.max]="config.max"
     [attr.step]="config.step"
     [attr.pattern]="config.pattern"
+    (focus)="config.readonly && $event.target.blur()"
     (input)="handleInput($event)"
   />
 
