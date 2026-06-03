@@ -65,8 +65,6 @@ constructor(
 
   drivers: Driver[] = [];
   totalCount = 0;
-  loading = false;
-
   page = 0;
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
@@ -120,9 +118,7 @@ constructor(
   }
 
   loadDrivers(): void {
-    this.loading = true;
-
-    this.driverService
+   this.driverService
       .getDrivers({
         page: this.page + 1,
         pageSize: this.pageSize,
@@ -131,7 +127,6 @@ constructor(
         ascending: this.sortAsc ?? undefined,
       })
       .pipe(
-        finalize(() => (this.loading = false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({

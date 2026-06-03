@@ -76,7 +76,6 @@ export class VehicleDialogComponent implements OnInit {
   private toastr = inject(ToastrService);
   private destroyref = inject(DestroyRef);
   form: FormGroup<VehicleForm>;
-  saving = false;
 
   // Configs
   vehicleNameConfig: InputFieldConfig;
@@ -168,8 +167,6 @@ export class VehicleDialogComponent implements OnInit {
 
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
 
       clicked: () => {
         this.submit();
@@ -187,12 +184,11 @@ export class VehicleDialogComponent implements OnInit {
 
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.saving = true;
     const value = this.form.getRawValue();
     const request = this.isEdit
       ? this.vehicleService.updateVehicle(this.data.vehicle!.id, value)
@@ -200,7 +196,6 @@ export class VehicleDialogComponent implements OnInit {
 
     request.pipe(takeUntilDestroyed(this.destroyref)).subscribe({
       next: () => {
-        this.saving = false;
         this.toastr.success(
           this.isEdit ? 'Vehicle updated successfully.' : 'Vehicle added successfully.'
         );
@@ -209,7 +204,6 @@ export class VehicleDialogComponent implements OnInit {
         });
       },
     });
-    this.saving = false;
   }
 
   cancel(): void {

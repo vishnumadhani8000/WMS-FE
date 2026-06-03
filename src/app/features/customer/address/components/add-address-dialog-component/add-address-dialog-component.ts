@@ -43,11 +43,6 @@ interface AddressForm {
 })
 export class AddAddressDialogComponent implements OnInit {
 
-
-  saving = false;
-  loadingStates = false;
-  loadingCities = false;
-
   form: FormGroup<AddressForm>;
 
   addressLineConfig: InputFieldConfig;
@@ -163,14 +158,11 @@ export class AddAddressDialogComponent implements OnInit {
       label: 'Save & Continue',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.save(),
     };
   }
 
   private loadStates(): void {
-    this.loadingStates = true;
     this.statesCitiesService
       .getStates()
       .pipe(takeUntilDestroyed(this.destroyref))
@@ -179,11 +171,9 @@ export class AddAddressDialogComponent implements OnInit {
           this.stateConfig = { ...this.stateConfig, options: states };
         },
       });
-      this.loadingStates = false;
   }
 
   private loadCities(state: number): void {
-    this.loadingCities = true;
     this.statesCitiesService
       .getCitiesByState(state)
       .pipe(takeUntilDestroyed(this.destroyref))
@@ -192,7 +182,6 @@ export class AddAddressDialogComponent implements OnInit {
           this.cityConfig = { ...this.cityConfig, options: cities };
         },
       });
-      this.loadingCities = false;
   }
 
   save(): void {
@@ -200,11 +189,7 @@ export class AddAddressDialogComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-  
-    this.saveButtonConfig = {
-      ...this.saveButtonConfig,
-      loading: true,
-    };
+
   
     const formValue = this.form.getRawValue();
   
@@ -231,10 +216,6 @@ export class AddAddressDialogComponent implements OnInit {
         },
   
       });
-      this.saveButtonConfig = {
-        ...this.saveButtonConfig,
-        loading: false,
-      };
   }
   cancel(): void {
     this.dialogRef.close({ saved: false } as AddAddressDialogResult);

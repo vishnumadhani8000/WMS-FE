@@ -81,7 +81,6 @@ export class CityDialogComponent implements OnInit{
       label: this.isEdit ? 'Save Changes' : 'Add City',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
       disabled: this.saving,
       clicked: () => this.submit(),
     };

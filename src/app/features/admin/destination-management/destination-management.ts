@@ -61,11 +61,9 @@ export class DestinationManagement implements OnInit {
 
   states: State[] = [];
   stateTotalCount = 0;
-  stateLoading = false;
   
   cities: City[] = [];
   cityTotalCount = 0;
-  cityLoading = false;
   
   selectedState: State | null = null;
   
@@ -181,8 +179,6 @@ export class DestinationManagement implements OnInit {
   }
 
   loadStates(): void {
-    this.stateLoading = true;
-  
     this.stateService
       .getStates({
         page: this.statePage + 1,
@@ -192,9 +188,7 @@ export class DestinationManagement implements OnInit {
         ascending: this.stateSortAsc ?? undefined,
       })
       .pipe(
-        finalize(() => this.stateLoading = false),
-        takeUntilDestroyed(this.destroyRef)
-      )
+        takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.states = res.items;
@@ -209,8 +203,7 @@ export class DestinationManagement implements OnInit {
     if (!state) {
       return;
     }
-  
-    this.cityLoading = true;  
+
     this.cityService
       .getCities({
         stateId: state.id,
@@ -222,9 +215,7 @@ export class DestinationManagement implements OnInit {
       })
   
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.cityLoading = false)
-      )
+        takeUntilDestroyed(this.destroyRef))
   
       .subscribe({
         next: (res) => {

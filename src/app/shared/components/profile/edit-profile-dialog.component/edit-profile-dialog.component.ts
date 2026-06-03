@@ -41,9 +41,6 @@ export class EditProfileDialogComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   form: FormGroup<EditProfileForm>;
-
-  saving = false;
-
   nameConfig: InputFieldConfig;
   phoneConfig: InputFieldConfig;
 
@@ -105,8 +102,6 @@ export class EditProfileDialogComponent implements OnInit {
       label: 'Save Changes',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.submit(),
     };
 
@@ -118,12 +113,10 @@ export class EditProfileDialogComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.saving = true;
 
     const value = this.form.getRawValue();
 
@@ -132,18 +125,14 @@ export class EditProfileDialogComponent implements OnInit {
         name: value.name,
         phone: value.phone,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.saving = false;
-
           this.toastr.success('Profile updated successfully.');
 
           this.dialogRef.close({
             saved: true,
           });
-        },
-        error: () => {
-          this.saving = false;
         },
       });
   }

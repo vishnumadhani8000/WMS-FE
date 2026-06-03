@@ -54,8 +54,6 @@ export class Cart implements OnInit {
 
   cartItems = signal<CartItem[]>([]);
   totalWeightKg = signal(0);
-  loading = signal(false);
-  quantityLoading = signal(false);
   cartId = signal(0);
   totalItems = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
 
@@ -94,7 +92,6 @@ export class Cart implements OnInit {
       variant: 'icon',
       color: 'primary',
       prefixIcon: 'add',
-      disabled: this.quantityLoading() || item.quantity >= item.availableStock,
       clicked: () => this.increment(item),
     });
 
@@ -102,21 +99,17 @@ export class Cart implements OnInit {
       variant: 'icon',
       color: 'default',
       prefixIcon: 'remove',
-      disabled: this.quantityLoading(),
       clicked: () => this.decrement(item),
     });
   }
 
   loadCart(): void {
-    this.loading.set(true);
-
     this.cartService
       .getCart()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           if (!res.data) {
-            this.loading.set(false);
             return;
           }
 
@@ -125,7 +118,6 @@ export class Cart implements OnInit {
           this.totalWeightKg.set(res.data.totalWeightKg ?? 0);
         },
       });
-    this.loading.set(false);
   }
 
   increment(item: CartItem): void {
@@ -146,18 +138,12 @@ export class Cart implements OnInit {
   }
 
   private updateQuantity(item: CartItem, quantity: number): void {
-    this.quantityLoading.set(true);
-
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.loadCart();
-        },
-
-        complete: () => {
-          this.quantityLoading.set(false);
         },
       });
   }

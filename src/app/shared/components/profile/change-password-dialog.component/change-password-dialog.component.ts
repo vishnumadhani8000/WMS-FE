@@ -65,7 +65,6 @@ export class ChangePasswordDialogComponent implements OnInit {
 
   form: FormGroup<ChangePasswordForm>;
 
-  saving = false;
 
   currentPasswordConfig: InputFieldConfig;
   newPasswordConfig: InputFieldConfig;
@@ -140,8 +139,6 @@ export class ChangePasswordDialogComponent implements OnInit {
       label: 'Change Password',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.submit(),
     };
 
@@ -153,12 +150,10 @@ export class ChangePasswordDialogComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.saving = true;
 
     const value = this.form.getRawValue();
 
@@ -170,16 +165,12 @@ export class ChangePasswordDialogComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.saving = false;
 
           this.toastr.success('Password changed successfully.');
 
           this.dialogRef.close({
             saved: true,
           });
-        },
-        error: () => {
-          this.saving = false;
         },
       });
   }

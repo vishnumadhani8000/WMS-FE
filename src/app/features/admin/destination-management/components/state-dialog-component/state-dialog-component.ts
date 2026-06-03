@@ -38,7 +38,6 @@ export class StateDialogComponent implements OnInit {
   private destroyref = inject(DestroyRef)
 
   form: FormGroup<StateForm>;
-  saving = false;
   nameConfig: InputFieldConfig;
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
@@ -82,8 +81,6 @@ export class StateDialogComponent implements OnInit {
       label: this.isEdit ? 'Save Changes' : 'Add State',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.submit(),
     };
     this.closeButtonConfig = {  
@@ -95,12 +92,10 @@ export class StateDialogComponent implements OnInit {
 
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.saving = true;
     const value = this.form.getRawValue();
 
     const request = this.isEdit
@@ -115,7 +110,7 @@ export class StateDialogComponent implements OnInit {
         this.dialogRef.close({ saved: true });
       },
     });
-    this.saving = false;
+
   }
 
   cancel(): void {

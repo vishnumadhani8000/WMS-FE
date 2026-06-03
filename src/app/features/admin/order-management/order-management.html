@@ -42,9 +42,6 @@
 
   <!-- ── Card ──────────────────────────────────────────── -->
   <div class="om-card">
-    @if (loading) {
-    <mat-progress-bar mode="indeterminate" class="om-progress" />
-    }
 
     <div class="om-table-wrap">
       <table
@@ -206,12 +203,10 @@
 
         <tr class="mat-mdc-row" *matNoDataRow>
           <td class="mat-mdc-cell om-no-data" [attr.colspan]="displayedColumns.length">
-            @if (!loading) {
             <div class="om-empty-inline">
               <mat-icon>receipt_long</mat-icon>
               <span>No orders found</span>
             </div>
-            }
           </td>
         </tr>
       </table>

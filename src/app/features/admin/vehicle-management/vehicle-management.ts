@@ -73,7 +73,6 @@ export class VehicleManagement implements OnInit {
 
   dataSource = signal<Vehicle[]>([]);
   totalCount = signal(0);
-  loading = signal(false);
 
   form = new FormGroup({
     searchControl: new FormControl('', {
@@ -147,11 +146,8 @@ export class VehicleManagement implements OnInit {
     this.filter
       .pipe(
         switchMap((filter) => {
-          this.loading.set(true);
 
-          return this.vehicleService.getVehicles(filter).pipe(
-            finalize(() => this.loading.set(false))
-          );
+          return this.vehicleService.getVehicles(filter).pipe();
         }),
         takeUntilDestroyed(this.destroyref)
       )

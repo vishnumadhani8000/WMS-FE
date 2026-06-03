@@ -26,10 +26,6 @@
   </section>
 
   <div class="vm-card">
-    <!-- Loading -->
-    @if (loading()) {
-    <mat-progress-bar mode="indeterminate" class="vm-progress"> </mat-progress-bar>
-    }
 
     <div class="vm-table-wrap">
       <table
@@ -132,12 +128,10 @@
 
         <tr class="mat-mdc-row" *matNoDataRow>
           <td class="mat-mdc-cell vm-no-data" [attr.colspan]="displayedColumns.length">
-            @if (!loading()) {
             <div class="vm-empty-inline">
               <mat-icon> local_shipping </mat-icon>
               <span> No vehicles found </span>
             </div>
-            }
           </td>
         </tr>
       </table>

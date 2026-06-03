@@ -18,9 +18,6 @@
       </div>
 
       <div class="scm-table-wrap">
-        @if (stateLoading) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
 
         <table
           mat-table
@@ -69,12 +66,10 @@
 
           <tr class="mat-mdc-row" *matNoDataRow>
             <td class="mat-mdc-cell scm-no-data" colspan="3">
-              @if (!stateLoading) {
               <div class="scm-empty">
                 <mat-icon>location_on</mat-icon>
                 <span>No states found</span>
               </div>
-              }
             </td>
           </tr>
         </table>
@@ -110,10 +105,6 @@
       </div>
 
       <div class="scm-table-wrap">
-        @if (cityLoading) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
-
         <table
           mat-table
           [dataSource]="cities"
@@ -155,7 +146,6 @@
 
           <tr class="mat-mdc-row" *matNoDataRow>
             <td class="mat-mdc-cell scm-no-data" colspan="3">
-              @if (!cityLoading) {
               <div class="scm-empty">
                 @if (!selectedState) {
                 <mat-icon>touch_app</mat-icon>
@@ -165,7 +155,6 @@
                 <span>No cities found</span>
                 }
               </div>
-              }
             </td>
           </tr>
         </table>

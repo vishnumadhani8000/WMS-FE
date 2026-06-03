@@ -11,7 +11,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBar } from '@angular/material/progress-bar';
 
 import { ToastrService } from 'ngx-toastr';
 
@@ -43,7 +42,6 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
     MatPaginatorModule,
     MatIconModule,
     MatTooltipModule,
-    MatProgressBar,
     Button,
     InputField,
     TruncatePipe,
@@ -64,7 +62,6 @@ export class Products implements OnInit {
 
   products = signal<Product[]>([]);
   totalCount = signal(0);
-  loading = signal(false);
   page = signal(0);
   sortBy = signal<string | null>(null);
   ascending = signal<boolean | null>(null);
@@ -111,7 +108,6 @@ export class Products implements OnInit {
   }
 
   loadProducts(): void {
-    this.loading.set(true);
 
     this.productService.getAll({
       page: this.page() + 1,
@@ -121,11 +117,7 @@ export class Products implements OnInit {
       ascending: this.ascending() ?? undefined,
     })
       .pipe(
-        finalize(() => {
-          this.loading.set(false);
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
+        takeUntilDestroyed(this.destroyRef))
 
       .subscribe({
         next: (response) => {

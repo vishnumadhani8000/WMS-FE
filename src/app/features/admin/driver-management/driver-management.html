@@ -25,9 +25,6 @@
   </section>
 
   <div class="dm-card">
-    @if (loading) {
-    <mat-progress-bar mode="indeterminate" class="dm-progress" />
-    }
 
     <div class="dm-table-wrap">
       <table
@@ -125,15 +122,11 @@
 
         <tr class="mat-mdc-row" *matNoDataRow>
           <td class="mat-mdc-cell dm-no-data" [attr.colspan]="displayedColumns.length">
-            @if (!loading) {
-
             <div class="dm-empty-inline">
               <mat-icon>local_shipping</mat-icon>
 
               <span>No drivers found</span>
             </div>
-
-            }
           </td>
         </tr>
       </table>

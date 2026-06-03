@@ -9,7 +9,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import { OrderDetailService } from '../../services/order-detail.service';
@@ -55,10 +54,6 @@ export class OrderDetailComponent implements OnInit {
   ];
 
   order: OrderDetail | null = null;
-
-  loading = false;
-  actionLoading = false;
-
   // ── Button Configs ──────────────────────────────────────
   backButtonConfig: ButtonConfig;
 
@@ -89,8 +84,6 @@ export class OrderDetailComponent implements OnInit {
       prefixIcon: 'check_circle_outline',
       variant: 'stroked',
       color: 'primary',
-      loading: this.actionLoading,
-      disabled: this.actionLoading,
       clicked: () => this.acceptOrder(),
     };
 
@@ -99,8 +92,6 @@ export class OrderDetailComponent implements OnInit {
       prefixIcon: 'task_alt',
       variant: 'flat',
       color: 'primary',
-      loading: this.actionLoading,
-      disabled: this.actionLoading,
       clicked: () => this.completeOrder(),
     };
 
@@ -109,21 +100,16 @@ export class OrderDetailComponent implements OnInit {
       prefixIcon: 'cancel',
       variant: 'stroked',
       color: 'warn',
-      loading: this.actionLoading,
-      disabled: this.actionLoading,
       clicked: () => this.cancelOrder(),
     };
   }
 
   loadOrder(id: number): void {
-    this.loading = true;
 
     this.detailService
       .getOrderDetail(id)
       .pipe(
-        finalize(() => (this.loading = false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
+        takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
           this.order = data;
@@ -192,15 +178,10 @@ export class OrderDetailComponent implements OnInit {
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.actionLoading = true;
 
         this.orderService
           .acceptOrder(this.order!.orderId)
           .pipe(
-            finalize(() => {
-              this.actionLoading = false;
-              this.initializeButtons();
-            }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({
@@ -230,15 +211,10 @@ export class OrderDetailComponent implements OnInit {
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.actionLoading = true;
 
         this.orderService
           .completeOrder(this.order!.orderId)
           .pipe(
-            finalize(() => {
-              this.actionLoading = false;
-              this.initializeButtons();
-            }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({
@@ -267,22 +243,13 @@ export class OrderDetailComponent implements OnInit {
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) return;
-
-        this.actionLoading = true;
-
         this.orderService
           .cancelOrder(this.order!.orderId)
           .pipe(
-            finalize(() => {
-              this.actionLoading = false;
-              this.initializeButtons();
-            }),
-            takeUntilDestroyed(this.destroyRef)
-          )
+            takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => {
               this.toastr.success('Order cancelled.');
-
               this.loadOrder(this.order!.orderId);
             },
           });

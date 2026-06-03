@@ -14,7 +14,7 @@
         <span class="badge-selected"> {{ selectedCount() }} selected </span>
 
         <span class="badge-separator">·</span>
-        <span class="badge-selected">{{ selectedWeight() | number:'1.3-3' }} kg </span>
+        <span class="badge-selected">{{ selectedWeight() | number : '1.3-3' }} kg </span>
         }
       </span>
     </div>
@@ -36,16 +36,23 @@
   </section>
 
   <div class="tr-card">
-    @if (isLoading) {
-    <mat-progress-bar mode="indeterminate" class="tr-progress"></mat-progress-bar>
-    }
-
     <div class="tr-table-wrap">
-      <table mat-table [dataSource]="orders()" class="tr-table" matSort (matSortChange)="onSortChange($event)">
+      <table
+        mat-table
+        [dataSource]="orders()"
+        class="tr-table"
+        matSort
+        (matSortChange)="onSortChange($event)"
+      >
         <ng-container matColumnDef="select">
           <th mat-header-cell *matHeaderCellDef class="col-select">
-            <mat-checkbox [checked]="isAllSelected()" [indeterminate]="isIndeterminate()"
-              (change)="toggleAll()"></mat-checkbox>
+            @if(orders().length > 0) {
+            <mat-checkbox
+              [checked]="isAllSelected()"
+              [indeterminate]="isIndeterminate()"
+              (change)="toggleAll()"
+            ></mat-checkbox>
+            }
           </th>
           <td mat-cell *matCellDef="let row" class="col-select">
             <mat-checkbox [checked]="isSelected(row)" (change)="toggleRow(row)"></mat-checkbox>
@@ -101,35 +108,49 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef class="col-status">Status</th>
           <td mat-cell *matCellDef="let row" class="col-status">
-            <span class="cell-chip status-chip" [ngClass]="{
+            <span
+              class="cell-chip status-chip"
+              [ngClass]="{
                 'status-accepted': row.status === 'Accepted',
                 'status-pending': row.status === 'Pending'
-              }">
+              }"
+            >
               {{ row.status }}
             </span>
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="tr-header-row"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="tr-row"
-          [class.tr-row--selected]="isSelected(row)"></tr>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+          class="tr-header-row"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="tr-row"
+          [class.tr-row--selected]="isSelected(row)"
+        ></tr>
 
         <tr class="mat-mdc-row" *matNoDataRow>
           <td class="mat-mdc-cell tr-no-data" [attr.colspan]="displayedColumns.length">
-            @if (!isLoading) {
             <div class="tr-empty-inline">
               <mat-icon>inventory_2</mat-icon>
               <span>No orders found</span>
             </div>
-            }
           </td>
         </tr>
       </table>
     </div>
 
     <mat-divider></mat-divider>
-    <mat-paginator [length]="totalCount" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="page - 1" (page)="onPageChange($event)">
+    <mat-paginator
+      [length]="totalCount"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="page - 1"
+      (page)="onPageChange($event)"
+    >
     </mat-paginator>
   </div>
 </div>

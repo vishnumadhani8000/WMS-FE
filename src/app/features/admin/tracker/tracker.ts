@@ -81,7 +81,6 @@ export class Tracker implements OnInit {
 
   selectedOrders = signal<Map<number, AdminOrderResponseDto>>(new Map());
   orders = signal<AdminOrderResponseDto[]>([]);
-  isLoading = false;
   totalCount = 0;
   page: number = 1;
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
@@ -268,17 +267,15 @@ export class Tracker implements OnInit {
       isPendingAndAccepted: true,
     };
 
-    this.isLoading = true;
     this.trackerService
       .getOrders(filterParams)
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => (this.isLoading = false))
-      )
+        takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.orders.set(res.data?.items ?? []);
           this.totalCount = res.data?.totalCount ?? 0;
+          
         },
       });
   }
@@ -350,16 +347,12 @@ export class Tracker implements OnInit {
 
     const totalWeightKg = selectedOrders.reduce((sum, order) => sum + order.totalWeightKg, 0);
 
-    this.isLoading = true;
-
     forkJoin({
       drivers: this.trackerService.getAvailableDrivers(),
       vehicles: this.trackerService.getAvailableVehicles(totalWeightKg),
     })
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => (this.isLoading = false))
-      )
+        takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ drivers, vehicles }) => {
           const data: MakeShipmentDialogData = {

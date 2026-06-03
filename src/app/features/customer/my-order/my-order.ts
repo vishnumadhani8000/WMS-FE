@@ -26,7 +26,6 @@ export class MyOrders implements OnInit {
   ) {}
 
   orders  = signal<Order[]>([]);
-  loading = signal(false);
 
   totalOrders = computed(() => this.orders().length);
 
@@ -35,7 +34,6 @@ export class MyOrders implements OnInit {
   }
 
   loadOrders(): void {
-    this.loading.set(true);
     this.orderService
       .getOrders()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -44,7 +42,6 @@ export class MyOrders implements OnInit {
           this.orders.set(res.data ?? []);
         },
       });
-      this.loading.set(false);
   }
 
     getStatusMeta(status: string): OrderStatusMeta {
