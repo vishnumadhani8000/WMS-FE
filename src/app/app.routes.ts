@@ -51,7 +51,6 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./features/admin/destination-management/destination-management.js')
                         .then((m) => m.DestinationManagement),
-
             },
             {
                 path: APP_ROUTES.ADMIN.ORDER_MANAGEMENT,
@@ -71,6 +70,18 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./features/admin/tracker/tracker.js')
                         .then((m) => m.Tracker),
+            },
+            {
+                path:APP_ROUTES.ADMIN.SHIPMENT_MANAGEMENT ,
+                loadComponent:()=> 
+                    import('./features/admin/shipment-management/shipment-management.js')
+                        .then((m) => m.ShipmentManagement),
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.SHIPMENT_MANAGEMENT}/${APP_ROUTES.ADMIN.SHIPMENT_DETAIL}/:id`,
+                loadComponent: () =>
+                    import('./features/admin/shipment-management/components/shipment-detail.component/shipment-detail.component.js')
+                        .then((m) => m.ShipmentDetailComponent)
             },
             {
                 path:APP_ROUTES.ADMIN.PROFILE ,

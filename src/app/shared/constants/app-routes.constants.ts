@@ -13,6 +13,8 @@ export const APP_ROUTES = {
         PRODUCT_MANAGEMENT: 'product-management',
         ORDER_MANAGEMENT: 'order-management',
         ORDER_DETAIL : 'order-details',
+        SHIPMENT_MANAGEMENT: 'shipment-management',
+        SHIPMENT_DETAIL : 'shipment-details',
         DESTINATION_MANAGEMENT: 'destination-management',
         TRACKER: 'tracker',
         PROFILE: 'profile'

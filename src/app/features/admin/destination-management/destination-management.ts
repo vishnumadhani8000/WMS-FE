@@ -59,18 +59,18 @@ export class DestinationManagement implements OnInit {
   readonly stateColumns = ['index', 'name', 'actions'];
   readonly cityColumns = ['index', 'name', 'actions'];
 
-  states = signal<State[]>([]);
-  stateTotalCount = signal(0);
-  stateLoading = signal(false);
-
-  cities = signal<City[]>([]);
-  cityTotalCount = signal(0);
-  cityLoading = signal(false);
-
-  selectedState = signal<State | null>(null);
-
-  statePage = signal(0);
-  cityPage = signal(0);
+  states: State[] = [];
+  stateTotalCount = 0;
+  stateLoading = false;
+  
+  cities: City[] = [];
+  cityTotalCount = 0;
+  cityLoading = false;
+  
+  selectedState: State | null = null;
+  
+  statePage = 0;
+  cityPage = 0;
 
   statePageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
   cityPageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
@@ -163,7 +163,7 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.statePage.set(0);
+        this.statePage = 0;
         this.loadStates();
       });
 
@@ -175,47 +175,46 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.cityPage.set(0);
+        this.cityPage= 0;
         this.loadCities();
       });
   }
 
   loadStates(): void {
-    this.stateLoading.set(true);
+    this.stateLoading = true;
   
     this.stateService
       .getStates({
-        page: this.statePage() + 1,
+        page: this.statePage + 1,
         pageSize: this.statePageSize,
         search: this.stateForm.controls.stateSearchControl.value,
         sortBy: this.stateSortBy ?? undefined,
         ascending: this.stateSortAsc ?? undefined,
       })
       .pipe(
-        finalize(() => this.stateLoading.set(false)),
+        finalize(() => this.stateLoading = false),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (res) => {
-          this.states.set(res.items);
-          this.stateTotalCount.set(res.totalCount);
+          this.states = res.items;
+          this.stateTotalCount = res.totalCount;
         },
       });
   }
 
   loadCities(): void {
-    const state = this.selectedState();
+    const state = this.selectedState;
   
     if (!state) {
       return;
     }
   
-    this.cityLoading.set(true);
-  
+    this.cityLoading = true;  
     this.cityService
       .getCities({
         stateId: state.id,
-        page: this.cityPage() + 1,
+        page: this.cityPage + 1,
         pageSize: this.cityPageSize,
         search: this.cityForm.controls.citySearchControl.value,
         sortBy: this.citySortBy ?? undefined,
@@ -224,13 +223,13 @@ export class DestinationManagement implements OnInit {
   
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.cityLoading.set(false))
+        finalize(() => this.cityLoading = false)
       )
   
       .subscribe({
         next: (res) => {
-          this.cities.set(res.items);
-          this.cityTotalCount.set(res.totalCount);
+          this.cities = res.items;
+          this.cityTotalCount = res.totalCount;
         },
       });
   }
@@ -243,7 +242,7 @@ export class DestinationManagement implements OnInit {
       this.stateSortAsc = sort.direction === 'asc';
     }
 
-    this.statePage.set(0);
+    this.statePage = 0;
     this.loadStates();
   }
 
@@ -256,38 +255,38 @@ export class DestinationManagement implements OnInit {
       this.citySortAsc = sort.direction === 'asc';
     }
 
-    this.cityPage.set(0);
+    this.cityPage = 0;
 
     this.loadCities();
   }
 
   onStatePageChange(event: PageEvent): void {
-    this.statePage.set(event.pageIndex);
+    this.statePage = event.pageIndex;
     this.statePageSize = event.pageSize;
 
     this.loadStates();
   }
 
   onCityPageChange(event: PageEvent): void {
-    this.cityPage.set(event.pageIndex);
+    this.cityPage = event.pageIndex;
     this.cityPageSize = event.pageSize;
     this.loadCities();
   }
 
   selectState(state: State): void {
-    this.selectedState.set(state);
-    this.cityPage.set(0);
+    this.selectedState = state;
+    this.cityPage = 0;
     this.addCityButtonConfig.disabled = false;
     this.cityForm.controls.citySearchControl.setValue('');
     this.loadCities();
   }
 
   stateRowIndex(index: number): number {
-    return this.statePage() * this.statePageSize + index + 1;
+    return this.statePage * this.statePageSize + index + 1;
   }
 
   cityRowIndex(index: number): number {
-    return this.cityPage() * this.cityPageSize + index + 1;
+    return this.cityPage * this.cityPageSize + index + 1;
   }
 
   openAddStateDialog(): void {
@@ -337,7 +336,7 @@ export class DestinationManagement implements OnInit {
   }
 
   openAddCityDialog(): void {
-    const state = this.selectedState();
+    const state = this.selectedState;
 
     if (!state) {
       return;
@@ -367,7 +366,7 @@ export class DestinationManagement implements OnInit {
   }
 
   openEditCityDialog(city: City): void {
-    const state = this.selectedState();
+    const state = this.selectedState;
 
     if (!state) {
       return;
@@ -421,9 +420,9 @@ export class DestinationManagement implements OnInit {
             next: () => {
               this.toastr.success('State deleted.');
 
-              if (this.selectedState()?.id === state.id) {
-                this.selectedState.set(null);
-                this.cities.set([]);
+              if (this.selectedState?.id === state.id) {
+                this.selectedState = null;
+                this.cities = [];
               }
 
               this.loadStates();

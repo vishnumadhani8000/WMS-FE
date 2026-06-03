@@ -1,0 +1,319 @@
+@use 'styles/variables' as *;
+
+$bp-sm: 480px;
+$bp-md: 768px;
+
+// ── Page ──────────────────────────────────────────────────────
+.sd-page {
+  padding: 28px;
+  background: $page-bg;
+  min-height: 100%;
+
+  @media (max-width: $bp-md) {
+    padding: 16px;
+  }
+}
+
+// ── Progress ──────────────────────────────────────────────────
+.sd-progress {
+  height: 3px;
+  margin-bottom: 16px;
+}
+
+// ── Header ────────────────────────────────────────────────────
+.sd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $fs-h5;
+    font-weight: $fw-bold;
+    color: $text-main;
+    letter-spacing: -0.03em;
+  }
+
+  &__sub {
+    margin: 0;
+    font-size: $fs-body2;
+    color: $text-muted;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// ── Status Badge ──────────────────────────────────────────────
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: $fs-body2;
+  font-weight: $fw-semibold;
+}
+
+.status-assigned {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.status-transit {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+}
+
+.status-delivered {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+// ── Body ──────────────────────────────────────────────────────
+.sd-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sd-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: $bp-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Card ──────────────────────────────────────────────────────
+.sd-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+
+
+
+  &--full {
+    width: 100%;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+  }
+
+  &__icon {
+    color: $primary;
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $fs-body1;
+    font-weight: $fw-bold;
+    color: $text-main;
+    flex: 1;
+  }
+
+  &__body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.items-count {
+  font-size: $fs-caption;
+  font-weight: $fw-semibold;
+  color: $text-muted;
+  background: $surface-soft;
+  border: 1px solid $border;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+// ── Info Rows ─────────────────────────────────────────────────
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: $fs-body2;
+}
+
+.info-label {
+  color: $text-muted;
+  font-weight: $fw-medium;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: $text-main;
+  font-weight: $fw-semibold;
+  text-align: right;
+
+  &.notes-value {
+    max-width: 240px;
+    white-space: pre-line;
+  }
+}
+
+.vehicle-no {
+  font-family: monospace;
+  letter-spacing: 0.06em;
+  font-size: 13px;
+}
+
+// ── Summary Stats ─────────────────────
+.summary-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: $fs-body2;
+
+  &__label {
+    color: $text-muted;
+    font-weight: $fw-medium;
+  }
+
+  &__value {
+    color: $text-main;
+    font-weight: $fw-bold;
+    font-size: $fs-body1;
+  }
+
+  &--total {
+    .summary-stat__label {
+      font-size: $fs-body1;
+      font-weight: $fw-bold;
+      color: $text-main;
+    }
+
+    .summary-stat__value {
+      font-size: $fs-h5;
+      color: $primary;
+    }
+  }
+}
+
+// ── Table ─────────────────────────
+.sd-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sd-table {
+  width: 100%;
+  min-width: 700px;
+
+  .mat-mdc-header-row {
+    background: $surface-soft;
+    height: 52px;
+  }
+
+  th.mat-mdc-header-cell {
+    padding: 0 16px;
+    color: $text-muted;
+    font-size: $fs-caption;
+    font-weight: $fw-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    border-bottom: 2px solid $border !important;
+    vertical-align: middle;
+  }
+
+  td.mat-mdc-cell {
+    height: 56px;
+    padding: 0 16px;
+    border-bottom: 1px solid $border;
+    color: $text-main;
+    font-size: $fs-body1;
+    vertical-align: middle;
+  }
+
+  .sd-order-row:last-child td {
+    border-bottom: none;
+  }
+
+  .col-index,
+  .col-num {
+    text-align: center !important;
+  }
+}
+
+.order-id {
+  font-weight: $fw-semibold;
+  color: $primary;
+}
+
+.product-name {
+  font-weight: $fw-medium;
+}
+
+// ── Empty ─────────────────────────────────────────────────────
+.sd-no-data {
+  text-align: center !important;
+  padding: 48px 16px !important;
+  border-bottom: none !important;
+}
+
+.sd-empty-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: $text-muted;
+
+  mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    opacity: 0.5;
+  }
+
+  span {
+    font-size: 15px;
+    font-weight: 500;
+  }
+}

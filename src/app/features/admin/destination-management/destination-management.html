@@ -18,13 +18,13 @@
       </div>
 
       <div class="scm-table-wrap">
-        @if (stateLoading()) {
+        @if (stateLoading) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         }
 
         <table
           mat-table
-          [dataSource]="states()"
+          [dataSource]="states"
           class="scm-table"
           matSort
           (matSortChange)="onStateSortChange($event)"
@@ -63,13 +63,13 @@
             mat-row
             *matRowDef="let row; columns: stateColumns"
             class="scm-row"
-            [class.scm-row--selected]="selectedState()?.id === row.id"
+            [class.scm-row--selected]="selectedState?.id === row.id"
             (click)="selectState(row)"
           ></tr>
 
           <tr class="mat-mdc-row" *matNoDataRow>
             <td class="mat-mdc-cell scm-no-data" colspan="3">
-              @if (!stateLoading()) {
+              @if (!stateLoading) {
               <div class="scm-empty">
                 <mat-icon>location_on</mat-icon>
                 <span>No states found</span>
@@ -84,10 +84,10 @@
 
       <mat-paginator
         class="paginator"
-        [length]="stateTotalCount()"
+        [length]="stateTotalCount"
         [pageSize]="statePageSize"
         [pageSizeOptions]="pageSizeOptions"
-        [pageIndex]="statePage()"
+        [pageIndex]="statePage"
         (page)="onStatePageChange($event)"
         showFirstLastButtons
       ></mat-paginator>
@@ -97,7 +97,7 @@
     <div class="scm-panel">
       <div class="scm-panel__header">
         <h2 class="scm-panel__title">
-          @if (selectedState()) { Cities — {{ selectedState()!.name }}
+          @if (selectedState) { Cities — {{ selectedState!.name }}
           } @else { Cities }
         </h2>
         <app-common-button [config]="addCityButtonConfig" />
@@ -110,13 +110,13 @@
       </div>
 
       <div class="scm-table-wrap">
-        @if (cityLoading()) {
+        @if (cityLoading) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         }
 
         <table
           mat-table
-          [dataSource]="cities()"
+          [dataSource]="cities"
           class="scm-table"
           matSort
           (matSortChange)="onCitySortChange($event)"
@@ -155,9 +155,9 @@
 
           <tr class="mat-mdc-row" *matNoDataRow>
             <td class="mat-mdc-cell scm-no-data" colspan="3">
-              @if (!cityLoading()) {
+              @if (!cityLoading) {
               <div class="scm-empty">
-                @if (!selectedState()) {
+                @if (!selectedState) {
                 <mat-icon>touch_app</mat-icon>
                 <span>Select a state to view cities</span>
                 } @else {
@@ -175,10 +175,10 @@
 
       <mat-paginator
         class="paginator"
-        [length]="cityTotalCount()"
+        [length]="cityTotalCount"
         [pageSize]="cityPageSize"
         [pageSizeOptions]="pageSizeOptions"
-        [pageIndex]="cityPage()"
+        [pageIndex]="cityPage"
         (page)="onCityPageChange($event)"
         showFirstLastButtons
       ></mat-paginator>

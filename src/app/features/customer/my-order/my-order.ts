@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  inject,
   signal,
   computed,
   DestroyRef,
@@ -10,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { ToastrService } from 'ngx-toastr';
 import { Order, OrderItem, ORDER_STATUS_META, OrderStatusMeta } from './models/order.model';
 import { OrderService } from './services/order.services';
 
@@ -24,7 +22,6 @@ import { OrderService } from './services/order.services';
 export class MyOrders implements OnInit {
   constructor(
     private readonly orderService: OrderService,
-    private readonly toastr: ToastrService,
     private readonly destroyRef: DestroyRef
   ) {}
 
@@ -50,7 +47,7 @@ export class MyOrders implements OnInit {
       this.loading.set(false);
   }
 
-  getStatusMeta(status: string): OrderStatusMeta {
+    getStatusMeta(status: string): OrderStatusMeta {
     return ORDER_STATUS_META[status] ?? { label: status, cssClass: 'status--pending', icon: 'help_outline' };
   }
 
