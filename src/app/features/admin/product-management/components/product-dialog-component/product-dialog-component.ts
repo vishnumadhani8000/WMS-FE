@@ -50,8 +50,6 @@ export class ProductDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: ProductDialogData
   ) {}
 
-
-  saving = false;
   form: FormGroup<ProductForm>;
   productNameConfig: InputFieldConfig;
   weightConfig: InputFieldConfig;
@@ -159,8 +157,6 @@ export class ProductDialogComponent implements OnInit {
       label: this.isEdit ? 'Save Changes' : 'Add Product',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
 
       clicked: () => {
         this.submit();
@@ -179,12 +175,11 @@ export class ProductDialogComponent implements OnInit {
 
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.saving = true;
 
     const value = this.form.getRawValue();
 
@@ -200,15 +195,12 @@ export class ProductDialogComponent implements OnInit {
       : this.productManagementService.createProduct(payload);
     request.pipe(takeUntilDestroyed(this.destroyref)).subscribe({
       next: (product) => {
-        this.saving = false;
-
         this.dialogRef.close({
           saved: true,
           product,
         });
       },
     });
-    this.saving = false;
   }
 
   cancel(): void {

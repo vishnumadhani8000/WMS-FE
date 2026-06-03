@@ -2,17 +2,20 @@
 
 .profile-wrapper {
   padding: 24px;
+  border-radius: 20px;
+  margin-bottom: 24px;
 }
 
 .profile-card {
   background: $surface;
   border-radius: 20px;
-  box-shadow: $shadow-md;
-  overflow: hidden;
+  margin-top: 24px  ;
+
 }
 
 .profile-header {
   padding: 24px;
+  border-radius: 20px;
   background:
     linear-gradient(
       135deg,
@@ -46,6 +49,5 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-
   padding: 24px;
 }

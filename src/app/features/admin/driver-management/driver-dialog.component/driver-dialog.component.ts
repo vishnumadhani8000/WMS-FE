@@ -70,8 +70,6 @@ export class DriverDialogComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   form: FormGroup<DriverForm>;
-  saving = false;
-
   nameConfig: InputFieldConfig;
   phoneConfig: InputFieldConfig;
   licenceConfig: InputFieldConfig;
@@ -174,8 +172,6 @@ export class DriverDialogComponent implements OnInit {
       label: this.isEdit ? 'Save Changes' : 'Add Driver',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.submit(),
     };
 
@@ -191,12 +187,11 @@ export class DriverDialogComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.saving = true;
     this.submitButtonConfig.loading = true;
     this.submitButtonConfig.disabled = true;
 
@@ -214,7 +209,6 @@ export class DriverDialogComponent implements OnInit {
         this.dialogRef.close({ saved: true });
       },
       error: () => {
-        this.saving = false;
         this.submitButtonConfig.loading = false;
         this.submitButtonConfig.disabled = false;
       },

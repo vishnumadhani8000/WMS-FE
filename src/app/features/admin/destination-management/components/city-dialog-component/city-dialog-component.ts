@@ -37,7 +37,6 @@ export class CityDialogComponent implements OnInit{
   private destroyRef = inject(DestroyRef);
 
   form: FormGroup<CityForm>;
-  saving = false;
   nameConfig: InputFieldConfig;
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
@@ -81,7 +80,6 @@ export class CityDialogComponent implements OnInit{
       label: this.isEdit ? 'Save Changes' : 'Add City',
       variant: 'flat',
       color: 'primary',
-      disabled: this.saving,
       clicked: () => this.submit(),
     };
 
@@ -96,12 +94,11 @@ export class CityDialogComponent implements OnInit{
 
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid ) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.saving = true;
     const value = this.form.getRawValue();
     console.log(value);
     console.log(this.data.stateId);
@@ -118,7 +115,7 @@ export class CityDialogComponent implements OnInit{
         this.dialogRef.close({ saved: true });
       },
     });
-    this.saving = false;
+
   }
 
   cancel(): void {

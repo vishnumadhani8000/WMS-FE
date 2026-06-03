@@ -2,6 +2,7 @@
 
 <div class="login-wrapper">
   <div class="login-card">
+
     <!-- LOGO -->
     <div class="login-logo">
       <mat-icon class="logo-icon">warehouse</mat-icon>
@@ -10,24 +11,64 @@
     <!-- HEADER -->
     <div class="login-header">
       <h1 class="login-title">Welcome</h1>
-      <p class="login-subtitle">Sign in to your WMS account</p>
+      <p class="login-subtitle">Sign in or create your WMS account</p>
     </div>
 
-    <!-- FORM -->
-    <form class="login-form" [formGroup]="form" autocomplete="off">
-      <!-- EMAIL -->
-      <app-common-input [config]="emailConfig" />
+    <!-- TAB SWITCHER -->
+    <div class="auth-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'login'"
+        type="button"
+        (click)="setTab('login')"
+      >
+        Login
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'signup'"
+        type="button"
+        (click)="setTab('signup')"
+      >
+        Sign Up
+      </button>
+      <span class="tab-indicator" [class.right]="activeTab === 'signup'"></span>
+    </div>
 
-      <!-- PASSWORD -->
-      <app-common-input [config]="passwordConfig" />
+    <!-- ── LOGIN FORM ── -->
+    @if (activeTab === 'login') {
+      <form class="auth-form" [formGroup]="form" autocomplete="off">
 
-      <!-- FORGOT PASSWORD -->
-      <div class="login-forgot">
-        <a routerLink="/auth/forgot-password" class="forgot-link"> Forgot password? </a>
-      </div>
+        <app-common-input [config]="emailConfig" />
+        <app-common-input [config]="passwordConfig" />
+        <app-common-button [config]="loginButtonConfig" />
 
-      <!-- SUBMIT -->
-      <app-common-button [config]="loginButtonConfig" />
-    </form>
+      </form>
+
+      <p class="switch-hint">
+        Don't have an account?
+        <button type="button" class="switch-link" (click)="setTab('signup')">Sign Up</button>
+      </p>
+    }
+
+    <!-- ── SIGN UP FORM ── -->
+    @if (activeTab === 'signup') {
+      <form class="auth-form" [formGroup]="signUpForm" autocomplete="off">
+
+        <app-common-input [config]="nameConfig" />
+        <app-common-input [config]="signUpEmailConfig" />
+        <app-common-input [config]="phoneConfig" />
+        <app-common-input [config]="signUpPasswordConfig" />
+        <app-common-input [config]="confirmPasswordConfig" />
+        <app-common-button [config]="signUpButtonConfig" />
+
+      </form>
+
+      <p class="switch-hint">
+        Already have an account?
+        <button type="button" class="switch-link" (click)="setTab('login')">Login</button>
+      </p>
+    }
+
   </div>
 </div>

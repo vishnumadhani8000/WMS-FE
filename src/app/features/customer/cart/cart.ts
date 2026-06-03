@@ -92,6 +92,7 @@ export class Cart implements OnInit {
       variant: 'icon',
       color: 'primary',
       prefixIcon: 'add',
+      disabled:  item.quantity >= item.availableStock,
       clicked: () => this.increment(item),
     });
 
@@ -104,6 +105,7 @@ export class Cart implements OnInit {
   }
 
   loadCart(): void {
+
     this.cartService
       .getCart()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -138,6 +140,7 @@ export class Cart implements OnInit {
   }
 
   private updateQuantity(item: CartItem, quantity: number): void {
+
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -145,6 +148,8 @@ export class Cart implements OnInit {
         next: () => {
           this.loadCart();
         },
+
+
       });
   }
 

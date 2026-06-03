@@ -1,11 +1,20 @@
-import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, switchMap } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,16 +22,21 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule, Sort } from '@angular/material/sort';
+
 import { ToastrService } from 'ngx-toastr';
+
 import { ProductManagementService } from './services/product-management.service';
-import { Product, ProductFilter } from './models/product-management.model';
+import { Product } from './models/product-management.model';
 import { ProductDialogComponent } from './components/product-dialog-component/product-dialog-component';
+
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { Button } from '../../../shared/components/button/button';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
+
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
@@ -30,7 +44,6 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
   standalone: true,
   templateUrl: './product-management.html',
   styleUrl: './product-management.scss',
-
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -49,21 +62,36 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
   ],
 })
 export class ProductManagement implements OnInit {
-  private readonly productManagementService = inject(ProductManagementService);
-  private readonly dialog = inject(MatDialog);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyref = inject(DestroyRef);
+  constructor(
+    private readonly productManagementService: ProductManagementService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   @ViewChild(MatPaginator)
   paginator: MatPaginator;
 
-  readonly DEBOUNCE_MS = APP_CONSTANTS.SEARCH_DEBOUNCE_MS;
-  readonly displayedColumns = ['index', 'name', 'weightKg', 'stock','price', 'description', 'actions'];
-  readonly pageSizeOptions =APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+  readonly displayedColumns = [
+    'index',
+    'name',
+    'weightKg',
+    'stock',
+    'price',
+    'description',
+    'actions',
+  ];
 
-  dataSource = signal<Product[]>([]);
-  totalCount = signal(0);
-  loading = signal(false);
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+  dataSource: Product[] = [];
+  totalCount = 0;
+  loading = false;
+
+  page = 0;
+  pageSize : number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+
+  sortBy: string | null = 'createdAt';
+  sortAsc: boolean | null = false;
 
   form = new FormGroup({
     searchControl: new FormControl('', {
@@ -74,16 +102,7 @@ export class ProductManagement implements OnInit {
   searchInputConfig: InputFieldConfig;
   addProductButtonConfig: ButtonConfig;
 
-  readonly filter = new BehaviorSubject<ProductFilter>({
-    page: 1,
-    pageSize: APP_CONSTANTS.DEFAULT_PAGE_SIZE,
-    search: '',
-    sortBy: 'createdAt',
-    ascending: false,
-  });
-
   ngOnInit(): void {
-    // Search Config
     this.searchInputConfig = {
       label: 'Search',
       type: 'text',
@@ -93,9 +112,7 @@ export class ProductManagement implements OnInit {
       trimStart: true,
       formControlName: 'searchControl',
 
-      iconClick: () => {
-        this.clearSearch();
-      },
+      iconClick: () => this.clearSearch(),
     };
 
     this.addProductButtonConfig = {
@@ -104,81 +121,65 @@ export class ProductManagement implements OnInit {
       color: 'primary',
       prefixIcon: 'add',
 
-      clicked: () => {
-        this.openAddDialog();
-      },
+      clicked: () => this.openAddDialog(),
     };
 
-    this.initializeSearch();
-    this.initializeProductLoader();
-  }
-
-  private initializeSearch(): void {
     this.form.controls.searchControl.valueChanges
       .pipe(
-        debounceTime(this.DEBOUNCE_MS),
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
         distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyref)
+        takeUntilDestroyed(this.destroyRef)
       )
-
-      .subscribe((search) => {
-        this.paginator?.firstPage();
-
-        this.filter.next({
-          page: 1,
-          pageSize: this.filter.value.pageSize,
-          search,
-          sortBy: this.filter.value.sortBy,
-          ascending: this.filter.value.ascending,
-        });
+      .subscribe(() => {
+        this.page = 0;
+        this.loadProducts();
       });
+
+    this.loadProducts();
   }
 
-  private initializeProductLoader(): void {
-    this.filter
-    .pipe(
-      switchMap((filter) => {
-          this.loading.set(true);
-          return this.productManagementService.getProducts(filter).pipe(
-            finalize(()=>this.loading.set(false))
-          );
-        }),
+  loadProducts(): void {
+    this.loading = true;
 
-        takeUntilDestroyed(this.destroyref)
+    this.productManagementService
+      .getProducts({
+        page: this.page + 1,
+        pageSize: this.pageSize,
+        search: this.form.controls.searchControl.value,
+        sortBy: this.sortBy ,
+        ascending: this.sortAsc ,
+      })
+      .pipe(
+        finalize(() => this.loading = false ),
+        takeUntilDestroyed(this.destroyRef)
       )
-
       .subscribe({
         next: (result) => {
-          this.dataSource.set(result.items);
-          this.totalCount.set(result.totalCount);
+          this.dataSource=  result.items;
+          this.totalCount =  result.totalCount;
         },
       });
   }
 
   onPageChange(event: PageEvent): void {
-    this.filter.next({
-      page: event.pageIndex + 1,
-      pageSize: event.pageSize,
-      search: this.form.controls.searchControl.value,
-      sortBy: this.filter.value.sortBy,
-      ascending: this.filter.value.ascending,
-    });
+    this.page = event.pageIndex;
+    this.pageSize = event.pageSize;
+
+    this.loadProducts();
   }
 
   onSortChange(sort: Sort): void {
-    this.paginator?.firstPage();
+    this.sortBy = sort.direction ? sort.active : null;
+    this.sortAsc = sort.direction
+      ? sort.direction === 'asc'
+      : null;
 
-    this.filter.next({
-      page: 1,
-      pageSize: this.filter.value.pageSize,
-      search: this.form.controls.searchControl.value,
-      sortBy: sort.direction ? sort.active : undefined,
-      ascending: sort.direction === '' ? undefined : sort.direction === 'asc',
-    });
+    this.page = 0;
+    this.loadProducts();
   }
 
   rowIndex(index: number): number {
-    return (this.filter.value.page - 1) * this.filter.value.pageSize + index + 1;
+    return this.page * this.pageSize + index + 1;
   }
 
   clearSearch(): void {
@@ -191,17 +192,15 @@ export class ProductManagement implements OnInit {
         data: {
           mode: 'add',
         },
-
         disableClose: true,
       })
-
       .afterClosed()
       .subscribe((result) => {
         if (!result?.saved) {
           return;
         }
-        this.toastr.success('Product added successfully.');
 
+        this.toastr.success('Product added successfully.');
         this.reload();
       });
   }
@@ -215,7 +214,6 @@ export class ProductManagement implements OnInit {
         },
         disableClose: true,
       })
-
       .afterClosed()
       .subscribe((result) => {
         if (!result?.saved) {
@@ -223,7 +221,6 @@ export class ProductManagement implements OnInit {
         }
 
         this.toastr.success('Product updated successfully.');
-
         this.reload();
       });
   }
@@ -233,7 +230,6 @@ export class ProductManagement implements OnInit {
       .open(ConfirmDialog, {
         width: '420px',
         disableClose: true,
-
         data: {
           title: 'Delete Product',
           message: `Are you sure you want to delete "${product.name}"?`,
@@ -242,38 +238,33 @@ export class ProductManagement implements OnInit {
           type: 'warning',
         },
       })
-
       .afterClosed()
-
       .subscribe((confirmed) => {
         if (!confirmed) {
           return;
         }
 
-        this.productManagementService.deleteProduct(product.id).subscribe({
-          next: () => {
-            this.toastr.warning('Product deleted.');
+        this.productManagementService
+          .deleteProduct(product.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.toastr.warning('Product deleted.');
 
-            const isLastItemOnPage = this.dataSource().length === 1 && this.filter.value.page > 1;
+              const isLastItemOnPage =
+                this.dataSource.length === 1 && this.page > 0;
 
-            if (isLastItemOnPage) {
-              this.paginator.previousPage();
-            } else {
-              this.reload();
-            }
-          },
-
-        });
+              if (isLastItemOnPage) {
+                this.paginator.previousPage();
+              } else {
+                this.reload();
+              }
+            },
+          });
       });
   }
 
-  private reload(): void {
-    this.filter.next({
-      page: this.filter.value.page,
-      pageSize: this.filter.value.pageSize,
-      search: this.form.controls.searchControl.value,
-      sortBy: this.filter.value.sortBy,
-      ascending: this.filter.value.ascending,
-    });
+  reload(): void {
+    this.loadProducts();
   }
 }

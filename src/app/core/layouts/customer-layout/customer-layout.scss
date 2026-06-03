@@ -1,5 +1,6 @@
 @use 'styles/variables' as *;
-
+$bp-sm: 480px;
+$bp-md: 768px;
 // ── Root Wrapper ───────────────────────────────────────────
 .page-wrapper {
   min-height: 100vh;
@@ -21,4 +22,19 @@
 .customer-layout {
   flex: 1;
   min-width: 0;
+}
+
+.customer-layout {
+  padding: 28px;
+  background: $page-bg;
+
+  @media (max-width: $bp-md) {
+    padding: 16px;
+    padding-top: 28px;
+  }
+
+  @media (max-width: $bp-sm) {
+    padding: 12px;
+    padding-top: 28px;
+  }
 }

@@ -8,8 +8,8 @@
       <span class="pm-header__count-badge">
         <mat-icon class="badge-icon"> inventory_2 </mat-icon>
 
-        {{ totalCount() }}
-        {{ totalCount() === 1 ? 'Product' : 'Products' }}
+        {{ totalCount }}
+        {{ totalCount === 1 ? 'Product' : 'Products' }}
       </span>
     </div>
   </header>
@@ -25,15 +25,11 @@
   </section>
 
   <div class="pm-card">
-    @if (loading()) {
-
-    <mat-progress-bar mode="indeterminate" class="pm-progress"> </mat-progress-bar>
-    }
 
     <div class="pm-table-wrap">
       <table
         mat-table
-        [dataSource]="dataSource()"
+        [dataSource]="dataSource"
         class="pm-table"
         matSort
         (matSortChange)="onSortChange($event)"
@@ -144,15 +140,12 @@
 
         <tr class="mat-mdc-row" *matNoDataRow>
           <td class="mat-mdc-cell pm-no-data" [attr.colspan]="displayedColumns.length">
-            @if (!loading()) {
 
             <div class="pm-empty-inline">
               <mat-icon> inventory_2 </mat-icon>
 
               <span> No products found </span>
             </div>
-
-            }
           </td>
         </tr>
       </table>
@@ -161,14 +154,13 @@
     <mat-divider> </mat-divider>
 
     <mat-paginator
-      #paginator
-      class="pm-paginator"
-      [length]="totalCount()"
-      [pageSize]="this.filter.value.pageSize"
-      [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="this.filter.value.page - 1"
-      showFirstLastButtons
-      (page)="onPageChange($event)"
+    class="pm-paginator"
+    [length]="totalCount"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [pageIndex]="page"
+    showFirstLastButtons
+    (page)="onPageChange($event)"
     >
     </mat-paginator>
   </div>
