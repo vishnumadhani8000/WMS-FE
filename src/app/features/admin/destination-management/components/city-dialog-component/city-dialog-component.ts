@@ -100,8 +100,6 @@ export class CityDialogComponent implements OnInit{
     }
 
     const value = this.form.getRawValue();
-    console.log(value);
-    console.log(this.data.stateId);
 
     const request = this.isEdit
       ? this.cityService.updateCity(this.data.city.id,value.name)

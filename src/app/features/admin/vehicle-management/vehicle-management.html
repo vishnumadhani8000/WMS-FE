@@ -8,8 +8,8 @@
       <span class="vm-header__count-badge">
         <mat-icon class="badge-icon"> local_shipping </mat-icon>
 
-        {{ totalCount() }}
-        {{ totalCount() === 1 ? 'Vehicle' : 'Vehicles' }}
+        {{ totalCount }}
+        {{ totalCount === 1 ? 'Vehicle' : 'Vehicles' }}
       </span>
     </div>
   </header>
@@ -30,7 +30,7 @@
     <div class="vm-table-wrap">
       <table
         mat-table
-        [dataSource]="dataSource()"
+        [dataSource]="dataSource"
         class="vm-table"
         matSort
         (matSortChange)="onSortChange($event)"
@@ -142,10 +142,10 @@
     <mat-paginator
       #paginator
       class="vm-paginator"
-      [length]="totalCount()"
-      [pageSize]="this.filter.value.pageSize"
+      [length]="totalCount"
+      [pageSize]="this.pageSize"
       [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="this.filter.value.page - 1"
+      [pageIndex]="this.page - 1"
       showFirstLastButtons
       (page)="onPageChange($event)"
     >

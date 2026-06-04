@@ -335,7 +335,6 @@ export class Tracker implements OnInit {
     const selectedIds = selectedOrders.map((order) => order.orderId);
 
     const cityNames = new Set(selectedOrders.map((order) => order.cityName));
-
     if (cityNames.size > 1) {
       this.toastr.warning('All selected orders must be from the same city.');
       return;
@@ -343,23 +342,23 @@ export class Tracker implements OnInit {
 
     const cityName = selectedOrders[0].cityName;
 
-    const totalWeightKg = selectedOrders.reduce((sum, order) => sum + order.totalWeightKg, 0);
+      const totalWeightKg = selectedOrders.reduce((sum, order) => sum + order.totalWeightKg, 0);
 
-    forkJoin({
-      drivers: this.trackerService.getAvailableDrivers(),
-      vehicles: this.trackerService.getAvailableVehicles(totalWeightKg),
-    })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ({ drivers, vehicles }) => {
-          const data: MakeShipmentDialogData = {
-            orderIds: selectedIds,
-            cityName,
-            totalWeightKg,
-            drivers: drivers.data ?? [],
-            vehicles: vehicles.data ?? [],
-          };
+      forkJoin({
+        drivers: this.trackerService.getAvailableDrivers(),
+        vehicles: this.trackerService.getAvailableVehicles(totalWeightKg),
+      })
+        .pipe(
+          takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: ({ drivers, vehicles }) => {
+            const data: MakeShipmentDialogData = {
+              orderIds: selectedIds,
+              cityName,
+              totalWeightKg,
+              drivers: drivers.data ?? [],
+              vehicles: vehicles.data ?? [],
+            };
 
           this.dialog
             .open(MakeShipmentDialog, {
@@ -373,7 +372,6 @@ export class Tracker implements OnInit {
               if (!result?.confirmed) {
                 return;
               }
-
               this.trackerService
                 .makeShipment({
                   orderIds: selectedIds,

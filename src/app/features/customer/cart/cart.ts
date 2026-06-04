@@ -240,7 +240,6 @@ export class Cart implements OnInit {
         if (!result?.saved || !result.address) {
           return;
         }
-        console.log(result.address);
         this.openConfirmOrderDialog(result.address, orderItems);
       });
   }
@@ -258,7 +257,6 @@ export class Cart implements OnInit {
           this.reloadAddressesAndOpenDialog(orderItems);
           return;
         }
-        console.log(result.address);
         this.openConfirmOrderDialog(result.address, orderItems);
       });
   }
