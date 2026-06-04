@@ -1,0 +1,63 @@
+import { FormControl } from "@angular/forms";
+
+export interface State {
+    id: number;
+    name: string;
+
+  }
+  
+  export interface City {
+    id: number;
+    name: string;
+    stateId: number;
+  }
+  
+
+  export interface StateFilter {
+    page: number;
+    pageSize: number;
+    search?: string;
+    sortBy?: string;
+    ascending?: boolean;
+  }
+  
+  export interface CityFilter {
+    stateId: number;
+    page: number;
+    pageSize: number;
+    search?: string;
+    sortBy?: string;
+    ascending?: boolean;
+  }
+  
+  export interface StateFormValue {
+    name: string;
+  }
+
+  
+  export interface CityFormValue {
+    name: string;
+    stateId: number;
+  }
+  
+  export interface StateDialogData {
+    mode: 'add' | 'edit';
+    state?: State;
+  }
+  
+  export interface EditCityDialogData {
+    city: City;
+  }
+
+  export interface StateForm {
+    name: FormControl<string>;
+  }
+  
+  export interface AddCityDialogData {
+    selectedState: State;
+    states: State[];
+  }
+
+  export interface CityForm {
+    name: FormControl<string>;
+  }

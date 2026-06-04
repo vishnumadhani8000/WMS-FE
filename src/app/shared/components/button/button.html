@@ -1,0 +1,137 @@
+@if (config.variant === 'raised') {
+
+  <button
+    mat-raised-button
+    [color]="config.color === 'default' ? null : config.color"
+    [disabled]="isDisabled"
+    [class]="hostClass"
+    [attr.aria-label]="config.ariaLabel || config.label"
+    (click)="handleClick($event)">
+
+    <ng-container *ngTemplateOutlet="btnContent" />
+
+  </button>
+}
+
+@if (config.variant === 'flat') {
+
+  <button
+    mat-flat-button
+    [color]="config.color === 'default' ? null : config.color"
+    [disabled]="isDisabled"
+    [class]="hostClass"
+    [attr.aria-label]="config.ariaLabel || config.label"
+    (click)="handleClick($event)">
+
+    <ng-container *ngTemplateOutlet="btnContent" />
+
+  </button>
+}
+
+@if (config.variant === 'stroked') {
+
+  <button
+    mat-stroked-button
+    [color]="config.color === 'default' ? null : config.color"
+    [disabled]="isDisabled"
+    [class]="hostClass"
+    [attr.aria-label]="config.ariaLabel || config.label"
+    (click)="handleClick($event)">
+
+    <ng-container *ngTemplateOutlet="btnContent" />
+
+  </button>
+}
+
+@if (config.variant === 'icon') {
+
+  <button
+    mat-icon-button
+    [color]="config.color === 'default' ? null : config.color"
+    [disabled]="isDisabled"
+    [class]="hostClass"
+    [attr.aria-label]="config.ariaLabel || config.label"
+    (click)="handleClick($event)">
+
+    @if (config.loading) {
+
+      <mat-spinner
+        class="btn-spinner"
+        [diameter]="18">
+      </mat-spinner>
+
+    } @else {
+
+      @if (config.iconPath) {
+
+        <img
+          class="btn-img-icon"
+          [src]="config.iconPath"
+          width="18"
+          height="18"
+          alt="icon" />
+
+      } @else if (config.prefixIcon) {
+
+        <mat-icon class="btn-icon">
+          {{ config.prefixIcon }}
+        </mat-icon>
+
+      }
+
+    }
+
+  </button>
+}
+
+<ng-template #btnContent>
+
+  @if (config.loading) {
+
+    <mat-spinner
+      class="btn-spinner"
+      [diameter]="20">
+    </mat-spinner>
+
+  } @else {
+
+    <span class="btn-content">
+
+      @if (config.iconPath) {
+
+        <img
+          class="btn-img-icon"
+          [src]="config.iconPath"
+          width="18"
+          height="18"
+          alt="icon" />
+
+      } @else if (config.prefixIcon) {
+
+        <mat-icon class="btn-icon">
+          {{ config.prefixIcon }}
+        </mat-icon>
+
+      }
+
+      @if (config.label) {
+
+        <span class="btn-label">
+          {{ config.label }}
+        </span>
+
+      }
+
+      @if (config.suffixIcon) {
+
+        <mat-icon class="btn-icon">
+          {{ config.suffixIcon }}
+        </mat-icon>
+
+      }
+
+    </span>
+
+  }
+
+</ng-template>

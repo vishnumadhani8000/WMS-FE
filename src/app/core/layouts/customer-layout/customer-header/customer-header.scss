@@ -1,0 +1,234 @@
+@use 'styles/variables' as *;
+
+$header-bg: #15213a;
+$header-border: rgba($white, 0.07);
+$header-text: rgba($white, 0.8);
+$header-text-muted: rgba($white, 0.4);
+$header-hover-bg: rgba($white, 0.06);
+$header-height: 64px;
+$bp-md: 768px;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: $header-bg;
+  border-bottom: 1px solid $header-border;
+  font-family: $font-family;
+  box-shadow: $shadow-md;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: $header-height;
+    padding: 0 24px;
+  }
+}
+
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  &-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: #1976d2;
+    border-radius: 10px;
+
+    mat-icon {
+      font-size: 26px;
+      color: $white;
+    }
+  }
+
+  &-name {
+    color: $white;
+    font-size: $fs-body1;
+    font-weight: $fw-bold;
+  }
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+
+  @media (max-width: #{$bp-md - 1}) {
+    display: none;
+  }
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  @media (max-width: #{$bp-md - 1}) {
+    display: none;
+  }
+}
+
+.header__nav-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+  color: $header-text;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $header-hover-bg;
+    color: $white;
+
+    mat-icon {
+      color: $white;
+    }
+  }
+
+  &--active {
+    background: $primary !important;
+    color: $white !important;
+
+    mat-icon {
+      color: $white !important;
+    }
+  }
+}
+
+mat-icon.header__nav-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: $header-text-muted;
+  flex-shrink: 0;
+}
+
+.header__nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: $error;
+  color: $white;
+  font-size: 10px;
+  font-weight: $fw-bold;
+}
+
+.header__logout-btn,
+.header__logout-mobile {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: #ef4444;
+
+  .header__nav-icon {
+    color: #ef4444;
+  }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+  }
+}
+
+.header__hamburger {
+  display: none;
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $header-border;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+
+  @media (max-width: #{$bp-md - 1}) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  mat-icon {
+    color: $white;
+  }
+}
+
+.header__mobile-nav {
+  display: none;
+  position: absolute;
+  top: $header-height;
+  left: 0;
+  right: 0;
+  background: #111827;
+  border-bottom: 1px solid $header-border;
+  padding: 12px 16px 16px;
+  transform: translateY(-8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 999;
+
+  @media (max-width: #{$bp-md - 1}) {
+    display: block;
+  }
+
+  &--open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.header__mobile-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: $header-text;
+  background: transparent;
+  border: none;
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: $header-hover-bg;
+    color: $white;
+  }
+
+  &--active {
+    background: rgba($primary, 0.18);
+    color: $primary-light;
+  }
+}
+
+.header__backdrop {
+  position: fixed;
+  inset: 0;
+  top: $header-height;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+
+  @media (min-width: $bp-md) {
+    display: none;
+  }
+}

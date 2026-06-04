@@ -1,0 +1,143 @@
+<header class="header">
+  <div class="header__inner">
+
+    <!-- Brand -->
+    <a class="header__brand" routerLink="/">
+      <span class="header__brand-icon" aria-hidden="true">
+        <mat-icon>warehouse</mat-icon>
+      </span>
+      <span class="header__brand-name">WMS</span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="header__nav" aria-label="Main navigation">
+      @for (item of navItems; track item.route) {
+        <a
+          class="header__nav-link"
+          [routerLink]="item.route"
+          routerLinkActive="header__nav-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          <mat-icon class="header__nav-icon">
+            {{ item.icon }}
+          </mat-icon>
+
+          {{ item.label }}
+
+          @if (item.badge) {
+            <span class="header__nav-badge">
+              {{ item.badge }}
+            </span>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- Desktop Actions -->
+    <div class="header__actions">
+      <a
+      class="header__nav-link"
+      routerLink="/customer/profile"
+      routerLinkActive="header__nav-link--active"
+    >
+      <mat-icon class="header__nav-icon">
+        account_circle
+      </mat-icon>
+      Profile
+    </a>
+
+      <button
+        type="button"
+        class="header__nav-link header__logout-btn"
+        (click)="logout()"
+      >
+        <mat-icon class="header__nav-icon">
+          logout
+        </mat-icon>
+        Logout
+      </button>
+
+    </div>
+
+    <!-- Mobile Hamburger -->
+    <button
+      class="header__hamburger"
+      (click)="toggleMenu()"
+      aria-label="Toggle menu"
+      [attr.aria-expanded]="mobileMenuOpen()"
+    >
+      <mat-icon>
+        {{ mobileMenuOpen() ? 'close' : 'menu' }}
+      </mat-icon>
+    </button>
+
+  </div>
+
+  <!-- Mobile Drawer -->
+  <div
+    class="header__mobile-nav"
+    [class.header__mobile-nav--open]="mobileMenuOpen()"
+    role="dialog"
+    aria-label="Mobile navigation"
+  >
+    <nav aria-label="Mobile navigation">
+
+      @for (item of navItems; track item.route) {
+        <a
+          class="header__mobile-link"
+          [routerLink]="item.route"
+          routerLinkActive="header__mobile-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          <mat-icon class="header__nav-icon">
+            {{ item.icon }}
+          </mat-icon>
+
+          {{ item.label }}
+
+          @if (item.badge) {
+            <span class="header__nav-badge">
+              {{ item.badge }}
+            </span>
+          }
+        </a>
+      }
+
+      <a
+        class="header__mobile-link"
+        routerLink="/customer/profile"
+        routerLinkActive="header__mobile-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+      >
+        <mat-icon class="header__nav-icon">
+          account_circle
+        </mat-icon>
+        Profile
+      </a>
+
+      <button
+        type="button"
+        class="header__mobile-link header__logout-mobile"
+        (click)="logout(); closeMenu()"
+      >
+        <mat-icon class="header__nav-icon">
+          logout
+        </mat-icon>
+        Logout
+      </button>
+
+    </nav>
+  </div>
+
+  <!-- Backdrop -->
+  @if (mobileMenuOpen()) {
+    <div
+      class="header__backdrop"
+      (click)="closeMenu()"
+      aria-hidden="true"
+    ></div>
+  }
+</header>

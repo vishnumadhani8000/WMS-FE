@@ -1,0 +1,294 @@
+@use 'styles/variables' as *;
+
+.dialog-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 85vh;
+  background: $surface;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+}
+
+// ── Header ────────────────────────────────────────────────
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 18px;
+  flex-shrink: 0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(69, 64, 225, 0.06),
+    rgba(69, 64, 225, 0.02)
+  );
+}
+
+.dialog-header__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dialog-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: $fs-h6;
+  font-weight: $fw-semibold;
+  line-height: 1.2;
+  color: $text-main;
+  letter-spacing: -0.02em;
+}
+
+.dialog-subtitle {
+  margin: 0;
+  padding-left: 46px;
+  font-size: $fs-body2;
+  font-weight: $fw-regular;
+  color: $text-muted;
+  line-height: 1.5;
+}
+
+// ── Scrollable items zone ─────────────────────────────────
+.dialog-body-scroll {
+  flex: 1 1 auto;         
+  overflow-y: auto;       
+  padding: 0 24px;
+  min-height: 0;         
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 99px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+// ── Items List ────────────────────────────────────────────
+.items-list {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0 16px;
+}
+
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: $fs-body1;
+  font-weight: 400;
+  color: $text-main;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-unit-price {
+  font-size: 12px;
+  color: $text-muted;
+  font-weight: $fw-regular;
+}
+
+.item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.item-qty {
+  font-size: $fs-body2;
+  color: $text-muted;
+  font-weight: $fw-regular;
+}
+
+.item-subtotal {
+  font-size: $fs-body1;
+  font-weight:$fw-regular;
+  color: $text-main;
+}
+
+// ── Sticky summary zone ───────────────────
+.dialog-body-sticky {
+  flex-shrink: 0;          
+  padding: 0 24px;
+  background: $surface-soft;
+}
+
+// ── Totals Row ──────────────────────────
+.totals-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 16px;
+}
+
+.totals-row__left,
+.totals-row__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.totals-label {
+  font-size: $fs-body1;
+  font-weight: 500;
+  color: $text-main;
+}
+
+.totals-count {
+  font-size: $fs-h6;
+  font-weight:550;
+  color: $primary;
+}
+
+.totals-amount {
+  font-size: $fs-h6;
+  font-weight:550;
+  color: $primary;
+  letter-spacing: -0.01em;
+}
+
+// ── Address Card ──────────────────────────────────────────
+.address-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  background: rgba(69, 64, 225, 0.04);
+  border: 1px solid rgba(69, 64, 225, 0.12);
+  border-radius: 12px;
+}
+
+.address-card__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: $fs-body2;
+  font-weight: $fw-semibold;
+  color: $primary;
+}
+
+.address-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: $primary;
+}
+
+.address-card__text {
+  margin: 0;
+  font-size: $fs-body2;
+  color: $text-main;
+  line-height: 1.6;
+  padding-left: 22px;
+}
+
+// ── Footer ────────────────────────────────────────────────
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px 24px;
+  background: $surface-soft;
+  flex-shrink: 0;
+}
+
+mat-divider {
+  flex-shrink: 0;
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+// ── Responsive ────────────────────────────────────────────
+@media (max-width: 640px) {
+  .dialog-wrapper {
+    border-radius: 16px;
+    max-height: 92vh;
+  }
+
+  .dialog-header {
+    padding: 20px 20px 16px;
+  }
+
+  .dialog-body-scroll,
+  .dialog-body-sticky {
+    padding: 0 20px;
+  }
+
+  .dialog-footer {
+    padding: 16px 20px 20px;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .totals-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .dialog-subtitle {
+    padding-left: 0;
+  }
+}

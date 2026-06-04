@@ -1,3 +1,178 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { APP_ROUTES } from './shared/constants/app-routes.constants';
+
+import { AdminLayout } from './core/layouts/admin-layout/admin-layout';
+
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { CustomerLayout } from './core/layouts/customer-layout/customer-layout';
+
+export const routes: Routes = [
+
+
+    /// ------------------------------- Admin 
+    {
+        path: APP_ROUTES.ADMIN.ROOT,
+        component: AdminLayout,
+        canActivate: [authGuard, roleGuard],
+        data: {
+            role: 'Admin',
+        },
+        children: [
+            {
+                path: '',
+                redirectTo: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
+                pathMatch: 'full',
+            },
+
+            {
+                path : APP_ROUTES.ADMIN.DRIVER_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/driver-management/driver-management.js')
+                    .then((m)=>m.DriverManagement),
+                
+            },
+
+            {
+                path: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/product-management/product-management.js')
+                        .then((m) => m.ProductManagement),
+            },
+            {
+                path: APP_ROUTES.ADMIN.VEHICLE_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/vehicle-management/vehicle-management.js')
+                        .then((m) => m.VehicleManagement),
+            },
+            {
+                path: APP_ROUTES.ADMIN.DESTINATION_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/destination-management/destination-management.js')
+                        .then((m) => m.DestinationManagement),
+            },
+            {
+                path: APP_ROUTES.ADMIN.ORDER_MANAGEMENT,
+                loadComponent :()=>
+                    import('./features/admin/order-management/order-management')
+                        .then((m)=>m.OrderManagement)
+ 
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.ORDER_MANAGEMENT}/${APP_ROUTES.ADMIN.ORDER_DETAIL}/:id`,
+                loadComponent: () =>
+                    import('./features/admin/order-management/components/order-detail.component/order-detail.component')
+                        .then((m) => m.OrderDetailComponent)
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.TRACKER}`,
+                loadComponent: () =>
+                    import('./features/admin/tracker/tracker.js')
+                        .then((m) => m.Tracker),
+            },
+            {
+                path:APP_ROUTES.ADMIN.SHIPMENT_MANAGEMENT ,
+                loadComponent:()=> 
+                    import('./features/admin/shipment-management/shipment-management.js')
+                        .then((m) => m.ShipmentManagement),
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.SHIPMENT_MANAGEMENT}/${APP_ROUTES.ADMIN.SHIPMENT_DETAIL}/:id`,
+                loadComponent: () =>
+                    import('./features/admin/shipment-management/components/shipment-detail.component/shipment-detail.component.js')
+                        .then((m) => m.ShipmentDetailComponent)
+            },
+            {
+                path:APP_ROUTES.ADMIN.PROFILE ,
+                loadComponent:()=> 
+                    import('./shared/components/profile/profile.js')
+                        .then((m) => m.Profile),
+            },
+
+
+            {
+                path: '**',
+                redirectTo: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
+            },
+
+
+        ],
+    },
+
+    {
+        path: APP_ROUTES.CUSTOMER.ROOT,
+        component: CustomerLayout,
+        canActivate: [authGuard, roleGuard],
+        data: {
+            role: 'Customer',
+        },
+
+        children:[
+            {
+                path: APP_ROUTES.CUSTOMER.PRODUCT,
+                loadComponent: () =>
+                    import('./features/customer/products/products.js')
+                        .then((m) => m.Products),
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.CART,
+                loadComponent:()=>
+                    import('./features/customer/cart/cart.js')
+                         .then((m)=>m.Cart)
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.ORDERS,
+                loadComponent:()=> 
+                    import('./features/customer/my-order/my-order.js')
+                .then((m)=>m.MyOrders)
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.PROFILE,
+                loadComponent:()=> 
+                    import('./shared/components/profile/profile.js')
+                .then((m)=>m.Profile)
+            },
+            
+
+            
+
+        ]
+
+
+    },
+
+
+    //----------------------------- Login Route
+
+
+    {
+        path: APP_ROUTES.AUTH.LOGIN,
+
+        canActivate: [authGuard],
+
+        data: {
+            guestOnly: true,
+        },
+        loadComponent: () =>
+            import('./features/auth/components/login/login')
+                .then((m) => m.Login),
+    },
+
+    {
+        path: `${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
+        loadComponent: () =>
+            import('../app/core/layouts/customer-layout/customer-header/customer-header.js')
+                .then((m) => m.CustomerHeader)
+    },
+    {
+        path: '',
+        redirectTo: APP_ROUTES.AUTH.LOGIN,
+        pathMatch: 'full',
+    },
+
+    {
+        path: '**',
+        redirectTo: APP_ROUTES.AUTH.LOGIN,
+    },
+];

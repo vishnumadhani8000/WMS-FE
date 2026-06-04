@@ -1,0 +1,36 @@
+<mat-form-field
+  class="full-width"
+  [appearance]="config.appearance || 'outline'"
+  [subscriptSizing]="config.subscriptSizing || 'fixed'"
+>
+  <mat-label>
+    {{ config.label }}
+  </mat-label>
+
+  @if (config.prefixIcon) {
+  <mat-icon matPrefix class="prefix-icon">
+    {{ config.prefixIcon }}
+  </mat-icon>
+  }
+
+  <mat-select
+    [formControl]="config.control!"
+    (blur)="markTouched()"
+  >
+    @for (option of config.options; track option.value) {
+    <mat-option [value]="option.value">
+      {{ option.label }}
+    </mat-option>
+    }
+  </mat-select>
+
+  @if (config.hint) {
+  <mat-hint>
+    {{ config.hint }}
+  </mat-hint>
+  } @if ( config.control?.invalid && (config.control?.dirty || config.control?.touched) ) {
+  <mat-error>
+    {{ errorMessage }}
+  </mat-error>
+  }
+</mat-form-field>

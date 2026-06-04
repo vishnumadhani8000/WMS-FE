@@ -23,6 +23,11 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -75,6 +80,11 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            },
             "polyfills": [
               "zone.js",
               "zone.js/testing"
@@ -85,7 +95,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              } 
             ],
             "styles": [
               "src/styles.scss"

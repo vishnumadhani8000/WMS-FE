@@ -1,0 +1,314 @@
+@use 'styles/variables' as *;
+
+.dialog-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+//   max-width: 540px;
+
+  background: $surface;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+}
+
+// ── Header ───────────────────────────────────────────────
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 18px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(69, 64, 225, 0.06),
+    rgba(69, 64, 225, 0.02)
+  );
+}
+
+.dialog-header__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dialog-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(69, 64, 225, 0.1);
+  color: $primary;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: $fs-h6;
+  font-weight: $fw-semibold;
+  line-height: 1.2;
+  color: $text-main;
+  letter-spacing: -0.02em;
+}
+
+.dialog-subtitle {
+  margin: 0;
+  padding-left: 40px;
+  font-size: $fs-body2;
+  font-weight: $fw-regular;
+  color: $text-muted;
+  line-height: 1.5;
+}
+
+// ── Body ──────────────────────────────────────────────
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+}
+
+// ── Address list ─────────────────────────────────
+.address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background: rgba(69, 64, 225, 0.35);
+      border-radius: 999px;
+    }
+  
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
+
+// ── Address card ──────────────────────────────
+
+
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+
+  background: $surface;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    border-color: rgba(69, 64, 225, 0.35);
+    background: rgba(69, 64, 225, 0.02);
+  }
+
+&.address-card--selected {
+  border-color: $primary;
+  background: rgba(69, 64, 225, 0.04);
+  box-shadow: 0 0 0 3px rgba(69, 64, 225, 0.08);
+}
+}
+.address-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.delete-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn mat-icon {
+  font-size: 20px;
+}
+
+.radio-outer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  transition: border-color 0.15s ease;
+
+  .address-card--selected & {
+    border-color: $primary;
+  }
+}
+
+.radio-inner {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: $primary;
+}
+
+.address-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.address-card__label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: $fs-body2;
+  font-weight: $fw-semibold;
+  color: $text-main;
+
+  .address-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: $text-muted;
+  }
+}
+
+.address-card__line {
+  font-size: $fs-body2;
+  color: $text-main;
+  line-height: 1.5;
+
+  &--muted {
+    color: $text-muted;
+  }
+}
+
+// ── Empty state ──────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 36px 0 24px;
+  color: $text-muted;
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.35;
+  }
+
+  p {
+    margin: 0;
+    font-size: $fs-body1;
+    font-weight: $fw-medium;
+    color: $text-main;
+  }
+
+  span {
+    font-size: $fs-body2;
+  }
+}
+
+// ── Add address button ───────────────────────────────────
+.add-address-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+
+  background: transparent;
+  border: 1.5px dashed rgba(69, 64, 225, 0.35);
+  border-radius: 12px;
+
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+  color: $primary;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: rgba(69, 64, 225, 0.04);
+    border-color: $primary;
+  }
+}
+
+// ── Footer ───────────────────────────────────────────────
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px 24px;
+  background: $surface-soft;
+}
+
+mat-divider {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+// ── Responsive ───────────────────────────────────────────
+@media (max-width: 640px) {
+  .dialog-wrapper {
+    max-width: 100%;
+    border-radius: 16px;
+  }
+
+  .dialog-header {
+    padding: 20px 20px 16px;
+  }
+
+  .dialog-body {
+    padding: 20px;
+  }
+
+  .dialog-footer {
+    padding: 16px 20px 20px;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dialog-subtitle {
+    padding-left: 0;
+  }
+}

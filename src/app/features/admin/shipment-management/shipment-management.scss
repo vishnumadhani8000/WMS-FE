@@ -1,0 +1,356 @@
+@use 'styles/variables' as *;
+
+$bp-sm: 480px;
+$bp-md: 768px;
+
+// ── Page ─────────────────────────────────────────────
+.sm-page {
+  padding: 28px;
+  background: $page-bg;
+
+  @media (max-width: $bp-md) {
+    padding: 0;
+  }
+}
+
+// ── Header ─────────────────────────────────────────
+.sm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: $bp-sm) {
+    margin-bottom: 18px;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $fs-h4;
+    font-weight: $fw-bold;
+    color: $text-main;
+    letter-spacing: -0.03em;
+
+    @media (max-width: $bp-sm) {
+      font-size: $fs-h5;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+  }
+
+  &__count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid $border;
+    border-radius: 999px;
+    background: $white;
+    box-shadow: $shadow-sm;
+    font-size: $fs-body2;
+    font-weight: $fw-semibold;
+    color: $text-muted;
+
+    .badge-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+    }
+  }
+}
+
+// ── Toolbar ─────────────────────────────────────────────────
+.sm-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &__search {
+    width: 380px;
+    max-width: 100%;
+  }
+
+  @media (max-width: $bp-md) {
+    flex-direction: column;
+    align-items: stretch;
+
+    &__search {
+      width: 100%;
+    }
+  }
+}
+
+// ── Card ────────────────────────────────────────────────────
+.sm-card {
+  background: $surface-soft;
+  border: 1px solid $border;
+  border-radius: 18px;
+  overflow: hidden;
+  padding: 5px;
+  box-shadow: $shadow-md;
+}
+
+// ── Table Wrapper ───────────────────────────────────────────
+.sm-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// ── Table ───────────────────────────────────────────────────
+.sm-table {
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
+
+  .mat-column-index         { width: 5%; }
+  .mat-column-shipmentId    { width: 10%; }
+  .mat-column-driverName    { width: 22%; }
+  .mat-column-vehicleNumber { width: 16%; }
+  .mat-column-status        { width: 14%; }
+  .mat-column-createdAt     { width: 12%; }
+  .mat-column-actions       { width: 8%; }
+
+  .mat-mdc-header-row {
+    background: $surface-soft;
+    height: 56px;
+  }
+
+  th.mat-mdc-header-cell {
+    padding: 0 16px;
+    color: $text-muted;
+    font-size: $fs-caption;
+    font-weight: $fw-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    border-bottom: 2px solid $border !important;
+    vertical-align: middle;
+  }
+
+  td.mat-mdc-cell {
+    height: 60px;
+    padding: 0 16px;
+    border-bottom: 1px solid $border;
+    color: $text-main;
+    font-size: $fs-body1;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mat-mdc-row {
+    cursor: pointer;
+    transition: background 0.18s ease;
+
+    &:hover {
+      background: $hover-bg;
+    }
+  }
+
+  .mat-mdc-row:last-child td {
+    border-bottom: none;
+  }
+
+  .col-index,
+  .col-num,
+  .col-actions {
+    text-align: center !important;
+  }
+
+  ::ng-deep {
+    .mat-column-status,
+    .mat-column-actions {
+      th.mat-mdc-header-cell,
+      td.mat-mdc-cell {
+        text-align: center !important;
+      }
+
+      .mat-sort-header-container {
+        width: 100%;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+    }
+  }
+}
+
+
+// ── Cell ────────────────────────────────────────────────────
+.cell-text {
+  display: block;
+  font-size: $fs-body1;
+  font-weight: $fw-medium;
+  color: $text-main;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Chips ───────────────────────────────────────────────────
+.cell-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+}
+
+.vehicle-chip {
+  background: rgba(100, 116, 139, 0.1);
+  color: #475569;
+  font-family: monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.status-chip {
+  min-width: 95px;
+}
+
+// ── Status Colors ────────────────────────────────────────────
+.status-assigned {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.status-transit {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+}
+
+.status-delivered {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+// ── Action Button ────────────────────────────────────────────
+.action-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  transition: 0.2s ease;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.action-disabled {
+  opacity: 0.4;
+  font-size: 10px;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+// ── Action Menu ──────────────────────────────────────────────
+::ng-deep .sm-action-menu {
+  .mat-mdc-menu-content {
+    padding: 6px;
+  }
+
+  .mat-mdc-menu-item {
+    min-height: 42px;
+    border-radius: 10px;
+    font-size: $fs-body2;
+    font-weight: $fw-medium;
+    color: $text-main;
+    transition: background 0.18s ease;
+
+    &:hover {
+      background: $hover-bg;
+    }
+  }
+
+  .delete-item {
+    color: $error;
+
+    mat-icon {
+      color: $error;
+    }
+  }
+}
+
+// ── Progress ─────────────────────────────────────────────────
+.sm-progress {
+  height: 3px;
+}
+
+// ── Paginator ────────────────────────────────────────────────
+.sm-paginator {
+  border-top: 1px solid $border;
+  background: $white;
+
+  ::ng-deep .mat-mdc-paginator-container {
+    min-height: 68px;
+    padding: 0 16px;
+  }
+
+  @media (max-width: $bp-sm) {
+    ::ng-deep {
+      .mat-mdc-paginator-page-size {
+        display: none;
+      }
+
+      .mat-mdc-paginator-range-label {
+        margin: 0 8px;
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+// ── Empty State ──────────────────────────────────────────────
+.sm-no-data {
+  text-align: center !important;
+  padding: 48px 16px !important;
+  border-bottom: none !important;
+}
+
+.sm-empty-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: $text-muted;
+
+  mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    opacity: 0.5;
+  }
+
+  span {
+    font-size: 15px;
+    font-weight: 500;
+  }
+}

@@ -1,0 +1,36 @@
+<div class="confirm-dialog">
+  <!-- Icon -->
+
+  <div class="confirm-dialog__icon" [ngClass]="data.type || 'danger'">
+    <mat-icon>
+      @switch (data.type) {
+         @case ('warning') { warning }
+          @case ('info') { info } 
+          @default { delete } 
+        }
+    </mat-icon>
+  </div>
+
+  <!-- Content -->
+
+  <div class="confirm-dialog__content">
+    <h2 class="confirm-dialog__title">
+      {{ data.title }}
+    </h2>
+
+    <p class="confirm-dialog__message">
+      {{ data.message }}
+    </p>
+  </div>
+
+  <!-- Actions -->
+
+  <div class="confirm-dialog__actions">
+    <app-common-button
+     [config]="cancelButtonConfig"/>
+  
+    <app-common-button
+      [config]="confirmButtonConfig"/>
+   
+  </div>
+</div>

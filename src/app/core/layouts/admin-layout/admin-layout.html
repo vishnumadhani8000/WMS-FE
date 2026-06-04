@@ -1,0 +1,42 @@
+<div class="admin-layout">
+
+    <!-- Mobile Overlay -->
+  
+    @if (sidebarOpen && isMobile) {
+  
+      <div
+        class="overlay"
+        (click)="closeSidebar()">
+      </div>
+  
+    }
+  
+    <!-- Sidebar -->
+  
+    <app-admin-sidebar
+      [isOpen]="sidebarOpen"
+      [isMobile]="isMobile"
+      (sidebarClose)="closeSidebar()">
+    </app-admin-sidebar>
+  
+    <!-- Main -->
+  
+    <div
+      class="main-container"
+      [class.sidebar-close]="!sidebarOpen">
+  
+    
+  
+      <app-admin-header
+        (toggleSidebar)="toggleSidebar()">
+      </app-admin-header>
+  
+
+  
+      <div class="page-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+  
+    </div>
+  
+  </div>

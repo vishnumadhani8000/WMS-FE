@@ -1,0 +1,42 @@
+<div class="dialog-wrapper">
+  <div class="dialog-header">
+    <div class="dialog-header__content">
+      <h2 class="dialog-title">
+        {{ title }}
+      </h2>
+
+      <p class="dialog-subtitle">
+        @if (isEdit) { Update product details and save changes. } @else { Fill in the details to
+        create a new product. }
+      </p>
+    </div>
+
+    <app-common-button [config]="closeButtonConfig" />
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
+    <div class="two-col">
+    <app-common-input [config]="productNameConfig" />
+    <app-common-input [config]="productPriceConfig"/>
+  </div>
+
+    <div class="two-col">
+      <app-common-input [config]="weightConfig" />
+
+      <app-common-input [config]="stockConfig" />
+    </div>
+
+    <app-common-textarea [config]="descriptionConfig"> </app-common-textarea>
+  </form>
+  <mat-divider></mat-divider> 
+
+  <div class="dialog-footer">
+    <!-- Cancel -->
+    <app-common-button [config]="cancelButtonConfig" />
+
+    <!-- Submit -->
+    <app-common-button [config]="submitButtonConfig" />
+  </div>
+</div>
