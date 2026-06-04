@@ -62,17 +62,17 @@ export class DestinationManagement implements OnInit {
 
   states: State[] = [];
   stateTotalCount = 0;
-  
+
   cities: City[] = [];
   cityTotalCount = 0;
-  
+
   selectedState: State | null = null;
-  
+
   statePage = 0;
   cityPage = 0;
 
-  statePageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
-  cityPageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  statePageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  cityPageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   stateSortBy: string | null = 'createdAt';
   stateSortAsc: boolean | null = false;
@@ -85,7 +85,7 @@ export class DestinationManagement implements OnInit {
       nonNullable: true,
     }),
   });
-  
+
   cityForm = new FormGroup({
     citySearchControl: new FormControl('', {
       nonNullable: true,
@@ -146,7 +146,7 @@ export class DestinationManagement implements OnInit {
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'add',
-      disabled:true,
+      disabled: true,
       clicked: () => {
         this.openAddCityDialog();
       },
@@ -174,7 +174,7 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.cityPage= 0;
+        this.cityPage = 0;
         this.loadCities();
       });
   }
@@ -188,8 +188,7 @@ export class DestinationManagement implements OnInit {
         sortBy: this.stateSortBy ?? undefined,
         ascending: this.stateSortAsc ?? undefined,
       })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           this.states = res.items;
@@ -200,7 +199,7 @@ export class DestinationManagement implements OnInit {
 
   loadCities(): void {
     const state = this.selectedState;
-  
+
     if (!state) {
       return;
     }
@@ -214,10 +213,9 @@ export class DestinationManagement implements OnInit {
         sortBy: this.citySortBy ?? undefined,
         ascending: this.citySortAsc ?? undefined,
       })
-  
-      .pipe(
-        takeUntilDestroyed(this.destroyRef))
-  
+
+      .pipe(takeUntilDestroyed(this.destroyRef))
+
       .subscribe({
         next: (res) => {
           this.cities = res.items;
@@ -329,18 +327,17 @@ export class DestinationManagement implements OnInit {
 
   openAddCityDialog(): void {
     const state = this.selectedState;
-   
+
     if (!state) {
       return;
     }
-   
+
     this.dialog
       .open(AddCityDialogComponent, {
         width: '480px',
         disableClose: true,
         data: {
           selectedState: state,
-    
           states: this.states,
         },
       })
@@ -350,13 +347,13 @@ export class DestinationManagement implements OnInit {
         if (!res?.saved) {
           return;
         }
-   
+
         if (res.stateId === this.selectedState?.id) {
           this.loadCities();
         }
       });
   }
-   
+
   openEditCityDialog(city: City): void {
     const state = this.selectedState;
 
