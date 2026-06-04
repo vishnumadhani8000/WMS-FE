@@ -8,14 +8,11 @@ import { InputField } from '../../../../../shared/components/input-field/input-f
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
-import { StateDialogData } from '../../models/state-city.model';
+import { StateDialogData, StateForm } from '../../models/state-city.model';
 import { StateService } from '../../services/state-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 
-interface StateForm {
-  name: FormControl<string>;
-}
 
 @Component({
   selector: 'app-state-dialog',

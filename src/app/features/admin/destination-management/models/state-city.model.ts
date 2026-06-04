@@ -1,3 +1,5 @@
+import { FormControl } from "@angular/forms";
+
 export interface State {
     id: number;
     name: string;
@@ -48,3 +50,8 @@ export interface State {
     stateName: string;
     city?: City;
   }
+
+  export interface StateForm {
+    name: FormControl<string>;
+  }
+  

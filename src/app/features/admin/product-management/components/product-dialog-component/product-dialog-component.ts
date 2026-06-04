@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProductManagementService } from '../../services/product-management.service';
-import { ProductDialogData } from '../../models/product-management.model';
+import { ProductDialogData, ProductForm } from '../../models/product-management.model';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
@@ -14,13 +14,7 @@ import { TextareaField } from '../../../../../shared/components/textarea-field/t
 import { TextareaFieldConfig } from '../../../../../shared/components/textarea-field/textearea-field.config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface ProductForm {
-  name: FormControl<string>;
-  weightKg: FormControl<number | null>;
-  price:FormControl<number|null>;
-  stock: FormControl<number | null>;
-  description: FormControl<string>;
-}
+
 
 @Component({
   selector: 'app-product-dialog',

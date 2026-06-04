@@ -65,7 +65,6 @@ export class ShipmentManagement implements OnInit {
 
   shipments: Shipment[] = [];
   totalCount = 0;
-  loading = false;
   page = 0;
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
   sortBy: string | null = 'createdAt';
@@ -106,8 +105,6 @@ export class ShipmentManagement implements OnInit {
   }
 
   loadShipments(): void {
-    this.loading = true;
-
     this.shipmentService
       .getShipments({
         page: this.page + 1,
@@ -117,7 +114,6 @@ export class ShipmentManagement implements OnInit {
         ascending: this.sortAsc ,
       })
       .pipe(
-        finalize(() => (this.loading = false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({

@@ -1,4 +1,5 @@
 export interface InputFieldConfig {
+
   formControlName?: string;
 
   label: string;
@@ -34,6 +35,8 @@ export interface InputFieldConfig {
   trimStart?: boolean;
     
   disabled?: boolean;
+  
+  autocomplete?: string;
 
   iconClick?: () => void;
 }

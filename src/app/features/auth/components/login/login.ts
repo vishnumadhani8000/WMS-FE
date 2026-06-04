@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { Subject, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Button } from '../../../../shared/components/button/button';
 import { ButtonConfig } from '../../../../shared/components/button/button.config';
@@ -12,19 +11,9 @@ import { InputField } from '../../../../shared/components/input-field/input-fiel
 import { InputFieldConfig } from '../../../../shared/components/input-field/input-field.config';
 import { AuthService } from '../../services/auth.service';
 import { APP_ROUTES } from '../../../../shared/constants/app-routes.constants';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoginForm, SignUpForm } from '../../models/lodin-signup.model';
 
-interface LoginForm {
-  email: FormControl<string>;
-  password: FormControl<string>;
-}
-
-interface SignUpForm {
-  name: FormControl<string>;
-  email: FormControl<string>;
-  phone: FormControl<string>;
-  password: FormControl<string>;
-  confirmPassword: FormControl<string>;
-}
 
 @Component({
   selector: 'app-login',
@@ -44,25 +33,23 @@ interface SignUpForm {
 
   styleUrl: './login.scss',
 })
-export class Login implements OnInit, OnDestroy {
-  private readonly router = inject(Router);
-  private readonly authService = inject(AuthService);
-  private readonly toast = inject(ToastrService);
-  private readonly destroy$ = new Subject<void>();
+export class Login implements OnInit {
 
-  // ─── Tab state ───────────────────────────────────────────────
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly toast: ToastrService,
+    private readonly destroyref: DestroyRef,
+
+  ) {}
+
+
   activeTab: 'login' | 'signup' = 'login';
-
-  // ─── Login ───────────────────────────────────────────────────
   form: FormGroup<LoginForm>;
-  isSubmitting = false;
   emailConfig: InputFieldConfig;
   passwordConfig: InputFieldConfig;
   loginButtonConfig: ButtonConfig;
-
-  // ─── Sign Up ──────────────────────────────────────────────────
   signUpForm: FormGroup<SignUpForm>;
-  isSignUpSubmitting = false;
   nameConfig: InputFieldConfig;
   signUpEmailConfig: InputFieldConfig;
   phoneConfig: InputFieldConfig;
@@ -75,12 +62,10 @@ export class Login implements OnInit, OnDestroy {
     this.initSignUpForm();
   }
 
-  // ─── Tab toggle ───────────────────────────────────────────────
   setTab(tab: 'login' | 'signup'): void {
     this.activeTab = tab;
   }
 
-  // ─── Login form setup ─────────────────────────────────────────
   private initLoginForm(): void {
     this.form = new FormGroup<LoginForm>({
       email: new FormControl('', {
@@ -113,6 +98,7 @@ export class Login implements OnInit, OnDestroy {
       maxlength: 50,
       trimStart: true,
       formControlName: 'email',
+      autocomplete: 'username',
     };
 
     this.passwordConfig = {
@@ -123,6 +109,7 @@ export class Login implements OnInit, OnDestroy {
       maxlength: 50,
       trimStart: true,
       formControlName: 'password',
+      autocomplete: 'current-password'
     };
 
     this.loginButtonConfig = {
@@ -135,13 +122,12 @@ export class Login implements OnInit, OnDestroy {
     };
 
     this.form.statusChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyref))
       .subscribe(status => {
         this.loginButtonConfig.disabled = status !== 'VALID';
       });
   }
 
-  // ─── Sign Up form setup ───────────────────────────────────────
   private initSignUpForm(): void {
     this.signUpForm = new FormGroup<SignUpForm>({
       name: new FormControl('', {
@@ -199,6 +185,7 @@ export class Login implements OnInit, OnDestroy {
       prefixIcon: 'email',
       maxlength: 50,
       trimStart: true,
+      autocomplete: 'username',
       formControlName: 'email',
     };
 
@@ -219,6 +206,7 @@ export class Login implements OnInit, OnDestroy {
       prefixIcon: 'lock',
       maxlength: 50,
       trimStart: true,
+      autocomplete: 'new-password',
       formControlName: 'password',
     };
 
@@ -229,6 +217,7 @@ export class Login implements OnInit, OnDestroy {
       prefixIcon: 'lock',
       maxlength: 50,
       trimStart: true,
+      autocomplete: 'new-password',
       formControlName: 'confirmPassword',
     };
 
@@ -241,46 +230,41 @@ export class Login implements OnInit, OnDestroy {
       clicked: () => this.submitSignUp(),
     };
 
-    this.signUpForm.statusChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(status => {
-        this.signUpButtonConfig.disabled = status !== 'VALID';
+  }
+
+
+
+  private passwordMatchValidator(
+    group: AbstractControl
+  ): ValidationErrors | null {
+
+    const password = group.get('password');
+    const confirmPassword = group.get('confirmPassword');
+
+    if (!password || !confirmPassword) {
+      return null;
+    }
+
+    if (password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({
+        passwordMismatch: {
+          message: 'Passwords do not match',
+        },
       });
-  }
 
-  // ─── Cleanup ──────────────────────────────────────────────────
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+      return null;
+    }
 
-  // ─── Cross-field validator ────────────────────────────────────
-  private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
-    const pw = group.get('password')?.value;
-    const cpw = group.get('confirmPassword')?.value;
-    if (cpw && pw !== cpw) {
-      group.get('confirmPassword')?.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    }
-    // Clear the error if passwords match (but keep other existing errors)
-    const confirmCtrl = group.get('confirmPassword');
-    if (confirmCtrl?.hasError('passwordMismatch')) {
-      const { passwordMismatch, ...rest } = confirmCtrl.errors!;
-      confirmCtrl.setErrors(Object.keys(rest).length ? rest : null);
-    }
+    confirmPassword.setErrors(null);
     return null;
   }
 
-  // ─── Login submit ─────────────────────────────────────────────
+  // ─── Login submit ───────────────────────────
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.isSubmitting = true;
-    this.loginButtonConfig.loading = true;
-
     const payload = {
       ...this.form.getRawValue(),
       email: this.form.controls.email.value.trim().toLowerCase(),
@@ -288,9 +272,6 @@ export class Login implements OnInit, OnDestroy {
 
     this.authService.login(payload).subscribe({
       next: (res) => {
-        this.isSubmitting = false;
-        this.loginButtonConfig.loading = false;
-
         if (!res.isSuccess || !res.data) {
           this.toast.error('Login failed');
           return;
@@ -305,11 +286,6 @@ export class Login implements OnInit, OnDestroy {
             : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
         ]);
       },
-      error: () => {
-        this.isSubmitting = false;
-        this.loginButtonConfig.loading = false;
-        this.toast.error('Something went wrong. Please try again.');
-      },
     });
   }
 
@@ -320,8 +296,6 @@ export class Login implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSignUpSubmitting = true;
-    this.signUpButtonConfig.loading = true;
 
     const { confirmPassword, ...rest } = this.signUpForm.getRawValue();
     const payload = {
@@ -332,9 +306,6 @@ export class Login implements OnInit, OnDestroy {
 
     this.authService.signUp(payload).subscribe({
       next: (res) => {
-        this.isSignUpSubmitting = false;
-        this.signUpButtonConfig.loading = false;
-
         if (!res.isSuccess) {
           this.toast.error('Registration failed');
           return;
@@ -343,11 +314,6 @@ export class Login implements OnInit, OnDestroy {
         this.toast.success('Account created! Please login.');
         this.activeTab = 'login';
         this.signUpForm.reset();
-      },
-      error: () => {
-        this.isSignUpSubmitting = false;
-        this.signUpButtonConfig.loading = false;
-        this.toast.error('Something went wrong. Please try again.');
       },
     });
   }

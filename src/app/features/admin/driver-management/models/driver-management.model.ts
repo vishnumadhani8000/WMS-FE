@@ -1,3 +1,5 @@
+import { FormControl } from "@angular/forms";
+
 export interface Driver {
     id: number;
     name: string;
@@ -24,4 +26,11 @@ export interface Driver {
   export interface DriverDialogData {
     mode: 'add' | 'edit';
     driver?: Driver;
+  }
+
+  export interface DriverForm {
+    name: FormControl<string>;
+    phone: FormControl<string>;
+    licenceNo: FormControl<string>;
+    isAvailable: FormControl<boolean>;
   }

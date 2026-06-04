@@ -13,17 +13,12 @@ import { SelectFieldConfig } from '../../../../../shared/components/select-field
 import {
   AddAddressDialogData,
   AddAddressDialogResult,
+  AddressForm,
 } from '../../models/addAddressDialogData.model';
 import { AddressService } from '../../services/address.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface AddressForm {
-  addressLine: FormControl<string>;
-  landmark: FormControl<string>;
-  stateId: FormControl<number | null>;
-  cityId: FormControl<number | null>;
-  pincode: FormControl<string>;
-}
+
 
 @Component({
   selector: 'app-add-address-dialog',

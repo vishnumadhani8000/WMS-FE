@@ -4,14 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { OrderDetail } from '../models/order-detail.model';
 import { environment } from '../../../../../environments/environment';
-
-
-interface ApiResponse<T> {
-  data: T;
-  message: string;
-  isSuccess: boolean;
-  errors: null | string[];
-}
+import { ApiResponse } from '../../../../core/models/api-responce.model';
 
 @Injectable({ providedIn: 'root' })
 

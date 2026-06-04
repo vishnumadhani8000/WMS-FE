@@ -16,7 +16,7 @@ import {
 } from '../models/tracker.model';
 
 import { ApiResponse } from '../../../../core/models/api-responce.model';
-import { PagedResult } from '../../driver-management/services/driver-management.service';
+import { PaginatedResponse } from '../../../../core/models/paginated-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +25,7 @@ export class TrackerService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.baseUrl;
 
-  getOrders(filter: AdminOrderFilter): Observable<ApiResponse<PagedResult<AdminOrderResponseDto>>> {
+  getOrders(filter: AdminOrderFilter): Observable<ApiResponse<PaginatedResponse<AdminOrderResponseDto>>> {
     let params = new HttpParams().set('PageNumber', filter.page).set('PageSize', filter.pageSize);
 
     if (filter.search) {
@@ -52,7 +52,7 @@ export class TrackerService {
       params = params.set('onlypendingandaccepted', filter.isPendingAndAccepted);
     }
 
-    return this.http.get<ApiResponse<PagedResult<AdminOrderResponseDto>>>(
+    return this.http.get<ApiResponse<PaginatedResponse<AdminOrderResponseDto>>>(
       `${this.baseUrl}/orders`,
       { params }
     );

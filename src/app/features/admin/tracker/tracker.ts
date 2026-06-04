@@ -86,7 +86,6 @@ export class Tracker implements OnInit {
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
   sortByField: string | undefined = 'createdAt';
   isAscending: boolean | undefined = false;
-  selectedIds = [...this.selectedOrders().keys()];
 
   states: StateDto[] = [];
   cities: CityDto[] = [];
@@ -311,7 +310,6 @@ export class Tracker implements OnInit {
   toggleRow(order: AdminOrderResponseDto): void {
     this.selectedOrders.update((current) => {
       const next = new Map(current);
-      console.log(next);
 
       if (next.has(order.orderId)) {
         next.delete(order.orderId);

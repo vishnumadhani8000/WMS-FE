@@ -21,6 +21,7 @@ import { Button } from '../../button/button';
 import { InputFieldConfig } from '../../input-field/input-field.config';
 import { ButtonConfig } from '../../button/button.config';
 import { ProfileService } from '../Services/profile.service';
+import { ChangePasswordForm } from '../Models/change-password.model';
 
 function passwordMatchValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -37,11 +38,7 @@ function passwordMatchValidator(): ValidatorFn {
   };
 }
 
-interface ChangePasswordForm {
-  currentPassword: FormControl<string>;
-  newPassword: FormControl<string>;
-  confirmPassword: FormControl<string>;
-}
+
 
 @Component({
   selector: 'app-change-password-dialog',

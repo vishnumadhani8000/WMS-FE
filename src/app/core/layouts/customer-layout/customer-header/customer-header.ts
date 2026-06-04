@@ -4,13 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { APP_ROUTES } from '../../../../shared/constants/app-routes.constants';
+import { NavItem } from '../models/customer-header.model';
 
-export interface NavItem {
-  label: string;
-  icon: string;
-  route: string;
-  badge?: number;
-}
 
 @Component({
   selector: 'app-customer-header',

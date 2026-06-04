@@ -4,27 +4,19 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Driver, DriverFilter, DriverFormValue } from '../models/driver-management.model';
 import { environment } from '../../../../../environments/environment';
+import { ApiResponse } from '../../../../core/models/api-responce.model';
+import { PaginatedResponse } from '../../../../core/models/paginated-response.model';
 
 
-export interface PagedResult<T> {
-  items: T[];
-  totalCount: number;
-  pageNumber: number;
-  pageSize: number;
-}
 
-interface ApiResponse<T> {
-  data: T;
-  message: string;
-  success: boolean;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class DriverService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.baseUrl}/drivers`;
 
-  getDrivers(filter: DriverFilter): Observable<PagedResult<Driver>> {
+  getDrivers(filter: DriverFilter): Observable<PaginatedResponse<Driver>> {
     let params = new HttpParams()
       .set('page', filter.page.toString())
       .set('pageSize', filter.pageSize.toString());
@@ -40,7 +32,7 @@ export class DriverService {
     }
 
     return this.http
-      .get<ApiResponse<PagedResult<Driver>>>(this.baseUrl, { params })
+      .get<ApiResponse<PaginatedResponse<Driver>>>(this.baseUrl, { params })
       .pipe(map((res) => res.data));
   }
 

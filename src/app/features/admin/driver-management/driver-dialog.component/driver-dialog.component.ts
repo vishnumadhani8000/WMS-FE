@@ -29,24 +29,7 @@ import { Button } from '../../../../shared/components/button/button';
 import { DriverService } from '../services/driver-management.service';
 import { InputFieldConfig } from '../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../shared/components/button/button.config';
-import { DriverDialogData } from '../models/driver-management.model';
-
-
-// function notWhitespaceOnly(): ValidatorFn {
-//   return (control: AbstractControl): ValidationErrors | null => {
-//     const v: string = control.value ?? '';
-//     return v.length > 0 && v.trim().length === 0
-//       ? { whitespaceOnly: true }
-//       : null;
-//   };
-// }
-
-interface DriverForm {
-  name: FormControl<string>;
-  phone: FormControl<string>;
-  licenceNo: FormControl<string>;
-  isAvailable: FormControl<boolean>;
-}
+import { DriverDialogData, DriverForm } from '../models/driver-management.model';
 
 @Component({
   selector: 'app-driver-dialog',
@@ -64,11 +47,14 @@ interface DriverForm {
   styleUrl: './driver-dialog.component.scss',
 })
 export class DriverDialogComponent implements OnInit {
-  private readonly driverService = inject(DriverService);
-  private readonly dialogRef = inject(MatDialogRef<DriverDialogComponent>);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
 
+  constructor(
+    private readonly driverService : DriverService,
+    private readonly dialogRef : MatDialogRef<DriverDialogComponent>,
+    private readonly toastr : ToastrService,
+    private readonly destroyRef : DestroyRef,
+    @Inject(MAT_DIALOG_DATA) public data: DriverDialogData) {}
+    
   form: FormGroup<DriverForm>;
   nameConfig: InputFieldConfig;
   phoneConfig: InputFieldConfig;
@@ -78,7 +64,6 @@ export class DriverDialogComponent implements OnInit {
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: DriverDialogData) {}
 
   get isEdit(): boolean {
     return this.data.mode === 'edit';

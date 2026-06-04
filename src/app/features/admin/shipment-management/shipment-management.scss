@@ -191,20 +191,6 @@ $bp-md: 768px;
   }
 }
 
-// ── Row States ──────────────────────────────────────────────
-.sm-row {
-  &--delivered {
-    td.mat-mdc-cell {
-      color: $text-muted;
-    }
-  }
-
-  &--cancelled {
-    td.mat-mdc-cell {
-      color: $text-muted;
-    }
-  }
-}
 
 // ── Cell ────────────────────────────────────────────────────
 .cell-text {
