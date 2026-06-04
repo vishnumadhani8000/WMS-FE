@@ -33,14 +33,16 @@ import { ShipmentDetailService } from '../../services/shipment-details.service';
   styleUrl: './shipment-detail.component.scss',
 })
 export class ShipmentDetailComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly detailService = inject(ShipmentDetailService);
-  private readonly shipmentService = inject(ShipmentService);
-  private readonly dialog = inject(MatDialog);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
+constructor(
+  private readonly route : ActivatedRoute,
+  private readonly router : Router,
+  private readonly detailService: ShipmentDetailService,
+  private readonly shipmentService : ShipmentService,
+  private readonly dialog : MatDialog,
+  private readonly toastr : ToastrService,
+  private readonly destroyRef :DestroyRef,
 
+){}
   readonly orderColumns = [
     'index', 'orderId', 'customerName', 'cityName',
     'stateName', 'totalWeightKg', 'totalPrice',

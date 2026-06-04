@@ -12,7 +12,7 @@ import { AvailableDriverDto, AvailableVehicleDto, MakeShipmentDialogData, MakeSh
   selector: 'app-make-shipment-dialog',
   standalone: true,
   templateUrl: './make-shipment-dialog.html',
-  styleUrl:    './make-shipment-dialog.scss',
+  styleUrl: './make-shipment-dialog.scss',
   imports: [
     CommonModule,
     MatDialogModule,
@@ -23,7 +23,7 @@ import { AvailableDriverDto, AvailableVehicleDto, MakeShipmentDialogData, MakeSh
   ],
 })
 export class MakeShipmentDialog implements OnInit {
-  selectedDriverId  = signal<number | null>(null);
+  selectedDriverId = signal<number | null>(null);
   selectedVehicleId = signal<number | null>(null);
   disabledConfirmButton = computed(() =>
     this.selectedDriverId() === null ||
@@ -37,7 +37,7 @@ export class MakeShipmentDialog implements OnInit {
   constructor(
     private readonly dialogRef: MatDialogRef<MakeShipmentDialog, MakeShipmentDialogResult>,
     @Inject(MAT_DIALOG_DATA) public data: MakeShipmentDialogData,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.confirmButtonConfig = computed<ButtonConfig>(() => ({
@@ -51,9 +51,9 @@ export class MakeShipmentDialog implements OnInit {
       clicked: () => this.confirm(),
     }));
     this.cancelButtonConfig = {
-      label:   'Cancel',
+      label: 'Cancel',
       variant: 'stroked',
-      color:   'default',
+      color: 'default',
       clicked: () => this.cancel(),
     };
   }
@@ -74,7 +74,7 @@ export class MakeShipmentDialog implements OnInit {
     if (this.selectedDriverId() === null || this.selectedVehicleId() === null) return;
     this.dialogRef.close({
       confirmed: true,
-      driverId:  this.selectedDriverId()!,
+      driverId: this.selectedDriverId()!,
       vehicleId: this.selectedVehicleId()!,
     });
   }
