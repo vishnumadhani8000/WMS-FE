@@ -8,8 +8,8 @@
       <span class="vm-header__count-badge">
         <mat-icon class="badge-icon"> local_shipping </mat-icon>
 
-        {{ totalCount() }}
-        {{ totalCount() === 1 ? 'Vehicle' : 'Vehicles' }}
+        {{ totalCount }}
+        {{ totalCount === 1 ? 'Vehicle' : 'Vehicles' }}
       </span>
     </div>
   </header>
@@ -26,15 +26,11 @@
   </section>
 
   <div class="vm-card">
-    <!-- Loading -->
-    @if (loading()) {
-    <mat-progress-bar mode="indeterminate" class="vm-progress"> </mat-progress-bar>
-    }
 
     <div class="vm-table-wrap">
       <table
         mat-table
-        [dataSource]="dataSource()"
+        [dataSource]="dataSource"
         class="vm-table"
         matSort
         (matSortChange)="onSortChange($event)"
@@ -132,12 +128,10 @@
 
         <tr class="mat-mdc-row" *matNoDataRow>
           <td class="mat-mdc-cell vm-no-data" [attr.colspan]="displayedColumns.length">
-            @if (!loading()) {
             <div class="vm-empty-inline">
               <mat-icon> local_shipping </mat-icon>
               <span> No vehicles found </span>
             </div>
-            }
           </td>
         </tr>
       </table>
@@ -148,10 +142,10 @@
     <mat-paginator
       #paginator
       class="vm-paginator"
-      [length]="totalCount()"
-      [pageSize]="this.filter.value.pageSize"
+      [length]="totalCount"
+      [pageSize]="this.pageSize"
       [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="this.filter.value.page - 1"
+      [pageIndex]="this.page - 1"
       showFirstLastButtons
       (page)="onPageChange($event)"
     >

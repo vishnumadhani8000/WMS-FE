@@ -1,12 +1,10 @@
-import { Component, Inject, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProductManagementService } from '../../services/product-management.service';
-import { ProductDialogData } from '../../models/product-management.model';
+import { ProductDialogData, ProductForm } from '../../models/product-management.model';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
@@ -14,14 +12,9 @@ import { ToastrService } from 'ngx-toastr';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import { TextareaField } from '../../../../../shared/components/textarea-field/textarea-field';
 import { TextareaFieldConfig } from '../../../../../shared/components/textarea-field/textearea-field.config';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface ProductForm {
-  name: FormControl<string>;
-  weightKg: FormControl<number | null>;
-  price:FormControl<number|null>;
-  stock: FormControl<number | null>;
-  description: FormControl<string>;
-}
+
 
 @Component({
   selector: 'app-product-dialog',
@@ -40,12 +33,17 @@ interface ProductForm {
   templateUrl: './product-dialog-component.html',
   styleUrl: './product-dialog-component.scss',
 })
-export class ProductDialogComponent implements OnInit, OnDestroy {
-  private productManagementService = inject(ProductManagementService);
-  private dialogRef = inject(MatDialogRef<ProductDialogComponent>);
-  private toastr = inject(ToastrService);
-  private destroy = new Subject<void>();
-  saving = false;
+export class ProductDialogComponent implements OnInit {
+
+  constructor(
+    private productManagementService: ProductManagementService,
+    private dialogRef: MatDialogRef<ProductDialogComponent>,
+    private toastr: ToastrService,
+    private destroyref : DestroyRef,
+    
+    @Inject(MAT_DIALOG_DATA) public data: ProductDialogData
+  ) {}
+
   form: FormGroup<ProductForm>;
   productNameConfig: InputFieldConfig;
   weightConfig: InputFieldConfig;
@@ -55,11 +53,6 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
   productPriceConfig:InputFieldConfig;
-
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public data: ProductDialogData
-  ) {}
 
   get isEdit(): boolean {
     return this.data.mode === 'edit';
@@ -158,8 +151,6 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
       label: this.isEdit ? 'Save Changes' : 'Add Product',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
 
       clicked: () => {
         this.submit();
@@ -176,18 +167,13 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     };
   }
 
-  ngOnDestroy(): void {
-    this.destroy.next();
-    this.destroy.complete();
-  }
 
   submit(): void {
-    if (this.form.invalid || this.saving) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.saving = true;
 
     const value = this.form.getRawValue();
 
@@ -201,17 +187,14 @@ export class ProductDialogComponent implements OnInit, OnDestroy {
     const request = this.isEdit
       ? this.productManagementService.updateProduct(this.data.product.id, payload)
       : this.productManagementService.createProduct(payload);
-    request.pipe(takeUntil(this.destroy)).subscribe({
+    request.pipe(takeUntilDestroyed(this.destroyref)).subscribe({
       next: (product) => {
-        this.saving = false;
-
         this.dialogRef.close({
           saved: true,
           product,
         });
       },
     });
-    this.saving = false;
   }
 
   cancel(): void {

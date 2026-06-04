@@ -38,7 +38,7 @@ export class AdminSidebar {
     {
       title: 'Order Management',
       icon: 'shopping_cart',
-      route: '/order-management'
+      route: '/admin/order-management'
     },
     {
       title: 'Destination Management',
@@ -48,8 +48,13 @@ export class AdminSidebar {
     {
       title: 'Tracker',
       icon: 'track_changes',
-      route: '/tracker'
-    }
+      route: '/admin/tracker'
+    },
+    {
+      title: 'Shipment Management',
+      icon: 'local_shipping',
+      route: '/admin/shipment-management'
+    },
   ];
 
   closeSidebar() {

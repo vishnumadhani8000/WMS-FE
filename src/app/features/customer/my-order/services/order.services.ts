@@ -13,11 +13,9 @@ export class OrderService {
   private readonly baseUrl = `${environment.baseUrl}`;
 
   getOrders(): Observable<ApiResponse<Order[]>> {
-    return this.http.get<ApiResponse<Order[]>>(`${this.baseUrl}/orders`);
+    return this.http.get<ApiResponse<Order[]>>(`${this.baseUrl}/orders/my-orders`);
   }
 
 
-  getOrderById(orderId: number): Observable<ApiResponse<Order>> {
-    return this.http.get<ApiResponse<Order>>(`${this.baseUrl}/orders/${orderId}`);
-  }
+
 }

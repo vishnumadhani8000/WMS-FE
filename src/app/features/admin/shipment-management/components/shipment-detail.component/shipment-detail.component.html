@@ -1,0 +1,169 @@
+<div class="sd-page">
+   @if (shipment) {
+  
+    <!-- ── Header ─────────────────────────────────────── -->
+    <header class="sd-header">
+      <div class="sd-header__left">
+        <app-common-button [config]="backButtonConfig" />
+        <div class="sd-header__title-group">
+          <h1 class="sd-header__title">Shipment #{{ shipment.shipmentId }}</h1>
+          <p class="sd-header__sub">{{ shipment.createdAt | date : 'dd MMM yyyy, hh:mm a' }}</p>
+        </div>
+      </div>
+  
+      <div class="sd-header__right">
+        <span
+          class="status-badge"
+          [ngClass]="{
+            'status-assigned': isAssigned(),
+            'status-transit': isInTransit(),
+            'status-delivered': isDelivered(),
+            'status-cancelled': isCancelled()
+          }"
+        >
+          {{ shipment.status === 'InTransit' ? 'In Transit' : (shipment.status ?? '-') }}
+        </span>
+  
+        @if (isActionable()) {
+        <div class="sd-header__actions">
+          @if (isAssigned()) {
+            <app-common-button [config]="transitButtonConfig" />
+            <app-common-button [config]="cancelButtonConfig" />
+          } @else {
+            <app-common-button [config]="deliveredButtonConfig" />
+            <app-common-button [config]="cancelButtonConfig" />
+          }
+        </div>
+        }
+      </div>
+    </header>
+  
+    <!-- ── Body ──────────────────────────────────────────── -->
+    <div class="sd-body">
+      <div class="sd-top-row">
+  
+        <!-- Driver Info -->
+        <div class="sd-card">
+          <div class="sd-card__header">
+            <mat-icon class="sd-card__icon">person_outline</mat-icon>
+            <h2 class="sd-card__title">Driver</h2>
+          </div>
+          <mat-divider />
+          <div class="sd-card__body">
+            <div class="info-row">
+              <span class="info-label">Name</span>
+              <span class="info-value">{{ shipment.driverName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone</span>
+              <span class="info-value">{{ shipment.driverPhone }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Vehicle No.</span>
+              <span class="info-value vehicle-no">{{ shipment.vehicleNumber }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Shipment Summary -->
+        <div class="sd-card sd-card--summary">
+          <div class="sd-card__header">
+            <mat-icon class="sd-card__icon">summarize</mat-icon>
+            <h2 class="sd-card__title">Summary</h2>
+          </div>
+          <mat-divider />
+          <div class="sd-card__body">
+            <div class="summary-stat">
+              <span class="summary-stat__label">Total Orders</span>
+              <span class="summary-stat__value">{{ shipment.orders.length }}</span>
+            </div>
+            <div class="summary-stat">
+              <span class="summary-stat__label">Total Weight</span>
+              <span class="summary-stat__value">{{ shipment.totalWeightKg }} kg</span>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+  
+      <!-- ── Orders Table ──────────────────────────────── -->
+      <div class="sd-card sd-card--full">
+        <div class="sd-card__header">
+          <mat-icon class="sd-card__icon">receipt_long</mat-icon>
+          <h2 class="sd-card__title">Assigned Orders</h2>
+          <span class="items-count">
+            {{ shipment.orders.length }} {{ shipment.orders.length === 1 ? 'order' : 'orders' }}
+          </span>
+        </div>
+        <mat-divider />
+  
+        <div class="sd-table-wrap">
+          <table mat-table [dataSource]="shipment.orders" class="sd-table">
+  
+            <!-- Index -->
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef class="col-index">#</th>
+              <td mat-cell *matCellDef="let row; let i = index" class="col-index">
+                {{ orderIndex(i) }}
+              </td>
+            </ng-container>
+  
+            <!-- Order ID -->
+            <ng-container matColumnDef="orderId">
+              <th mat-header-cell *matHeaderCellDef>Order ID</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="order-id">#{{ row.orderId }}</span>
+              </td>
+            </ng-container>
+  
+            <!-- Customer -->
+            <ng-container matColumnDef="customerName">
+              <th mat-header-cell *matHeaderCellDef>Customer</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="product-name">{{ row.customerName }}</span>
+              </td>
+            </ng-container>
+  
+            <!-- City -->
+            <ng-container matColumnDef="cityName">
+              <th mat-header-cell *matHeaderCellDef>City</th>
+              <td mat-cell *matCellDef="let row">{{ row.cityName }}</td>
+            </ng-container>
+  
+            <!-- State -->
+            <ng-container matColumnDef="stateName">
+              <th mat-header-cell *matHeaderCellDef>State</th>
+              <td mat-cell *matCellDef="let row">{{ row.stateName }}</td>
+            </ng-container>
+  
+            <!-- Weight -->
+            <ng-container matColumnDef="totalWeightKg">
+              <th mat-header-cell *matHeaderCellDef class="col-num">Weight</th>
+              <td mat-cell *matCellDef="let row" class="col-num">{{ row.totalWeightKg }} kg</td>
+            </ng-container>
+  
+            <!-- Price -->
+            <ng-container matColumnDef="totalPrice">
+              <th mat-header-cell *matHeaderCellDef class="col-num">Amount</th>
+              <td mat-cell *matCellDef="let row" class="col-num">
+                <strong>₹{{ row.totalPrice }}</strong>
+              </td>
+            </ng-container>
+  
+            <tr mat-header-row *matHeaderRowDef="orderColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: orderColumns" class="sd-order-row"></tr>
+  
+            <tr class="mat-mdc-row" *matNoDataRow>
+              <td class="mat-mdc-cell sd-no-data" [attr.colspan]="orderColumns.length">
+                <div class="sd-empty-inline">
+                  <mat-icon>receipt_long</mat-icon>
+                  <span>No orders assigned</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    }
+  </div>

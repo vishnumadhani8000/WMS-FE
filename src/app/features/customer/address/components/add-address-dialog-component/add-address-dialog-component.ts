@@ -13,17 +13,12 @@ import { SelectFieldConfig } from '../../../../../shared/components/select-field
 import {
   AddAddressDialogData,
   AddAddressDialogResult,
+  AddressForm,
 } from '../../models/addAddressDialogData.model';
 import { AddressService } from '../../services/address.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface AddressForm {
-  addressLine: FormControl<string>;
-  landmark: FormControl<string>;
-  stateId: FormControl<number | null>;
-  cityId: FormControl<number | null>;
-  pincode: FormControl<string>;
-}
+
 
 @Component({
   selector: 'app-add-address-dialog',
@@ -43,11 +38,6 @@ interface AddressForm {
 })
 export class AddAddressDialogComponent implements OnInit {
 
-
-  saving = false;
-  loadingStates = false;
-  loadingCities = false;
-
   form: FormGroup<AddressForm>;
 
   addressLineConfig: InputFieldConfig;
@@ -66,9 +56,7 @@ export class AddAddressDialogComponent implements OnInit {
     private readonly userAddressService: AddressService,
     private readonly dialogRef: MatDialogRef<AddAddressDialogComponent>,
     private readonly destroyref : DestroyRef,
-  
-    @Inject(MAT_DIALOG_DATA)
-    public data: AddAddressDialogData
+
   ) {}
 
   ngOnInit(): void {
@@ -163,14 +151,11 @@ export class AddAddressDialogComponent implements OnInit {
       label: 'Save & Continue',
       variant: 'flat',
       color: 'primary',
-      loading: this.saving,
-      disabled: this.saving,
       clicked: () => this.save(),
     };
   }
 
   private loadStates(): void {
-    this.loadingStates = true;
     this.statesCitiesService
       .getStates()
       .pipe(takeUntilDestroyed(this.destroyref))
@@ -179,11 +164,9 @@ export class AddAddressDialogComponent implements OnInit {
           this.stateConfig = { ...this.stateConfig, options: states };
         },
       });
-      this.loadingStates = false;
   }
 
   private loadCities(state: number): void {
-    this.loadingCities = true;
     this.statesCitiesService
       .getCitiesByState(state)
       .pipe(takeUntilDestroyed(this.destroyref))
@@ -192,7 +175,6 @@ export class AddAddressDialogComponent implements OnInit {
           this.cityConfig = { ...this.cityConfig, options: cities };
         },
       });
-      this.loadingCities = false;
   }
 
   save(): void {
@@ -201,21 +183,8 @@ export class AddAddressDialogComponent implements OnInit {
       return;
     }
   
-    this.saveButtonConfig = {
-      ...this.saveButtonConfig,
-      loading: true,
-    };
-  
-    const formValue = this.form.getRawValue();
-  
-    const payload = {
-      addressLine: formValue.addressLine,
-      landmark: formValue.landmark,
-      stateId: formValue.stateId,
-      cityId: formValue.cityId,
-      pincode: formValue.pincode,
-    };
-  
+    const payload: AddAddressDialogData = this.form.getRawValue();
+    
     this.userAddressService
       .createAddress(payload)
       .pipe(takeUntilDestroyed(this.destroyref))
@@ -231,10 +200,6 @@ export class AddAddressDialogComponent implements OnInit {
         },
   
       });
-      this.saveButtonConfig = {
-        ...this.saveButtonConfig,
-        loading: false,
-      };
   }
   cancel(): void {
     this.dialogRef.close({ saved: false } as AddAddressDialogResult);

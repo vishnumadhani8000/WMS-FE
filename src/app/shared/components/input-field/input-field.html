@@ -10,19 +10,22 @@
   }
 
   <input
-    matInput
-    [formControl]="control"
-    [type]="inputType"
-    [placeholder]="config.placeholder || ''"
-    [readonly]="config.readonly"
-    [attr.minlength]="config.minlength"
-    [attr.maxlength]="config.maxlength"
-    [attr.min]="config.min"
-    [attr.max]="config.max"
-    [attr.step]="config.step"
-    [attr.pattern]="config.pattern"
-    (input)="handleInput($event)"
-  />
+  matInput
+  [formControl]="control"
+  [type]="inputType"
+  [placeholder]="config.placeholder || config.label"
+  [readonly]="config.readonly"
+  [attr.autocomplete]="config.autocomplete"
+  [class.readonly-input]="config.readonly"
+  [attr.minlength]="config.minlength"
+  [attr.maxlength]="config.maxlength"
+  [attr.min]="config.min"
+  [attr.max]="config.max"
+  [attr.step]="config.step"
+  [attr.pattern]="config.pattern"
+  (focus)="config.readonly && $event.target.blur()"
+  (input)="handleInput($event)"
+/>
 
   @if (config.type === 'password') {
   <button mat-icon-button matSuffix type="button" (click)="togglePassword()">

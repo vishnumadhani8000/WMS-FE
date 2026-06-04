@@ -68,8 +68,6 @@ export class ConfirmOrderDialog implements OnInit {
   }
 
   placeOrder(): void {
-    this.setLoading(true);
-  
     this.confirmOrderService
       .placeOrder({
         cartId: this.data.cartId,
@@ -84,16 +82,10 @@ export class ConfirmOrderDialog implements OnInit {
           });
         },
       });
-      this.setLoading(false);
+
   }
   cancel(): void {
     this.dialogRef.close({ confirmed: false } as ConfirmOrderDialogResult);
   }
-  private setLoading(loading: boolean): void {
-    this.placeOrderButtonConfig = {
-      ...this.placeOrderButtonConfig,
-      loading,
-      disabled: loading,
-    };
-  }
+
 }

@@ -17,12 +17,8 @@
   </section>
 
   <div class="product-card">
-    @if (loading()) {
-    <mat-progress-bar mode="indeterminate"> </mat-progress-bar>
-    }
-
     <div class="product-table-wrap">
-      <table mat-table [dataSource]="loading() ? [] : products()" class="product-table" matSort  (matSortChange)="onSortChange($event)" >
+      <table mat-table [dataSource]=" products()" class="product-table" matSort  (matSortChange)="onSortChange($event)" >
         <ng-container matColumnDef="index">
           <th mat-header-cell *matHeaderCellDef>#</th>
 

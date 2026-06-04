@@ -12,8 +12,12 @@ export const APP_ROUTES = {
         VEHICLE_MANAGEMENT: 'vehicle-management',
         PRODUCT_MANAGEMENT: 'product-management',
         ORDER_MANAGEMENT: 'order-management',
+        ORDER_DETAIL : 'order-details',
+        SHIPMENT_MANAGEMENT: 'shipment-management',
+        SHIPMENT_DETAIL : 'shipment-details',
         DESTINATION_MANAGEMENT: 'destination-management',
-        TRACKING: 'tracking',
+        TRACKER: 'tracker',
+        PROFILE: 'profile'
     },
 
     CUSTOMER: {
@@ -21,7 +25,7 @@ export const APP_ROUTES = {
         PRODUCT: 'product',
         CART:'cart',
         ORDERS : 'my-orders',
-        PROFILE :'Profile'
+        PROFILE :'profile'
     },
 
     CUSTOMER_AUTH: {

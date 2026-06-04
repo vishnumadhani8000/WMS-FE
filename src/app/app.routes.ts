@@ -27,6 +27,14 @@ export const routes: Routes = [
             },
 
             {
+                path : APP_ROUTES.ADMIN.DRIVER_MANAGEMENT,
+                loadComponent: () =>
+                    import('./features/admin/driver-management/driver-management.js')
+                    .then((m)=>m.DriverManagement),
+                
+            },
+
+            {
                 path: APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT,
                 loadComponent: () =>
                     import('./features/admin/product-management/product-management.js')
@@ -41,10 +49,47 @@ export const routes: Routes = [
             {
                 path: APP_ROUTES.ADMIN.DESTINATION_MANAGEMENT,
                 loadComponent: () =>
-                    import('./features/admin/state-city-management/state-city-management.js')
-                        .then((m) => m.StateCityManagement),
-
+                    import('./features/admin/destination-management/destination-management.js')
+                        .then((m) => m.DestinationManagement),
             },
+            {
+                path: APP_ROUTES.ADMIN.ORDER_MANAGEMENT,
+                loadComponent :()=>
+                    import('./features/admin/order-management/order-management')
+                        .then((m)=>m.OrderManagement)
+ 
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.ORDER_MANAGEMENT}/${APP_ROUTES.ADMIN.ORDER_DETAIL}/:id`,
+                loadComponent: () =>
+                    import('./features/admin/order-management/components/order-detail.component/order-detail.component')
+                        .then((m) => m.OrderDetailComponent)
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.TRACKER}`,
+                loadComponent: () =>
+                    import('./features/admin/tracker/tracker.js')
+                        .then((m) => m.Tracker),
+            },
+            {
+                path:APP_ROUTES.ADMIN.SHIPMENT_MANAGEMENT ,
+                loadComponent:()=> 
+                    import('./features/admin/shipment-management/shipment-management.js')
+                        .then((m) => m.ShipmentManagement),
+            },
+            {
+                path: `${APP_ROUTES.ADMIN.SHIPMENT_MANAGEMENT}/${APP_ROUTES.ADMIN.SHIPMENT_DETAIL}/:id`,
+                loadComponent: () =>
+                    import('./features/admin/shipment-management/components/shipment-detail.component/shipment-detail.component.js')
+                        .then((m) => m.ShipmentDetailComponent)
+            },
+            {
+                path:APP_ROUTES.ADMIN.PROFILE ,
+                loadComponent:()=> 
+                    import('./shared/components/profile/profile.js')
+                        .then((m) => m.Profile),
+            },
+
 
             {
                 path: '**',
@@ -81,7 +126,16 @@ export const routes: Routes = [
                 loadComponent:()=> 
                     import('./features/customer/my-order/my-order.js')
                 .then((m)=>m.MyOrders)
-            }
+            },
+            {
+                path:APP_ROUTES.CUSTOMER.PROFILE,
+                loadComponent:()=> 
+                    import('./shared/components/profile/profile.js')
+                .then((m)=>m.Profile)
+            },
+            
+
+            
 
         ]
 

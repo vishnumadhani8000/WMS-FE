@@ -4,17 +4,7 @@ $bp-sm: 480px;
 $bp-md: 768px;
 $bp-lg: 1100px;
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-.orders-page {
-  min-height: 100vh;
-  padding: 28px;
-  background:
-    radial-gradient(circle at top right, rgba($primary, 0.06), transparent 30%),
-    $page-bg;
 
-  @media (max-width: $bp-md) { padding: 18px; }
-  @media (max-width: $bp-sm) { padding: 14px; }
-}
 
 // ── Header ────────────────────────────────────────────────────────────────────
 .orders-header {
@@ -40,7 +30,7 @@ $bp-lg: 1100px;
 
     mat-icon {
       color: $primary;
-      font-size: 26px;
+      // font-size: 26px;
       width: 26px;
       height: 26px;
     }
@@ -48,7 +38,7 @@ $bp-lg: 1100px;
 
   &__title {
     margin: 0;
-    font-size: clamp(1.6rem, 2vw, 2.1rem);
+    // font-size: clamp(1.6rem, 2vw, 2.1rem);
     font-weight: 800;
     letter-spacing: -0.4px;
     color: $text-main;

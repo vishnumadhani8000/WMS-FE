@@ -1,0 +1,107 @@
+<div class="msd-wrap">
+  <!-- Header -->
+  <div class="msd-header">
+    <div class="msd-header__icon">
+      <mat-icon>local_shipping</mat-icon>
+    </div>
+    <div class="msd-header__text">
+      <h2 class="msd-header__title">Make Shipment</h2>
+      <p class="msd-header__sub">
+        {{ data.orderIds.length }} order{{ data.orderIds.length === 1 ? '' : 's' }} &nbsp;·&nbsp;
+        {{ data.cityName }} &nbsp;·&nbsp; {{ data.totalWeightKg }} kg total
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="msd-body">
+    <!-- Drivers -->
+    <section class="msd-section">
+      <h3 class="msd-section__title">
+        <mat-icon>person</mat-icon>
+        Available Drivers
+      </h3>
+
+      @if (data.drivers.length === 0) {
+      <div class="msd-empty">
+        <mat-icon>person_off</mat-icon>
+        <span>No drivers available</span>
+      </div>
+      }
+
+      <div class="msd-list">
+        @for (driver of data.drivers; track driver.id) {
+        <div
+          class="msd-card"
+          [class.msd-card--selected]="selectedDriverId() === driver.id"
+          (click)="selectDriver(driver)"
+        >
+          <div class="msd-card__check">
+            <mat-icon>
+              {{ selectedDriverId() === driver.id ? 'check_circle' : 'radio_button_unchecked' }}
+            </mat-icon>
+          </div>
+          <div class="msd-card__avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="msd-card__info">
+            <span class="msd-card__name">{{ driver.name }}</span>
+            <span class="msd-card__sub">{{ driver.phone }}</span>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <!-- Vehicles -->
+    <section class="msd-section">
+      <h3 class="msd-section__title">
+        <mat-icon>directions_car</mat-icon>
+        Available Vehicles
+      </h3>
+
+      @if (data.vehicles.length === 0) {
+      <div class="msd-empty">
+        <mat-icon>no_transfer</mat-icon>
+        <span>No vehicles available</span>
+      </div>
+      }
+
+      <div class="msd-list">
+        @for (vehicle of data.vehicles; track vehicle.id) {
+        <div
+          class="msd-card"
+          [class.msd-card--selected]="selectedVehicleId() === vehicle.id"
+          (click)="selectVehicle(vehicle)"
+        >
+          <div class="msd-card__check">
+            <mat-icon>
+              {{ selectedVehicleId() === vehicle.id ? 'check_circle' : 'radio_button_unchecked' }}
+            </mat-icon>
+          </div>
+          <div class="msd-card__avatar msd-card__avatar--vehicle">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="msd-card__info">
+            <span class="msd-card__name">{{ vehicle.name }}</span>
+            <span class="msd-card__sub">{{ vehicle.plateNumber }}</span>
+          </div>
+          <span class="msd-card__capacity"> {{ vehicle.capacityKg | number : '1.2-2' }} kg </span>
+        </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Footer -->
+  <div class="msd-footer">
+    <app-common-button [config]="cancelButtonConfig" />
+
+    <app-common-button [config]="confirmButtonConfig()" />
+  </div>
+</div>

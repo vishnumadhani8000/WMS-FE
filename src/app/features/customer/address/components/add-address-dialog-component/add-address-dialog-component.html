@@ -28,23 +28,11 @@
   
         <div class="select-wrapper">
           <app-common-select [config]="stateConfig" />
-          @if (loadingStates) {
-            <span class="field-loading">
-              <mat-icon class="spin">autorenew</mat-icon>
-              Loading states…
-            </span>
-          }
         </div>
   
         <div class="select-wrapper">
           <app-common-select [config]="cityConfig" />
-          @if (loadingCities) {
-            <span class="field-loading">
-              <mat-icon class="spin">autorenew</mat-icon>
-              Loading cities…
-            </span>
-          }
-          @if (!loadingCities && !form.controls.stateId.value) {
+          @if ( !form.controls.stateId.value) {
             <span class="field-hint">Select a state first</span>
           }
         </div>

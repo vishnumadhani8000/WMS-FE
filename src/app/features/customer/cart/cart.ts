@@ -43,17 +43,17 @@ import { SelectAddressDialogResult } from '../address/models/SelectAddressDialog
   ],
 })
 export class Cart implements OnInit {
-  private readonly cartService = inject(CartService);
-  private readonly toastr = inject(ToastrService);
-  private readonly dialog = inject(MatDialog);
-  private readonly destroyRef = inject(DestroyRef);
+  constructor(
+    private readonly cartService: CartService,
+    private readonly toastr: ToastrService,
+    private readonly dialog: MatDialog,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   readonly displayedColumns = ['index', 'name', 'description', 'weight', 'quantity', 'actions'];
 
   cartItems = signal<CartItem[]>([]);
   totalWeightKg = signal(0);
-  loading = signal(false);
-  quantityLoading = signal(false);
   cartId = signal(0);
   totalItems = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
 
@@ -92,7 +92,7 @@ export class Cart implements OnInit {
       variant: 'icon',
       color: 'primary',
       prefixIcon: 'add',
-      disabled: this.quantityLoading() || item.quantity >= item.availableStock,
+      disabled:  item.quantity >= item.availableStock,
       clicked: () => this.increment(item),
     });
 
@@ -100,13 +100,11 @@ export class Cart implements OnInit {
       variant: 'icon',
       color: 'default',
       prefixIcon: 'remove',
-      disabled: this.quantityLoading(),
       clicked: () => this.decrement(item),
     });
   }
 
   loadCart(): void {
-    this.loading.set(true);
 
     this.cartService
       .getCart()
@@ -114,17 +112,14 @@ export class Cart implements OnInit {
       .subscribe({
         next: (res) => {
           if (!res.data) {
-            this.loading.set(false);
             return;
           }
 
           this.cartId.set(res.data.cartId);
           this.cartItems.set(res.data.items ?? []);
           this.totalWeightKg.set(res.data.totalWeightKg ?? 0);
-
         },
       });
-      this.loading.set(false);
   }
 
   increment(item: CartItem): void {
@@ -145,14 +140,17 @@ export class Cart implements OnInit {
   }
 
   private updateQuantity(item: CartItem, quantity: number): void {
-    this.quantityLoading.set(true);
 
     this.cartService
       .updateQuantity(item.cartItemId, { quantity })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({});
-      this.quantityLoading.set(false);
-      this.loadCart();
+      .subscribe({
+        next: () => {
+          this.loadCart();
+        },
+
+
+      });
   }
 
   confirmDelete(item: CartItem): void {
@@ -215,7 +213,10 @@ export class Cart implements OnInit {
       });
   }
 
-  private openSelectAddressDialog(addresses: CheckoutAddress[], orderItems: CheckoutOrderItem[]): void {
+  private openSelectAddressDialog(
+    addresses: CheckoutAddress[],
+    orderItems: CheckoutOrderItem[]
+  ): void {
     this.dialog
       .open(SelectAddressDialog, {
         width: '800px',
@@ -229,6 +230,10 @@ export class Cart implements OnInit {
       .subscribe((result: SelectAddressDialogResult) => {
         if (result?.action === 'add-new') {
           this.openAddAddressDialog(orderItems);
+          return;
+        }
+        if (result?.action === 'delete') {
+          this.placeOrder();
           return;
         }
 

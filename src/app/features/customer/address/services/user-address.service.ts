@@ -2,26 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { CityOption, StateOption } from './address.service';
+import { CityResponse, StateResponse } from '../models/addresh.model';
 
-export interface StateOption {
-  label: string;
-  value: number;
-}
-
-export interface CityOption {
-  label: string;
-  value: number;
-}
-
-interface StateResponse {
-  id: number;
-  name: string;
-}
-
-interface CityResponse {
-  id: number;
-  name: string;
-}
 
 @Injectable({
   providedIn: 'root',

@@ -3,27 +3,10 @@
 $bp-sm: 480px;
 $bp-md: 768px;
 
-.product-page {
-  padding: 28px;
-  background: $page-bg;
 
-  @media (max-width: $bp-md) {
-    padding: 16px;
-  }
-
-  @media (max-width: $bp-sm) {
-    padding: 12px;
-  }
-}
-
-.product-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
-}
+  .product-header {
+    margin-bottom: 24px;
+  } 
 
 .product-title {
   margin: 0;

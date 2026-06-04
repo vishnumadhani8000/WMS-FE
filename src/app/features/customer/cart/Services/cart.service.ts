@@ -11,6 +11,7 @@ import {
 import { environment } from '../../../../../environments/environment';
 
 import { ApiResponse } from '../../../../core/models/api-responce.model';
+import { AddressData } from '../../address/models/addresh.model';
 
 @Injectable({
   providedIn: 'root'
@@ -63,8 +64,8 @@ export class CartService {
       {}
     );
   }
-  getUserAddresses(): Observable<any> {
-    return this.http.get<any>(
+  getUserAddresses(): Observable<ApiResponse<AddressData[]>> {
+    return this.http.get<ApiResponse<AddressData[]>>(
       `${this.baseUrl}/user-addresses`
     );
   }

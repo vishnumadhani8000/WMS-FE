@@ -8,5 +8,5 @@ export interface SelectAddressDialogData {
 export interface SelectAddressDialogResult {
   saved?: boolean;
   address?: AddressData;
-  action?: 'add-new';
+  action?: 'add-new' | 'delete';
 }

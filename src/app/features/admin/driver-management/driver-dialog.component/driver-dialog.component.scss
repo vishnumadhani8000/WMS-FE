@@ -1,0 +1,174 @@
+@use 'styles/variables' as *;
+
+// ── Wrapper ────────────────────────────────────────────────
+.dialog-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 520px;
+
+  background: $surface;
+  border-radius: 20px;
+  overflow: hidden;
+
+  box-shadow: $shadow-md;
+}
+
+// ── Header ─────────────────────────────────────────────────
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 24px 24px 18px;
+
+  background: linear-gradient(135deg, rgba(69, 64, 225, 0.06), rgba(69, 64, 225, 0.02));
+}
+
+.dialog-header__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dialog-title {
+  margin: 0;
+
+  font-size: $fs-h6;
+  font-weight: $fw-semibold;
+  line-height: 1.2;
+
+  color: $text-main;
+  letter-spacing: -0.02em;
+}
+
+.dialog-subtitle {
+  margin: 0;
+
+  font-size: $fs-body2;
+  font-weight: $fw-regular;
+  line-height: 1.5;
+
+  color: $text-muted;
+}
+
+// ── Body ───────────────────────────────────────────────────
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 24px;
+}
+
+// ── Field Group ────────────────────────────────────────────
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  app-common-input {
+    width: 100%;
+  }
+}
+
+// ── Toggle Group ───────────────────────────────────────────
+.toggle-group {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 16px 18px;
+
+  border: 1px solid $border;
+  border-radius: 12px;
+
+  background: $surface-soft;
+}
+
+.toggle-label-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.toggle-label {
+  font-size: $fs-body2;
+  font-weight: $fw-semibold;
+
+  color: $text-main;
+}
+
+.toggle-hint {
+  max-width: 260px;
+
+  font-size: $fs-caption;
+  line-height: 1.4;
+
+  color: $text-muted;
+}
+
+.availability-toggle {
+  flex-shrink: 0;
+}
+
+.toggle-value-label {
+  margin-left: 4px;
+
+  font-size: $fs-body2;
+  font-weight: $fw-medium;
+
+  color: $text-main;
+}
+
+// ── Footer ─────────────────────────────────────────────────
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+
+  padding: 20px 24px 24px;
+
+  background: $surface-soft;
+}
+
+// ── Divider ────────────────────────────────────────────────
+mat-divider {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+// ── Responsive ─────────────────────────────────────────────
+@media (max-width: 640px) {
+  .dialog-wrapper {
+    border-radius: 16px;
+  }
+
+  .dialog-header {
+    padding: 20px 20px 16px;
+  }
+
+  .dialog-body {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .dialog-footer {
+    padding: 16px 20px 20px;
+
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .toggle-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .availability-toggle {
+    width: 100%;
+  }
+}

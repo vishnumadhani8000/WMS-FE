@@ -1,15 +1,13 @@
 @use 'styles/variables' as *;
 
-// ─── Header-specific tokens ───────────────────────────────────────────────────
-$header-bg:         #15213a;
-$header-border:     rgba($white, 0.07);
-$header-text:       rgba($white, 0.80);
-$header-text-muted: rgba($white, 0.40);
-$header-hover-bg:   rgba($white, 0.06);
-$header-height:     64px;
-$bp-md:             768px;
+$header-bg: #15213a;
+$header-border: rgba($white, 0.07);
+$header-text: rgba($white, 0.8);
+$header-text-muted: rgba($white, 0.4);
+$header-hover-bg: rgba($white, 0.06);
+$header-height: 64px;
+$bp-md: 768px;
 
-// ─── Shell ───────────────────────────────────────────────────────────────────
 .header {
   position: sticky;
   top: 0;
@@ -24,20 +22,16 @@ $bp-md:             768px;
     align-items: center;
     gap: 8px;
     height: $header-height;
-    // max-width: 1400px;
-    margin: 0 auto;
     padding: 0 24px;
   }
 }
 
-// ─── Brand ───────────────────────────────────────────────────────────────────
 .header__brand {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   flex-shrink: 0;
-  margin-right: 8px;
 
   &-icon {
     display: flex;
@@ -46,24 +40,21 @@ $bp-md:             768px;
     width: 42px;
     height: 42px;
     background: #1976d2;
-    border-bottom: 1px solid rgba($white, 0.08);
     border-radius: 10px;
 
     mat-icon {
       font-size: 26px;
-      color: $primary-light;
+      color: $white;
     }
   }
 
   &-name {
+    color: $white;
     font-size: $fs-body1;
     font-weight: $fw-bold;
-    color: $white;
-    letter-spacing: -0.3px;
   }
 }
 
-// ─── Desktop Nav ─────────────────────────────────────────────────────────────
 .header__nav {
   display: flex;
   align-items: center;
@@ -75,7 +66,16 @@ $bp-md:             768px;
   }
 }
 
-// ─── Shared nav-link styles (desktop nav + profile link) ─────────────────────
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  @media (max-width: #{$bp-md - 1}) {
+    display: none;
+  }
+}
+
 .header__nav-link {
   display: flex;
   align-items: center;
@@ -87,43 +87,35 @@ $bp-md:             768px;
   color: $header-text;
   text-decoration: none;
   white-space: nowrap;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: $header-hover-bg;
     color: $white;
-    mat-icon { color: $white; }
+
+    mat-icon {
+      color: $white;
+    }
   }
 
   &--active {
     background: $primary !important;
     color: $white !important;
-    mat-icon { color: $white !important; }
+
+    mat-icon {
+      color: $white !important;
+    }
   }
 }
 
-// ─── Profile link — pinned to the right of the toolbar ───────────────────────
-.header__profile-link {
-  margin-left: auto;   // pushes it all the way to the right
-  flex-shrink: 0;
-
-  @media (max-width: #{$bp-md - 1}) {
-    display: none;     // hidden on mobile — shown in drawer instead
-  }
-}
-
-// ─── mat-icon sizing ─────────────────────────────────────────────────────────
 mat-icon.header__nav-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
-  line-height: 18px;
   color: $header-text-muted;
-  transition: color 0.18s;
   flex-shrink: 0;
 }
 
-// ─── Badge ───────────────────────────────────────────────────────────────────
 .header__nav-badge {
   display: inline-flex;
   align-items: center;
@@ -136,41 +128,46 @@ mat-icon.header__nav-icon {
   color: $white;
   font-size: 10px;
   font-weight: $fw-bold;
-  line-height: 1;
-  margin-left: 2px;
 }
 
-// ─── Hamburger (mobile only) ─────────────────────────────────────────────────
+.header__logout-btn,
+.header__logout-mobile {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: #ef4444;
+
+  .header__nav-icon {
+    color: #ef4444;
+  }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+  }
+}
+
 .header__hamburger {
   display: none;
-  align-items: center;
-  justify-content: center;
+  margin-left: auto;
   width: 36px;
   height: 36px;
-  padding: 0;
-  margin-left: auto;
-  background: transparent;
   border: 1px solid $header-border;
   border-radius: 8px;
+  background: transparent;
   cursor: pointer;
-  transition: background 0.18s;
 
   @media (max-width: #{$bp-md - 1}) {
     display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  &:hover { background: $header-hover-bg; }
-
   mat-icon {
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
-    color: $header-text;
+    color: $white;
   }
 }
 
-// ─── Mobile Drawer ───────────────────────────────────────────────────────────
 .header__mobile-nav {
   display: none;
   position: absolute;
@@ -183,7 +180,7 @@ mat-icon.header__nav-icon {
   transform: translateY(-8px);
   opacity: 0;
   pointer-events: none;
-  transition: transform 0.25s ease, opacity 0.2s ease;
+  transition: all 0.25s ease;
   z-index: 999;
 
   @media (max-width: #{$bp-md - 1}) {
@@ -201,43 +198,37 @@ mat-icon.header__nav-icon {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 12px;
   border-radius: 8px;
+  text-decoration: none;
+  color: $header-text;
+  background: transparent;
+  border: none;
   font-size: $fs-body2;
   font-weight: $fw-medium;
-  color: $header-text;
-  text-decoration: none;
-  font-family: $font-family;
-  transition: background 0.18s, color 0.18s;
+  text-align: left;
+  cursor: pointer;
 
   &:hover {
     background: $header-hover-bg;
     color: $white;
-    mat-icon { color: $white; }
   }
 
   &--active {
-    background: rgba($primary, 0.18) !important;
-    color: $primary-light !important;
-    mat-icon { color: $primary-light !important; }
+    background: rgba($primary, 0.18);
+    color: $primary-light;
   }
 }
 
-// ─── Backdrop ────────────────────────────────────────────────────────────────
 .header__backdrop {
   position: fixed;
   inset: 0;
   top: $header-height;
   background: rgba(0, 0, 0, 0.5);
   z-index: 998;
-  animation: fadeIn 0.2s ease forwards;
 
   @media (min-width: $bp-md) {
     display: none;
   }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
 }

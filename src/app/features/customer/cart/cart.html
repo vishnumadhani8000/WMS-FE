@@ -3,12 +3,9 @@
     <h1 class="cart-header__title">My Cart</h1>
   </header>
 
-  @if (loading()) {
-  <mat-progress-bar mode="indeterminate" class="cart-progress" />
-  }
 
   <div class="cart-list">
-    @if (!loading() && cartItems().length === 0) {
+    @if (cartItems().length === 0) {
     <div class="cart-empty">
       <mat-icon>shopping_cart</mat-icon>
       <span>Your cart is empty</span>
@@ -51,7 +48,7 @@
     }
   </div>
 
-  @if (!loading() && cartItems().length > 0) {
+  @if (cartItems().length > 0) {
 
   <div class="cart-summary">
     <div class="cart-summary__row">
