@@ -5,14 +5,13 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
-import { City, CityForm, EditCityDialogData } from '../../models/state-city.model';
+import { CityForm, EditCityDialogData } from '../../models/state-city.model';
 import { CityService } from '../../services/city-service';
-
-
 
 @Component({
   selector: 'app-city-dialog',
@@ -29,27 +28,60 @@ import { CityService } from '../../services/city-service';
   styleUrl: './city-dialog-component.scss',
 })
 export class CityDialogComponent implements OnInit {
-  private readonly cityService = inject(CityService);
-  private readonly dialogRef = inject(MatDialogRef<CityDialogComponent>);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
+  public form: FormGroup<CityForm>;
+  public nameConfig: InputFieldConfig;
+  public cancelButtonConfig: ButtonConfig;
+  public submitButtonConfig: ButtonConfig;
+  public closeButtonConfig: ButtonConfig;
 
-  form: FormGroup<CityForm>;
-  nameConfig: InputFieldConfig;
-  cancelButtonConfig: ButtonConfig;
-  submitButtonConfig: ButtonConfig;
-  closeButtonConfig: ButtonConfig;
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditCityDialogData) {}
+  constructor(
+    private readonly cityService: CityService,
+    private readonly dialogRef: MatDialogRef<CityDialogComponent>,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef,
+    @Inject(MAT_DIALOG_DATA) public data: EditCityDialogData
+  ) {}
 
   ngOnInit(): void {
+    this.initializeComponent();
+  }
+
+  public submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.cityService
+      .updateCity(this.data.city.id, this.form.getRawValue().name)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toastr.success('City updated successfully.');
+          this.dialogRef.close({ saved: true });
+        },
+      });
+  }
+
+  public cancel(): void {
+    this.dialogRef.close({ saved: false });
+  }
+
+  private initializeComponent(): void {
+    this.initializeForm();
+    this.initializeConfigs();
+  }
+
+  private initializeForm(): void {
     this.form = new FormGroup<CityForm>({
       name: new FormControl(this.data.city.name, {
         nonNullable: true,
         validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
       }),
     });
+  }
 
+  private initializeConfigs(): void {
     this.nameConfig = {
       label: 'City Name',
       type: 'text',
@@ -79,26 +111,5 @@ export class CityDialogComponent implements OnInit {
       variant: 'stroked',
       clicked: () => this.cancel(),
     };
-  }
-
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    this.cityService
-      .updateCity(this.data.city.id, this.form.getRawValue().name)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('City updated successfully.');
-          this.dialogRef.close({ saved: true });
-        },
-      });
-  }
-
-  cancel(): void {
-    this.dialogRef.close({ saved: false });
   }
 }

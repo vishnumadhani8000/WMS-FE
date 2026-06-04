@@ -28,16 +28,6 @@ import { AddressService } from './services/address.service';
   styleUrl: './select-address-dialog.scss',
 })
 export class SelectAddressDialog implements OnInit {
-  constructor(
-    private readonly dialogRef: MatDialogRef<SelectAddressDialog>,
-    private readonly dialog: MatDialog,
-    private readonly addressService: AddressService,
-    private readonly toastr: ToastrService,
-  
-    @Inject(MAT_DIALOG_DATA)
-    public data: SelectAddressDialogData
-  ) {}
-
   selectedAddressId: number | null = null;
   addresses: AddressData[] = [];
 
@@ -45,7 +35,15 @@ export class SelectAddressDialog implements OnInit {
   continueButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
 
+  constructor(
+    private readonly dialogRef: MatDialogRef<SelectAddressDialog>,
+    private readonly dialog: MatDialog,
+    private readonly addressService: AddressService,
+    private readonly toastr: ToastrService,
 
+    @Inject(MAT_DIALOG_DATA)
+    public data: SelectAddressDialogData
+  ) {}
 
   ngOnInit(): void {
     this.addresses = [...(this.data.addresses ?? [])];

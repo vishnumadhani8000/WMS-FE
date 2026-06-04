@@ -9,20 +9,13 @@ import { AdminHeader } from './components/admin-header/admin-header';
   standalone: true,
   templateUrl: './admin-layout.html',
   styleUrls: ['./admin-layout.scss'],
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    AdminSidebar,
-    AdminHeader,
-    
-]
+  imports: [CommonModule, RouterOutlet, AdminSidebar, AdminHeader],
 })
 export class AdminLayout {
-
   sidebarOpen = true;
   isMobile = false;
 
-  constructor() {
+  ngOnInit() {
     this.checkScreen();
   }
 

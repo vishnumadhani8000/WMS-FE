@@ -1,33 +1,51 @@
 import {
   Component,
-  OnInit,
-  inject,
   DestroyRef,
+  OnInit,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
+
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatSortModule, Sort } from '@angular/material/sort';
+import {
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
+import {
+  MatSortModule,
+  Sort,
+} from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { ToastrService } from 'ngx-toastr';
+
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { Button } from '../../../shared/components/button/button';
+
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
+
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
+
 import { DriverService } from './services/driver-management.service';
 import { Driver } from './models/driver-management.model';
 import { DriverDialogComponent } from './driver-dialog.component/driver-dialog.component';
-
 
 @Component({
   selector: 'app-driver-management',
@@ -51,78 +69,54 @@ import { DriverDialogComponent } from './driver-dialog.component/driver-dialog.c
 })
 export class DriverManagement implements OnInit {
 
+  pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
-constructor(
-  private readonly driverService: DriverService,
-  private readonly dialog: MatDialog,
-  private readonly toastr: ToastrService,
-  private readonly destroyRef: DestroyRef
-){}
-  
-
-  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
-  readonly displayedColumns = ['index', 'name', 'phone', 'licenceNo', 'isAvailable', 'actions'];
+  displayedColumns: string[] = [
+    'index',
+    'name',
+    'phone',
+    'licenceNo',
+    'isAvailable',
+    'actions',
+  ];
 
   drivers: Driver[] = [];
-  totalCount = 0;
-  page = 0;
+  totalCount: number = 0;
+
+  page: number = 0;
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   sortBy: string | null = 'createdAt';
   sortAsc: boolean | null = false;
 
-  searchForm = new FormGroup({
+  searchForm: FormGroup<{
+    searchControl: FormControl<string | null>;
+  }> = new FormGroup({
     searchControl: new FormControl(''),
   });
 
-  searchConfig: InputFieldConfig;
-  addButtonConfig: ButtonConfig;
+  searchConfig: InputFieldConfig = {} as InputFieldConfig;
+  addButtonConfig: ButtonConfig = {} as ButtonConfig;
+
+  constructor(
+    private readonly driverService: DriverService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
-    this.initializeConfigs();
     this.initializeSearch();
+    this.initializeConfigs();
     this.loadDrivers();
   }
 
-  private initializeConfigs(): void {
-    this.searchConfig = {
-      label: 'Search',
-      type: 'text',
-      placeholder: 'Search by name, phone or licence...',
-      prefixIcon: 'search',
-      icon: 'close',
-      formControlName: 'searchControl',
-      iconClick: () => this.clearSearch(),
-    };
-
-    this.addButtonConfig = {
-      label: 'Add Driver',
-      variant: 'flat',
-      color: 'primary',
-      prefixIcon: 'add',
-      clicked: () => this.openAddDialog(),
-    };
-  }
-
-  private initializeSearch(): void {
-    this.searchForm.controls.searchControl.valueChanges
-      .pipe(
-        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.page = 0;
-        this.loadDrivers();
-      });
-  }
-
   loadDrivers(): void {
-   this.driverService
+    this.driverService
       .getDrivers({
         page: this.page + 1,
         pageSize: this.pageSize,
-        search: this.searchForm.controls.searchControl.value,
+        search: this.searchForm.controls.searchControl.value ?? '',
         sortBy: this.sortBy ?? undefined,
         ascending: this.sortAsc ?? undefined,
       })
@@ -130,9 +124,9 @@ constructor(
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
-        next: (res) => {
-          this.drivers = res.items;
-          this.totalCount = res.totalCount;
+        next: (response) => {
+          this.drivers = response.items;
+          this.totalCount = response.totalCount;
         },
       });
   }
@@ -153,6 +147,7 @@ constructor(
   onPageChange(event: PageEvent): void {
     this.page = event.pageIndex;
     this.pageSize = event.pageSize;
+
     this.loadDrivers();
   }
 
@@ -164,13 +159,20 @@ constructor(
     this.dialog
       .open(DriverDialogComponent, {
         width: '520px',
-        data: { mode: 'add' },
+        data: {
+          mode: 'add',
+        },
         disableClose: true,
       })
       .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        if (!res?.saved) return;
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((result: { saved?: boolean } | undefined) => {
+        if (!result?.saved) {
+          return;
+        }
+
         this.loadDrivers();
       });
   }
@@ -179,13 +181,21 @@ constructor(
     this.dialog
       .open(DriverDialogComponent, {
         width: '520px',
-        data: { mode: 'edit', driver },
+        data: {
+          mode: 'edit',
+          driver,
+        },
         disableClose: true,
       })
       .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        if (!res?.saved) return;
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((result: { saved?: boolean } | undefined) => {
+        if (!result?.saved) {
+          return;
+        }
+
         this.loadDrivers();
       });
   }
@@ -204,12 +214,16 @@ constructor(
         },
       })
       .afterClosed()
-      .subscribe((confirmed) => {
-        if (!confirmed) return;
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) {
+          return;
+        }
 
         this.driverService
           .deleteDriver(driver.id)
-          .pipe(takeUntilDestroyed(this.destroyRef))
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
           .subscribe({
             next: () => {
               this.toastr.success('Driver deleted.');
@@ -221,5 +235,39 @@ constructor(
 
   clearSearch(): void {
     this.searchForm.controls.searchControl.setValue('');
+  }
+
+
+  initializeConfigs(): void {
+    this.searchConfig = {
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Search by name, phone or licence...',
+      prefixIcon: 'search',
+      icon: 'close',
+      formControlName: 'searchControl',
+      iconClick: () => this.clearSearch(),
+    };
+
+    this.addButtonConfig = {
+      label: 'Add Driver',
+      variant: 'flat',
+      color: 'primary',
+      prefixIcon: 'add',
+      clicked: () => this.openAddDialog(),
+    };
+  }
+
+  initializeSearch(): void {
+    this.searchForm.controls.searchControl.valueChanges
+      .pipe(
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.page = 0;
+        this.loadDrivers();
+      });
   }
 }

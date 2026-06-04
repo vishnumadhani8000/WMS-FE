@@ -9,6 +9,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import { OrderDetailService } from '../../services/order-detail.service';
@@ -36,15 +37,8 @@ import { ButtonConfig } from '../../../../../shared/components/button/button.con
   styleUrl: './order-detail.component.scss',
 })
 export class OrderDetailComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly detailService = inject(OrderDetailService);
-  private readonly orderService = inject(OrderService);
-  private readonly dialog = inject(MatDialog);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
 
-  readonly itemColumns = [
+  readonly itemColumns: string[] = [
     'index',
     'productName',
     'quantity',
@@ -54,62 +48,39 @@ export class OrderDetailComponent implements OnInit {
   ];
 
   order: OrderDetail | null = null;
-  // ── Button Configs ──────────────────────────────────────
+
+  loading: boolean = false;
+  actionLoading: boolean = false;
+
   backButtonConfig: ButtonConfig;
-
   acceptButtonConfig: ButtonConfig;
-
   completeButtonConfig: ButtonConfig;
-
   cancelButtonConfig: ButtonConfig;
+
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly detailService: OrderDetailService,
+    private readonly orderService: OrderService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     this.initializeButtons();
-
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-
-    this.loadOrder(id);
-  }
-
-  initializeButtons(): void {
-    this.backButtonConfig = {
-      prefixIcon: 'arrow_back',
-      variant: 'icon',
-      ariaLabel: 'Back',
-      clicked: () => this.goBack(),
-    };
-
-    this.acceptButtonConfig = {
-      label: 'Accept Order',
-      prefixIcon: 'check_circle_outline',
-      variant: 'stroked',
-      color: 'primary',
-      clicked: () => this.acceptOrder(),
-    };
-
-    this.completeButtonConfig = {
-      label: 'Complete',
-      prefixIcon: 'task_alt',
-      variant: 'flat',
-      color: 'primary',
-      clicked: () => this.completeOrder(),
-    };
-
-    this.cancelButtonConfig = {
-      label: 'Cancel Order',
-      prefixIcon: 'cancel',
-      variant: 'stroked',
-      color: 'warn',
-      clicked: () => this.cancelOrder(),
-    };
+    this.loadOrder(Number(this.route.snapshot.paramMap.get('id')));
   }
 
   loadOrder(id: number): void {
+    this.loading = true;
 
     this.detailService
       .getOrderDetail(id)
       .pipe(
-        takeUntilDestroyed(this.destroyRef))
+        finalize(() => (this.loading = false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (data) => {
           this.order = data;
@@ -121,8 +92,6 @@ export class OrderDetailComponent implements OnInit {
     this.router.navigate(['/admin/order-management']);
   }
 
-  // ── Status Helpers ──────────────────────────────────────
-
   isPending(): boolean {
     return this.order.status === 'Pending';
   }
@@ -131,12 +100,14 @@ export class OrderDetailComponent implements OnInit {
     return this.order.status === 'Accepted';
   }
 
-  isDispatched():boolean {
-    return this.order.status === 'Dispatched'
+  isDispatched(): boolean {
+    return this.order.status === 'Dispatched';
   }
-  isInTransit():boolean{
+
+  isInTransit(): boolean {
     return this.order.status === 'InTransit';
   }
+
   isDelivered(): boolean {
     return this.order?.status === 'Delivered';
   }
@@ -149,8 +120,6 @@ export class OrderDetailComponent implements OnInit {
     return !this.isDelivered() && !this.isCancelled();
   }
 
-  // ── Table Helpers ───────────────────────────────────────
-
   itemSubtotal(item: { quantity: number; price: number }): number {
     return item.quantity * item.price;
   }
@@ -158,8 +127,6 @@ export class OrderDetailComponent implements OnInit {
   itemIndex(i: number): number {
     return i + 1;
   }
-
-  // ── Actions ─────────────────────────────────────────────
 
   acceptOrder(): void {
     this.dialog
@@ -176,18 +143,24 @@ export class OrderDetailComponent implements OnInit {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
 
+        this.actionLoading = true;
 
         this.orderService
           .acceptOrder(this.order!.orderId)
           .pipe(
+            finalize(() => {
+              this.actionLoading = false;
+              this.initializeButtons();
+            }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({
             next: () => {
               this.toastr.success('Order accepted.');
-
               this.loadOrder(this.order!.orderId);
             },
           });
@@ -209,18 +182,24 @@ export class OrderDetailComponent implements OnInit {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
 
+        this.actionLoading = true;
 
         this.orderService
           .completeOrder(this.order!.orderId)
           .pipe(
+            finalize(() => {
+              this.actionLoading = false;
+              this.initializeButtons();
+            }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({
             next: () => {
               this.toastr.success('Order completed.');
-
               this.loadOrder(this.order!.orderId);
             },
           });
@@ -242,11 +221,21 @@ export class OrderDetailComponent implements OnInit {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
+        this.actionLoading = true;
+
         this.orderService
           .cancelOrder(this.order!.orderId)
           .pipe(
-            takeUntilDestroyed(this.destroyRef))
+            finalize(() => {
+              this.actionLoading = false;
+              this.initializeButtons();
+            }),
+            takeUntilDestroyed(this.destroyRef)
+          )
           .subscribe({
             next: () => {
               this.toastr.success('Order cancelled.');
@@ -255,5 +244,43 @@ export class OrderDetailComponent implements OnInit {
           });
       });
   }
-}
 
+  initializeButtons(): void {
+    this.backButtonConfig = {
+      prefixIcon: 'arrow_back',
+      variant: 'icon',
+      ariaLabel: 'Back',
+      clicked: () => this.goBack(),
+    };
+
+    this.acceptButtonConfig = {
+      label: 'Accept Order',
+      prefixIcon: 'check_circle_outline',
+      variant: 'stroked',
+      color: 'primary',
+      loading: this.actionLoading,
+      disabled: this.actionLoading,
+      clicked: () => this.acceptOrder(),
+    };
+
+    this.completeButtonConfig = {
+      label: 'Complete',
+      prefixIcon: 'task_alt',
+      variant: 'flat',
+      color: 'primary',
+      loading: this.actionLoading,
+      disabled: this.actionLoading,
+      clicked: () => this.completeOrder(),
+    };
+
+    this.cancelButtonConfig = {
+      label: 'Cancel Order',
+      prefixIcon: 'cancel',
+      variant: 'stroked',
+      color: 'warn',
+      loading: this.actionLoading,
+      disabled: this.actionLoading,
+      clicked: () => this.cancelOrder(),
+    };
+  }
+}

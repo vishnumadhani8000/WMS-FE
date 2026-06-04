@@ -1,4 +1,4 @@
-import { Component, DestroyRef, Inject, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -36,24 +36,64 @@ interface AddCityForm {
   styleUrl: './add-city-dialog-component.scss',
 })
 export class AddCityDialogComponent implements OnInit {
+  public form: FormGroup<AddCityForm>;
+
+  public nameConfig: InputFieldConfig;
+  public stateSelectConfig: SelectFieldConfig;
+  public cancelButtonConfig: ButtonConfig;
+  public submitButtonConfig: ButtonConfig;
+  public closeButtonConfig: ButtonConfig;
 
   constructor(
-    private cityService  : CityService,
-    private dialogRef: MatDialogRef<AddCityDialogComponent>,
-    private toastr : ToastrService,
-    private destroyRef : DestroyRef,
-    @Inject(MAT_DIALOG_DATA) public data: AddCityDialogData) {}
-
-  form: FormGroup<AddCityForm>;
-
-  nameConfig: InputFieldConfig;
-  stateSelectConfig: SelectFieldConfig;
-  cancelButtonConfig: ButtonConfig;
-  submitButtonConfig: ButtonConfig;
-  closeButtonConfig: ButtonConfig;
-
+    private readonly cityService: CityService,
+    private readonly dialogRef: MatDialogRef<AddCityDialogComponent>,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef,
+    @Inject(MAT_DIALOG_DATA) public data: AddCityDialogData
+  ) {}
 
   ngOnInit(): void {
+    this.initializeComponent();
+  }
+
+  public get selectedStateName(): string {
+    const id: number = this.form.controls.stateId.value;
+
+    return (
+      this.data.states.find((s) => s.id === id)?.name ??
+      this.data.selectedState.name
+    );
+  }
+
+  public submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const { name, stateId } = this.form.getRawValue();
+
+    this.cityService
+      .createCity({ name, stateId })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toastr.success('City added successfully.');
+          this.dialogRef.close({ saved: true, stateId });
+        },
+      });
+  }
+
+  public cancel(): void {
+    this.dialogRef.close({ saved: false });
+  }
+
+  private initializeComponent(): void {
+    this.initializeForm();
+    this.initializeConfigs();
+  }
+
+  private initializeForm(): void {
     this.form = new FormGroup<AddCityForm>({
       name: new FormControl('', {
         nonNullable: true,
@@ -64,7 +104,9 @@ export class AddCityDialogComponent implements OnInit {
         validators: [Validators.required],
       }),
     });
+  }
 
+  private initializeConfigs(): void {
     this.nameConfig = {
       label: 'City Name',
       type: 'text',
@@ -79,7 +121,10 @@ export class AddCityDialogComponent implements OnInit {
       label: 'State',
       control: this.form.controls.stateId,
       required: true,
-      options: this.data.states.map((s) => ({ label: s.name, value: s.id })),
+      options: this.data.states.map((s) => ({
+        label: s.name,
+        value: s.id,
+      })),
     };
 
     this.cancelButtonConfig = {
@@ -101,33 +146,5 @@ export class AddCityDialogComponent implements OnInit {
       variant: 'stroked',
       clicked: () => this.cancel(),
     };
-  }
-
-  get selectedStateName(): string {
-    const id = this.form.controls.stateId.value;
-    return this.data.states.find((s) => s.id === id)?.name ?? this.data.selectedState.name;
-  }
-
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const { name, stateId } = this.form.getRawValue();
-
-    this.cityService
-      .createCity({ name, stateId })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('City added successfully.');
-          this.dialogRef.close({ saved: true, stateId });
-        },
-      });
-  }
-
-  cancel(): void {
-    this.dialogRef.close({ saved: false });
   }
 }

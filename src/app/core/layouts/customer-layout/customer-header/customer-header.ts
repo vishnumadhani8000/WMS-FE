@@ -6,7 +6,6 @@ import { AuthService } from '../../../../features/auth/services/auth.service';
 import { APP_ROUTES } from '../../../../shared/constants/app-routes.constants';
 import { NavItem } from '../models/customer-header.model';
 
-
 @Component({
   selector: 'app-customer-header',
   standalone: true,
@@ -15,43 +14,37 @@ import { NavItem } from '../models/customer-header.model';
   styleUrls: ['./customer-header.scss'],
 })
 export class CustomerHeader {
-  constructor(  private readonly authService: AuthService,
-    private readonly router: Router){}
+  
   mobileMenuOpen = signal(false);
 
   navItems: NavItem[] = [
-    { label: 'Products',  icon: 'inventory_2',   route: '/customer/product' },
-    { label: 'Cart',      icon: 'shopping_cart', route: '/customer/cart'},
-    { label: 'My Orders', icon: 'history',       route: '/customer/my-orders' },
+    { label: 'Products', icon: 'inventory_2', route: '/customer/product' },
+    { label: 'Cart', icon: 'shopping_cart', route: '/customer/cart' },
+    { label: 'My Orders', icon: 'history', route: '/customer/my-orders' },
   ];
-
+  constructor(private readonly authService: AuthService, private readonly router: Router) {}
+  
   toggleMenu(): void {
-    this.mobileMenuOpen.update(v => !v);
+    this.mobileMenuOpen.update((v) => !v);
   }
 
   closeMenu(): void {
     this.mobileMenuOpen.set(false);
   }
-  
+
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeMenu();
   }
-  
-  
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
-        this.router.navigate([
-          `/${APP_ROUTES.AUTH.LOGIN}`,
-        ]);
+        this.router.navigate([`/${APP_ROUTES.AUTH.LOGIN}`]);
       },
       error: () => {
-        this.router.navigate([
-          `/${APP_ROUTES.AUTH.LOGIN}`,
-        ]);
+        this.router.navigate([`/${APP_ROUTES.AUTH.LOGIN}`]);
       },
     });
   }
-
 }

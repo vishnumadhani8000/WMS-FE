@@ -66,6 +66,65 @@ export class Login implements OnInit {
     this.activeTab = tab;
   }
 
+  
+  // ─── Login submit ───────────────────────────
+  submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const payload = {
+      ...this.form.getRawValue(),
+      email: this.form.controls.email.value.trim().toLowerCase(),
+    };
+    
+    this.authService.login(payload).subscribe({
+      next: (res) => {
+        if (!res.isSuccess || !res.data) {
+          this.toast.error('Login failed');
+          return;
+        }
+        
+        this.toast.success('Login successful!');
+        
+        const role = this.authService.getUserRole();
+        this.router.navigate([
+          role === 'Admin'
+            ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT}`
+            : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
+          ]);
+      },
+    });
+  }
+  
+  // ─── Sign Up submit ───────────────────────────────────────────
+  submitSignUp(): void {
+    if (this.signUpForm.invalid) {
+      this.signUpForm.markAllAsTouched();
+      return;
+    }
+
+    
+    const { confirmPassword, ...rest } = this.signUpForm.getRawValue();
+    const payload = {
+      ...rest,
+      email: this.signUpForm.controls.email.value.trim().toLowerCase(),
+      name: this.signUpForm.controls.name.value.trim(),
+    };
+
+    this.authService.signUp(payload).subscribe({
+      next: (res) => {
+        if (!res.isSuccess) {
+          this.toast.error('Registration failed');
+          return;
+        }
+
+        this.toast.success('Account created! Please login.');
+        this.activeTab = 'login';
+        this.signUpForm.reset();
+      },
+    });
+  }
   private initLoginForm(): void {
     this.form = new FormGroup<LoginForm>({
       email: new FormControl('', {
@@ -257,64 +316,5 @@ export class Login implements OnInit {
 
     confirmPassword.setErrors(null);
     return null;
-  }
-
-  // ─── Login submit ───────────────────────────
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    const payload = {
-      ...this.form.getRawValue(),
-      email: this.form.controls.email.value.trim().toLowerCase(),
-    };
-
-    this.authService.login(payload).subscribe({
-      next: (res) => {
-        if (!res.isSuccess || !res.data) {
-          this.toast.error('Login failed');
-          return;
-        }
-
-        this.toast.success('Login successful!');
-
-        const role = this.authService.getUserRole();
-        this.router.navigate([
-          role === 'Admin'
-            ? `/${APP_ROUTES.ADMIN.ROOT}/${APP_ROUTES.ADMIN.PRODUCT_MANAGEMENT}`
-            : `/${APP_ROUTES.CUSTOMER.ROOT}/${APP_ROUTES.CUSTOMER.PRODUCT}`,
-        ]);
-      },
-    });
-  }
-
-  // ─── Sign Up submit ───────────────────────────────────────────
-  submitSignUp(): void {
-    if (this.signUpForm.invalid) {
-      this.signUpForm.markAllAsTouched();
-      return;
-    }
-
-
-    const { confirmPassword, ...rest } = this.signUpForm.getRawValue();
-    const payload = {
-      ...rest,
-      email: this.signUpForm.controls.email.value.trim().toLowerCase(),
-      name: this.signUpForm.controls.name.value.trim(),
-    };
-
-    this.authService.signUp(payload).subscribe({
-      next: (res) => {
-        if (!res.isSuccess) {
-          this.toast.error('Registration failed');
-          return;
-        }
-
-        this.toast.success('Account created! Please login.');
-        this.activeTab = 'login';
-        this.signUpForm.reset();
-      },
-    });
   }
 }

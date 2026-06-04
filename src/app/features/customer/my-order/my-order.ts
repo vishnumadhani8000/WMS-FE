@@ -20,31 +20,22 @@ import { OrderService } from './services/order.services';
   imports: [CommonModule, MatIconModule, MatProgressBarModule],
 })
 export class MyOrders implements OnInit {
+
+  orders = signal<Order[]>([]);
+  totalOrders = computed(() => this.orders().length);
+
   constructor(
     private readonly orderService: OrderService,
     private readonly destroyRef: DestroyRef
-  ) {}
-
-  orders  = signal<Order[]>([]);
-
-  totalOrders = computed(() => this.orders().length);
+  ) { }
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
-  loadOrders(): void {
-    this.orderService
-      .getOrders()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => {
-          this.orders.set(res.data ?? []);
-        },
-      });
-  }
 
-    getStatusMeta(status: string): OrderStatusMeta {
+
+  getStatusMeta(status: string): OrderStatusMeta {
     return ORDER_STATUS_META[status] ?? { label: status, cssClass: 'status--pending', icon: 'help_outline' };
   }
 
@@ -60,7 +51,18 @@ export class MyOrders implements OnInit {
     const a = order.address;
     if (!a) return '—';
     return [a.addressLine, a.landmark, a.cityName, a.stateName, a.pincode]
-    .filter(x => x)
+      .filter(x => x)
       .join(', ');
+  }
+
+  private loadOrders(): void {
+    this.orderService
+      .getOrders()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.orders.set(res.data ?? []);
+        },
+      });
   }
 }

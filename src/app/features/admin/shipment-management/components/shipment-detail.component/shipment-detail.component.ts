@@ -32,33 +32,206 @@ import { ShipmentDetailService } from '../../services/shipment-details.service';
   styleUrl: './shipment-detail.component.scss',
 })
 export class ShipmentDetailComponent implements OnInit {
-constructor(
-  private readonly route : ActivatedRoute,
-  private readonly router : Router,
-  private readonly detailService: ShipmentDetailService,
-  private readonly shipmentService : ShipmentService,
-  private readonly dialog : MatDialog,
-  private readonly toastr : ToastrService,
-  private readonly destroyRef :DestroyRef,
 
-){}
   readonly orderColumns = [
-    'index', 'orderId', 'customerName', 'cityName',
-    'stateName', 'totalWeightKg', 'totalPrice',
+    'index',
+    'orderId',
+    'customerName',
+    'cityName',
+    'stateName',
+    'totalWeightKg',
+    'totalPrice',
   ];
 
   shipment: ShipmentDetail | null = null;
 
-  // ── Button Configs ─────────────────────────
   backButtonConfig: ButtonConfig;
   transitButtonConfig: ButtonConfig;
   deliveredButtonConfig: ButtonConfig;
   cancelButtonConfig: ButtonConfig;
 
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly detailService: ShipmentDetailService,
+    private readonly shipmentService: ShipmentService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef,
+  ) {}
+
   ngOnInit(): void {
     this.initializeButtons();
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadShipment(id);
+    this.loadShipment(
+      Number(this.route.snapshot.paramMap.get('id'))
+    );
+  }
+
+  loadShipment(id: number): void {
+    this.detailService
+      .getShipmentDetail(id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (data) => {
+          this.shipment = data;
+        },
+      });
+  }
+
+  goBack(): void {
+    this.router.navigate([
+      '/admin/shipment-management',
+    ]);
+  }
+
+  orderIndex(i: number): number {
+    return i + 1;
+  }
+
+  isAssigned(): boolean {
+    return this.shipment?.status === 'Assigned';
+  }
+
+  isInTransit(): boolean {
+    return this.shipment?.status === 'InTransit';
+  }
+
+  isDelivered(): boolean {
+    return this.shipment?.status === 'Delivered';
+  }
+
+  isCancelled(): boolean {
+    return this.shipment?.status === 'Cancelled';
+  }
+
+  isActionable(): boolean {
+    return !this.isDelivered() &&
+      !this.isCancelled();
+  }
+
+  markInTransit(): void {
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Mark In Transit',
+          message: `Mark shipment #${this.shipment!.shipmentId} as In Transit?`,
+          confirmText: 'Confirm',
+          cancelText: 'Cancel',
+          type: 'info',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.shipmentService
+          .updateShipmentStatus(
+            this.shipment!.shipmentId,
+            'InTransit'
+          )
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success(
+                'Shipment is now In Transit.'
+              );
+
+              this.loadShipment(
+                this.shipment!.shipmentId
+              );
+            },
+          });
+      });
+  }
+
+  markDelivered(): void {
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Mark Delivered',
+          message: `Mark shipment #${this.shipment!.shipmentId} as Delivered?`,
+          confirmText: 'Delivered',
+          cancelText: 'Cancel',
+          type: 'info',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.shipmentService
+          .updateShipmentStatus(
+            this.shipment!.shipmentId,
+            'Delivered'
+          )
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success(
+                'Shipment marked as Delivered.'
+              );
+
+              this.loadShipment(
+                this.shipment!.shipmentId
+              );
+            },
+          });
+      });
+  }
+
+  cancelShipment(): void {
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Cancel Shipment',
+          message: `Cancel shipment #${this.shipment!.shipmentId}?`,
+          confirmText: 'Cancel Shipment',
+          cancelText: 'Go Back',
+          type: 'warning',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.shipmentService
+          .updateShipmentStatus(
+            this.shipment!.shipmentId,
+            'Cancelled'
+          )
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success(
+                'Shipment cancelled.'
+              );
+
+              this.loadShipment(
+                this.shipment!.shipmentId
+              );
+            },
+          });
+      });
   }
 
   initializeButtons(): void {
@@ -92,123 +265,5 @@ constructor(
       color: 'warn',
       clicked: () => this.cancelShipment(),
     };
-  }
-
-  loadShipment(id: number): void {
-
-    this.detailService
-      .getShipmentDetail(id)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({ next: (data) => { this.shipment = data; } });
-  }
-
-  goBack(): void {
-    this.router.navigate(['/admin/shipment-management']);
-  }
-
-  orderIndex(i: number): number {
-    return i + 1;
-  }
-
-  // ── Status Helpers ──────────────────────────────────────────
-
-  isAssigned(): boolean {
-
-    return this.shipment?.status === 'Assigned';
-  }
-
-  isInTransit(): boolean {
-    return this.shipment?.status === 'InTransit';
-  }
-
-  isDelivered(): boolean {
-    return this.shipment?.status === 'Delivered';
-  }
-
-  isCancelled(): boolean {
-    return this.shipment?.status === 'Cancelled';
-  }
-
-  isActionable(): boolean {
-    return !this.isDelivered() && !this.isCancelled();
-  }
-
-  // ── Actions ─────────────────────────────────────────────────
-
-  markInTransit(): void {
-    this.dialog
-      .open(ConfirmDialog, {
-        width: '420px',
-        disableClose: true,
-        data: {
-          title: 'Mark In Transit',
-          message: `Mark shipment #${this.shipment!.shipmentId} as In Transit?`,
-          confirmText: 'Confirm',
-          cancelText: 'Cancel',
-          type: 'info',
-        },
-      })
-      .afterClosed()
-      .subscribe((confirmed) => {
-        if (!confirmed) return;
-        this.shipmentService
-          .updateShipmentStatus(this.shipment.shipmentId , 'InTransit')
-          .pipe(
-            takeUntilDestroyed(this.destroyRef)
-          )
-          .subscribe({ next: () => { this.toastr.success('Shipment is now In Transit.'); this.loadShipment(this.shipment!.shipmentId); } });
-      });
-  }
-
-  markDelivered(): void {
-    this.dialog
-      .open(ConfirmDialog, {
-        width: '420px',
-        disableClose: true,
-        data: {
-          title: 'Mark Delivered',
-          message: `Mark shipment #${this.shipment!.shipmentId} as Delivered?`,
-          confirmText: 'Delivered',
-          cancelText: 'Cancel',
-          type: 'info',
-        },
-      })
-      .afterClosed()
-      .subscribe((confirmed) => {
-        if (!confirmed) return;
-        this.shipmentService
-          .updateShipmentStatus(this.shipment.shipmentId,'Delivered')
-          .pipe(
-            takeUntilDestroyed(this.destroyRef)
-          )
-          .subscribe({ next: () => { this.toastr.success('Shipment marked as Delivered.'); this.loadShipment(this.shipment!.shipmentId); } });
-      });
-  }
-
-  cancelShipment(): void {
-    this.dialog
-      .open(ConfirmDialog, {
-        width: '420px',
-        disableClose: true,
-        data: {
-          title: 'Cancel Shipment',
-          message: `Cancel shipment #${this.shipment!.shipmentId}?`,
-          confirmText: 'Cancel Shipment',
-          cancelText: 'Go Back',
-          type: 'warning',
-        },
-      })
-      .afterClosed()
-      .subscribe((confirmed) => {
-        if (!confirmed) return;
-        this.shipmentService
-          .updateShipmentStatus (this.shipment.shipmentId , 'Cancelled')
-          .pipe(
-            takeUntilDestroyed(this.destroyRef)
-          )
-          .subscribe({ next: () => { this.toastr.success('Shipment cancelled.'); this.loadShipment(this.shipment!.shipmentId); } });
-      });
   }
 }

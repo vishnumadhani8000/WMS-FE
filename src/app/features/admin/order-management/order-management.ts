@@ -53,19 +53,24 @@ type OrderView = 'all' | 'pending';
   styleUrl: './order-management.scss',
 })
 export class OrderManagement implements OnInit {
-  constructor(
-    private readonly orderService: OrderService,
-    private readonly dialog: MatDialog,
-    private readonly toastr: ToastrService,
-    private readonly destroyRef: DestroyRef,
-    private readonly router: Router,
-  ) {}
+
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator;
 
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+
   readonly displayedColumns = [
-    'index', 'orderId', 'customerName', 'totalWeightKg',
-    'cityName', 'stateName', 'totalItems', 'totalPrice',
-    'orderStatus', 'createdAt', 'actions',
+    'index',
+    'orderId',
+    'customerName',
+    'totalWeightKg',
+    'cityName',
+    'stateName',
+    'totalItems',
+    'totalPrice',
+    'orderStatus',
+    'createdAt',
+    'actions',
   ];
 
   orders: Order[] = [];
@@ -84,37 +89,22 @@ export class OrderManagement implements OnInit {
   });
 
   searchConfig: InputFieldConfig;
-  
-  @ViewChild(MatPaginator)
-  paginator: MatPaginator;
+
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit(): void {
-    this.searchConfig = {
-      label: 'Search',
-      type: 'text',
-      placeholder: 'Search by Name Or Id...',
-      prefixIcon: 'search',
-      icon: 'close',
-      formControlName: 'searchControl',
-      iconClick: () => this.clearSearch(),
-    };
-
-    this.searchForm.controls.searchControl.valueChanges
-      .pipe(
-        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.page = 0;
-        this.loadOrders();
-      });
-
+    this.initializeSearchConfig();
+    this.initializeSearch();
     this.loadOrders();
   }
 
   loadOrders(): void {
-
     this.orderService
       .getOrders({
         page: this.page + 1,
@@ -161,42 +151,41 @@ export class OrderManagement implements OnInit {
   clearSearch(): void {
     this.searchForm.controls.searchControl.setValue('');
   }
+
   viewOrder(order: Order): void {
-    this.router.navigate(['/admin/order-management/order-details', order.orderId]);
+    this.router.navigate([
+      '/admin/order-management/order-details',
+      order.orderId,
+    ]);
   }
 
+  isPending(order: Order): boolean {
+    return order.status === 'Pending';
+  }
 
-// ── Status helpers ──────────────────────────────────────────
+  isAccepted(order: Order): boolean {
+    return order.status === 'Accepted';
+  }
 
-isPending(order: Order): boolean {
-  return order.status === 'Pending';
-}
+  isDispatched(order: Order): boolean {
+    return order.status === 'Dispatched';
+  }
 
-isAccepted(order: Order): boolean {
-  return order.status === 'Accepted';
-}
+  isInTransit(order: Order): boolean {
+    return order.status === 'InTransit';
+  }
 
-isDispatched(order: Order): boolean {
-  return order.status === 'Dispatched';
-}
+  isDelivered(order: Order): boolean {
+    return order.status === 'Delivered';
+  }
 
-isInTransit(order: Order): boolean {
-  return order.status === 'InTransit';
-}
+  isCancelled(order: Order): boolean {
+    return order.status === 'Cancelled';
+  }
 
-isDelivered(order: Order): boolean {
-  return order.status === 'Delivered';
-}
-
-isCancelled(order: Order): boolean {
-  return order.status === 'Cancelled';
-}
-
-isActionable(order: Order): boolean {
-  return !this.isDelivered(order) && !this.isCancelled(order);
-}
-
-  // ── Actions ─────────────────────────────────────────────────
+  isActionable(order: Order): boolean {
+    return !this.isDelivered(order) && !this.isCancelled(order);
+  }
 
   acceptOrder(order: Order): void {
     this.dialog
@@ -213,11 +202,21 @@ isActionable(order: Order): boolean {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
         this.orderService
           .acceptOrder(order.orderId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({ next: () => { this.toastr.success('Order accepted.'); this.loadOrders(); } });
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success('Order accepted.');
+              this.loadOrders();
+            },
+          });
       });
   }
 
@@ -236,11 +235,21 @@ isActionable(order: Order): boolean {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
         this.orderService
           .completeOrder(order.orderId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({ next: () => { this.toastr.success('Order completed.'); this.loadOrders(); } });
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success('Order completed.');
+              this.loadOrders();
+            },
+          });
       });
   }
 
@@ -259,11 +268,46 @@ isActionable(order: Order): boolean {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
         this.orderService
           .cancelOrder(order.orderId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({ next: () => { this.toastr.success('Order cancelled.'); this.loadOrders(); } });
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success('Order cancelled.');
+              this.loadOrders();
+            },
+          });
+      });
+  }
+
+  initializeSearchConfig(): void {
+    this.searchConfig = {
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Search by Name Or Id...',
+      prefixIcon: 'search',
+      icon: 'close',
+      formControlName: 'searchControl',
+      iconClick: () => this.clearSearch(),
+    };
+  }
+
+  initializeSearch(): void {
+    this.searchForm.controls.searchControl.valueChanges
+      .pipe(
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.page = 0;
+        this.loadOrders();
       });
   }
 }

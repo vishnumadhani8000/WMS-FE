@@ -35,24 +35,26 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class ProductDialogComponent implements OnInit {
 
-  constructor(
-    private productManagementService: ProductManagementService,
-    private dialogRef: MatDialogRef<ProductDialogComponent>,
-    private toastr: ToastrService,
-    private destroyref : DestroyRef,
-    
-    @Inject(MAT_DIALOG_DATA) public data: ProductDialogData
-  ) {}
-
   form: FormGroup<ProductForm>;
+
   productNameConfig: InputFieldConfig;
   weightConfig: InputFieldConfig;
   stockConfig: InputFieldConfig;
   descriptionConfig: TextareaFieldConfig;
+  productPriceConfig: InputFieldConfig;
+
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
-  productPriceConfig:InputFieldConfig;
+
+  constructor(
+    private productManagementService: ProductManagementService,
+    private dialogRef: MatDialogRef<ProductDialogComponent>,
+    private toastr: ToastrService,
+    private destroyref: DestroyRef,
+
+    @Inject(MAT_DIALOG_DATA) public data: ProductDialogData
+  ) {}
 
   get isEdit(): boolean {
     return this.data.mode === 'edit';
@@ -63,117 +65,15 @@ export class ProductDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const p = this.data.product;
-
-    this.form = new FormGroup<ProductForm>({
-      name: new FormControl(p?.name ?? '', {
-        nonNullable: true,
-        validators: [Validators.required, Validators.maxLength(100)],
-      }),
-
-      weightKg: new FormControl(p?.weightKg ?? null, {
-        validators: [Validators.required, Validators.min(0.001), Validators.max(9999)],
-      }),
-
-      stock: new FormControl(p?.stock ?? null, {
-        validators: [Validators.required, Validators.min(0), Validators.max(1000000) , Validators.pattern(/^\d+$/) ],
-      }),
-
-      description: new FormControl(p?.description ?? '', {
-        nonNullable: true,
-        validators: [Validators.maxLength(500)],
-      }),
-
-      price: new FormControl(p?.price ?? null,{
-        validators:[Validators.required,Validators.min(1),Validators.max(10000000)]
-      }),
-    });
-
-    this.productNameConfig = {
-      label: 'Product Name',
-      type: 'text',
-      placeholder: 'e.g. Wireless Keyboard',
-      maxlength: 100,
-      trimStart: true,
-      formControlName:'name',
-    };
-
-    this.weightConfig = {
-      label: 'Weight (kg)',
-      type: 'number',
-      placeholder: 'e.g. 0.850',
-      min: 0.001,
-      max: 9999,
-      step: 0.001,
-      formControlName:'weightKg',
-    };
-
-    this.stockConfig = {
-      label: 'Stock Quantity',
-      type: 'number',
-      placeholder: 'e.g. 100',
-      min: 0,
-      max: 1000000,
-      step: 1,
-      formControlName:'stock',
-    };
-
-    this.descriptionConfig = {
-      label: 'Description',
-      placeholder: 'Optional short product description...',
-      maxlength: 500,
-      rows: 3,
-      trimStart: true,
-      formControlName: 'description' ,
-    };
-    this.productPriceConfig = {
-      label:'Price',
-      type :'number',
-      placeholder:'e.g.1000',
-      min:1,
-      max:10000000,
-      step:1,
-      formControlName:'price',
-    }
-
-    this.cancelButtonConfig = {
-      label: 'Cancel',
-      variant: 'stroked',
-      color: 'default',
-
-      clicked: () => {
-        this.cancel();
-      },
-    };
-  
-
-    this.submitButtonConfig = {
-      label: this.isEdit ? 'Save Changes' : 'Add Product',
-      variant: 'flat',
-      color: 'primary',
-
-      clicked: () => {
-        this.submit();
-      },
-    };
-    this.closeButtonConfig = {
-      ariaLabel: 'Close',
-      prefixIcon: 'close',
-      variant: 'stroked',
-
-      clicked: () => {
-        this.cancel();
-      },
-    };
+    this.initializeForm();
+    this.initializeConfigs();
   }
-
 
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
 
     const value = this.form.getRawValue();
 
@@ -183,23 +83,152 @@ export class ProductDialogComponent implements OnInit {
           ...value,
         }
       : value;
-    
+
     const request = this.isEdit
-      ? this.productManagementService.updateProduct(this.data.product.id, payload)
+      ? this.productManagementService.updateProduct(
+          this.data.product.id,
+          payload
+        )
       : this.productManagementService.createProduct(payload);
-    request.pipe(takeUntilDestroyed(this.destroyref)).subscribe({
-      next: (product) => {
-        this.dialogRef.close({
-          saved: true,
-          product,
-        });
-      },
-    });
+
+    request
+      .pipe(
+        takeUntilDestroyed(this.destroyref)
+      )
+      .subscribe({
+        next: (product) => {
+          this.dialogRef.close({
+            saved: true,
+            product,
+          });
+        },
+      });
   }
 
   cancel(): void {
     this.dialogRef.close({
       saved: false,
     });
+  }
+
+  initializeForm(): void {
+    const p = this.data.product;
+
+    this.form = new FormGroup<ProductForm>({
+      name: new FormControl(p?.name ?? '', {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.maxLength(100),
+        ],
+      }),
+
+      weightKg: new FormControl(p?.weightKg ?? null, {
+        validators: [
+          Validators.required,
+          Validators.min(0.001),
+          Validators.max(9999),
+        ],
+      }),
+
+      stock: new FormControl(p?.stock ?? null, {
+        validators: [
+          Validators.required,
+          Validators.min(0),
+          Validators.max(1000000),
+          Validators.pattern(/^\d+$/),
+        ],
+      }),
+
+      description: new FormControl(p?.description ?? '', {
+        nonNullable: true,
+        validators: [Validators.maxLength(500)],
+      }),
+
+      price: new FormControl(p?.price ?? null, {
+        validators: [
+          Validators.required,
+          Validators.min(1),
+          Validators.max(10000000),
+        ],
+      }),
+    });
+  }
+
+  initializeConfigs(): void {
+    this.productNameConfig = {
+      label: 'Product Name',
+      type: 'text',
+      placeholder: 'e.g. Wireless Keyboard',
+      maxlength: 100,
+      trimStart: true,
+      formControlName: 'name',
+    };
+
+    this.weightConfig = {
+      label: 'Weight (kg)',
+      type: 'number',
+      placeholder: 'e.g. 0.850',
+      min: 0.001,
+      max: 9999,
+      step: 0.001,
+      formControlName: 'weightKg',
+    };
+
+    this.stockConfig = {
+      label: 'Stock Quantity',
+      type: 'number',
+      placeholder: 'e.g. 100',
+      min: 0,
+      max: 1000000,
+      step: 1,
+      formControlName: 'stock',
+    };
+
+    this.descriptionConfig = {
+      label: 'Description',
+      placeholder: 'Optional short product description...',
+      maxlength: 500,
+      rows: 3,
+      trimStart: true,
+      formControlName: 'description',
+    };
+
+    this.productPriceConfig = {
+      label: 'Price',
+      type: 'number',
+      placeholder: 'e.g.1000',
+      min: 1,
+      max: 10000000,
+      step: 1,
+      formControlName: 'price',
+    };
+
+    this.cancelButtonConfig = {
+      label: 'Cancel',
+      variant: 'stroked',
+      color: 'default',
+      clicked: () => {
+        this.cancel();
+      },
+    };
+
+    this.submitButtonConfig = {
+      label: this.isEdit ? 'Save Changes' : 'Add Product',
+      variant: 'flat',
+      color: 'primary',
+      clicked: () => {
+        this.submit();
+      },
+    };
+
+    this.closeButtonConfig = {
+      ariaLabel: 'Close',
+      prefixIcon: 'close',
+      variant: 'stroked',
+      clicked: () => {
+        this.cancel();
+      },
+    };
   }
 }

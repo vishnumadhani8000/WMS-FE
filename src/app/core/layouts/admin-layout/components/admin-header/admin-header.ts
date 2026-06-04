@@ -19,9 +19,10 @@ import { APP_ROUTES } from '../../../../../shared/constants/app-routes.constants
   ],
 })
 export class AdminHeader {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
+constructor(  
+    private readonly authService : AuthService,
+    private readonly router :Router
+){}
   @Output() toggleSidebar = new EventEmitter<void>();
 
   goToProfile(): void {

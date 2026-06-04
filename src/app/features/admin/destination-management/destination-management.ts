@@ -24,7 +24,6 @@ import { StateDialogComponent } from './components/state-dialog-component/state-
 import { CityDialogComponent } from './components/city-dialog-component/city-dialog-component';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
-import { AddCityDialogComponent } from './components/add-city-dialog-component/add-city-dialog-component';
 
 @Component({
   selector: 'app-state-city-management',
@@ -49,30 +48,30 @@ import { AddCityDialogComponent } from './components/add-city-dialog-component/a
   styleUrl: './destination-management.scss',
 })
 export class DestinationManagement implements OnInit {
-  private readonly stateService = inject(StateService);
-  private readonly cityService = inject(CityService);
-  private readonly dialog = inject(MatDialog);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
+  stateService: StateService;
+  cityService: CityService;
+  dialog: MatDialog;
+  toastr: ToastrService;
+  destroyRef: DestroyRef;
 
-  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+  pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
-  readonly stateColumns = ['index', 'name', 'actions'];
-  readonly cityColumns = ['index', 'name', 'actions'];
+  stateColumns = ['index', 'name', 'actions'];
+  cityColumns = ['index', 'name', 'actions'];
 
-  states: State[] = [];
-  stateTotalCount = 0;
+  states = signal<State[]>([]);
+  stateTotalCount = signal(0);
 
-  cities: City[] = [];
-  cityTotalCount = 0;
+  cities = signal<City[]>([]);
+  cityTotalCount = signal(0);
 
-  selectedState: State | null = null;
+  selectedState = signal<State | null>(null);
 
-  statePage = 0;
-  cityPage = 0;
+  statePage = signal(0);
+  cityPage = signal(0);
 
-  statePageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
-  cityPageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  statePageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  cityPageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   stateSortBy: string | null = 'createdAt';
   stateSortAsc: boolean | null = false;
@@ -97,6 +96,21 @@ export class DestinationManagement implements OnInit {
 
   addStateButtonConfig: ButtonConfig;
   addCityButtonConfig: ButtonConfig;
+
+  constructor(
+    stateService: StateService,
+    cityService: CityService,
+    dialog: MatDialog,
+    toastr: ToastrService,
+    destroyRef: DestroyRef
+  ) {
+    this.stateService = stateService;
+    this.cityService = cityService;
+    this.dialog = dialog;
+    this.toastr = toastr;
+    this.destroyRef = destroyRef;
+  }
+
   ngOnInit(): void {
     this.initializeConfigs();
     this.initializeSearch();
@@ -146,7 +160,7 @@ export class DestinationManagement implements OnInit {
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'add',
-      disabled: true,
+      disabled:true,
       clicked: () => {
         this.openAddCityDialog();
       },
@@ -162,7 +176,7 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.statePage = 0;
+        this.statePage.set(0);
         this.loadStates();
       });
 
@@ -174,7 +188,7 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.cityPage = 0;
+        this.cityPage.set(0);
         this.loadCities();
       });
   }
@@ -182,44 +196,49 @@ export class DestinationManagement implements OnInit {
   loadStates(): void {
     this.stateService
       .getStates({
-        page: this.statePage + 1,
+        page: this.statePage() + 1,
         pageSize: this.statePageSize,
         search: this.stateForm.controls.stateSearchControl.value,
         sortBy: this.stateSortBy ?? undefined,
         ascending: this.stateSortAsc ?? undefined,
       })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (res) => {
-          this.states = res.items;
-          this.stateTotalCount = res.totalCount;
+          this.states.set(res.items);
+          this.stateTotalCount.set(res.totalCount);
         },
       });
   }
 
   loadCities(): void {
-    const state = this.selectedState;
-
+    const state = this.selectedState();
+  
     if (!state) {
       return;
     }
-
+  
+  
     this.cityService
       .getCities({
         stateId: state.id,
-        page: this.cityPage + 1,
+        page: this.cityPage() + 1,
         pageSize: this.cityPageSize,
         search: this.cityForm.controls.citySearchControl.value,
         sortBy: this.citySortBy ?? undefined,
         ascending: this.citySortAsc ?? undefined,
       })
-
-      .pipe(takeUntilDestroyed(this.destroyRef))
-
+  
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+      )
+  
       .subscribe({
         next: (res) => {
-          this.cities = res.items;
-          this.cityTotalCount = res.totalCount;
+          this.cities.set(res.items);
+          this.cityTotalCount.set(res.totalCount);
         },
       });
   }
@@ -232,7 +251,7 @@ export class DestinationManagement implements OnInit {
       this.stateSortAsc = sort.direction === 'asc';
     }
 
-    this.statePage = 0;
+    this.statePage.set(0);
     this.loadStates();
   }
 
@@ -245,38 +264,38 @@ export class DestinationManagement implements OnInit {
       this.citySortAsc = sort.direction === 'asc';
     }
 
-    this.cityPage = 0;
+    this.cityPage.set(0);
 
     this.loadCities();
   }
 
   onStatePageChange(event: PageEvent): void {
-    this.statePage = event.pageIndex;
+    this.statePage.set(event.pageIndex);
     this.statePageSize = event.pageSize;
 
     this.loadStates();
   }
 
   onCityPageChange(event: PageEvent): void {
-    this.cityPage = event.pageIndex;
+    this.cityPage.set(event.pageIndex);
     this.cityPageSize = event.pageSize;
     this.loadCities();
   }
 
   selectState(state: State): void {
-    this.selectedState = state;
-    this.cityPage = 0;
+    this.selectedState.set(state);
+    this.cityPage.set(0);
     this.addCityButtonConfig.disabled = false;
     this.cityForm.controls.citySearchControl.setValue('');
     this.loadCities();
   }
 
   stateRowIndex(index: number): number {
-    return this.statePage * this.statePageSize + index + 1;
+    return this.statePage() * this.statePageSize + index + 1;
   }
 
   cityRowIndex(index: number): number {
-    return this.cityPage * this.cityPageSize + index + 1;
+    return this.cityPage() * this.cityPageSize + index + 1;
   }
 
   openAddStateDialog(): void {
@@ -326,36 +345,7 @@ export class DestinationManagement implements OnInit {
   }
 
   openAddCityDialog(): void {
-    const state = this.selectedState;
-
-    if (!state) {
-      return;
-    }
-
-    this.dialog
-      .open(AddCityDialogComponent, {
-        width: '480px',
-        disableClose: true,
-        data: {
-          selectedState: state,
-          states: this.states,
-        },
-      })
-      .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        if (!res?.saved) {
-          return;
-        }
-
-        if (res.stateId === this.selectedState?.id) {
-          this.loadCities();
-        }
-      });
-  }
-
-  openEditCityDialog(city: City): void {
-    const state = this.selectedState;
+    const state = this.selectedState();
 
     if (!state) {
       return;
@@ -366,6 +356,37 @@ export class DestinationManagement implements OnInit {
         width: '480px',
 
         data: {
+          mode: 'add',
+          stateId: state.id,
+          stateName: state.name, 
+        },
+        disableClose: true,
+      })
+
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        if (!res?.saved) {
+          return;
+        }
+
+        this.loadCities();
+      });
+  }
+
+  openEditCityDialog(city: City): void {
+    const state = this.selectedState();
+
+    if (!state) {
+      return;
+    }
+
+    this.dialog
+      .open(CityDialogComponent, {
+        width: '480px',
+
+        data: {
+          mode: 'edit',
           city,
         },
         disableClose: true,
@@ -408,9 +429,9 @@ export class DestinationManagement implements OnInit {
             next: () => {
               this.toastr.success('State deleted.');
 
-              if (this.selectedState?.id === state.id) {
-                this.selectedState = null;
-                this.cities = [];
+              if (this.selectedState()?.id === state.id) {
+                this.selectedState.set(null);
+                this.cities.set([]);
               }
 
               this.loadStates();

@@ -72,40 +72,7 @@ export class Cart implements OnInit {
     this.loadCart();
   }
 
-  private initializeConfigs(): void {
-    this.placeOrderButtonConfig = {
-      label: 'Place Order',
-      variant: 'flat',
-      color: 'primary',
-      prefixIcon: 'shopping_bag',
-      clicked: () => this.placeOrder(),
-    };
-
-    this.deleteButtonConfig = (item: CartItem): ButtonConfig => ({
-      variant: 'icon',
-      color: 'warn',
-      prefixIcon: 'delete_outline',
-      clicked: () => this.confirmDelete(item),
-    });
-
-    this.incrementButtonConfig = (item: CartItem): ButtonConfig => ({
-      variant: 'icon',
-      color: 'primary',
-      prefixIcon: 'add',
-      disabled:  item.quantity >= item.availableStock,
-      clicked: () => this.increment(item),
-    });
-
-    this.decrementButtonConfig = (item: CartItem): ButtonConfig => ({
-      variant: 'icon',
-      color: 'default',
-      prefixIcon: 'remove',
-      clicked: () => this.decrement(item),
-    });
-  }
-
   loadCart(): void {
-
     this.cartService
       .getCart()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -139,55 +106,6 @@ export class Cart implements OnInit {
     this.updateQuantity(item, item.quantity - 1);
   }
 
-  private updateQuantity(item: CartItem, quantity: number): void {
-
-    this.cartService
-      .updateQuantity(item.cartItemId, { quantity })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.loadCart();
-        },
-
-
-      });
-  }
-
-  confirmDelete(item: CartItem): void {
-    this.dialog
-      .open(ConfirmDialog, {
-        width: '420px',
-        disableClose: true,
-        data: {
-          title: 'Remove Item',
-          message: `Are you sure you want to remove "${item.productName}" from your cart?`,
-          confirmText: 'Remove',
-          cancelText: 'Cancel',
-          type: 'warning',
-        },
-      })
-      .afterClosed()
-      .subscribe((confirmed) => {
-        if (!confirmed) return;
-
-        this.deleteItem(item);
-      });
-  }
-
-  private deleteItem(item: CartItem): void {
-    this.cartService
-      .deleteCartItem(item.cartItemId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => {
-          if (!res.isSuccess) return;
-
-          this.loadCart();
-          this.toastr.success('Item removed from cart.');
-        },
-      });
-  }
-
   placeOrder(): void {
     this.cartService
       .getUserAddresses()
@@ -209,6 +127,82 @@ export class Cart implements OnInit {
           }
 
           this.openAddAddressDialog(orderItems);
+        },
+      });
+  }
+  confirmDelete(item: CartItem): void {
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '420px',
+        disableClose: true,
+        data: {
+          title: 'Remove Item',
+          message: `Are you sure you want to remove "${item.productName}" from your cart?`,
+          confirmText: 'Remove',
+          cancelText: 'Cancel',
+          type: 'warning',
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.deleteItem(item);
+      });
+  }
+  private initializeConfigs(): void {
+    this.placeOrderButtonConfig = {
+      label: 'Place Order',
+      variant: 'flat',
+      color: 'primary',
+      prefixIcon: 'shopping_bag',
+      clicked: () => this.placeOrder(),
+    };
+
+    this.deleteButtonConfig = (item: CartItem): ButtonConfig => ({
+      variant: 'icon',
+      color: 'warn',
+      prefixIcon: 'delete_outline',
+      clicked: () => this.confirmDelete(item),
+    });
+
+    this.incrementButtonConfig = (item: CartItem): ButtonConfig => ({
+      variant: 'icon',
+      color: 'primary',
+      prefixIcon: 'add',
+      disabled: item.quantity >= item.availableStock,
+      clicked: () => this.increment(item),
+    });
+
+    this.decrementButtonConfig = (item: CartItem): ButtonConfig => ({
+      variant: 'icon',
+      color: 'default',
+      prefixIcon: 'remove',
+      clicked: () => this.decrement(item),
+    });
+  }
+
+  private updateQuantity(item: CartItem, quantity: number): void {
+    this.cartService
+      .updateQuantity(item.cartItemId, { quantity })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.loadCart();
+        },
+      });
+  }
+
+  private deleteItem(item: CartItem): void {
+    this.cartService
+      .deleteCartItem(item.cartItemId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (!res.isSuccess) return;
+
+          this.loadCart();
+          this.toastr.success('Item removed from cart.');
         },
       });
   }

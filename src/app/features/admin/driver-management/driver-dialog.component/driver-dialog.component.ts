@@ -1,10 +1,4 @@
-import {
-  Component,
-  DestroyRef,
-  Inject,
-  OnInit,
-  inject,
-} from '@angular/core';
+import { Component, DestroyRef, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   AbstractControl,
@@ -15,11 +9,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrService } from 'ngx-toastr';
@@ -47,15 +37,15 @@ import { DriverDialogData, DriverForm } from '../models/driver-management.model'
   styleUrl: './driver-dialog.component.scss',
 })
 export class DriverDialogComponent implements OnInit {
+  driverService: DriverService;
+  dialogRef: MatDialogRef<DriverDialogComponent>;
+  toastr: ToastrService;
+  destroyRef: DestroyRef;
 
-  constructor(
-    private readonly driverService : DriverService,
-    private readonly dialogRef : MatDialogRef<DriverDialogComponent>,
-    private readonly toastr : ToastrService,
-    private readonly destroyRef : DestroyRef,
-    @Inject(MAT_DIALOG_DATA) public data: DriverDialogData) {}
+  data: DriverDialogData;
 
   form: FormGroup<DriverForm>;
+
   nameConfig: InputFieldConfig;
   phoneConfig: InputFieldConfig;
   licenceConfig: InputFieldConfig;
@@ -64,6 +54,19 @@ export class DriverDialogComponent implements OnInit {
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
 
+  constructor(
+    driverService: DriverService,
+    dialogRef: MatDialogRef<DriverDialogComponent>,
+    toastr: ToastrService,
+    destroyRef: DestroyRef,
+    @Inject(MAT_DIALOG_DATA) data: DriverDialogData
+  ) {
+    this.driverService = driverService;
+    this.dialogRef = dialogRef;
+    this.toastr = toastr;
+    this.destroyRef = destroyRef;
+    this.data = data;
+  }
 
   get isEdit(): boolean {
     return this.data.mode === 'edit';
@@ -84,23 +87,16 @@ export class DriverDialogComponent implements OnInit {
     this.buildConfigs();
   }
 
-  private buildForm(): void {
+  buildForm(): void {
     this.form = new FormGroup<DriverForm>({
       name: new FormControl(this.data.driver?.name ?? '', {
         nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-        ],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
       }),
 
       phone: new FormControl(this.data.driver?.phone ?? '', {
         nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.pattern(/^\+?[1-9]\d{6,13}$/),
-        ],
+        validators: [Validators.required, Validators.pattern(/^\+?[1-9]\d{6,13}$/)],
       }),
 
       licenceNo: new FormControl(this.data.driver?.licenceNo ?? '', {
@@ -116,6 +112,31 @@ export class DriverDialogComponent implements OnInit {
         nonNullable: true,
       }),
     });
+  }
+
+  submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const value = this.form.getRawValue();
+
+    const request = this.isEdit
+      ? this.driverService.updateDriver(this.data.driver!.id, value)
+      : this.driverService.createDriver(value);
+
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.toastr.success(
+          this.isEdit ? 'Driver updated successfully.' : 'Driver added successfully.'
+        );
+        this.dialogRef.close({ saved: true });
+      },
+    });
+  }
+
+  cancel(): void {
+    this.dialogRef.close({ saved: false });
   }
 
   private buildConfigs(): void {
@@ -169,30 +190,5 @@ export class DriverDialogComponent implements OnInit {
         this.cancel();
       },
     };
-  }
-
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    const value = this.form.getRawValue();
-
-    const request = this.isEdit
-      ? this.driverService.updateDriver(this.data.driver!.id, value)
-      : this.driverService.createDriver(value);
-
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.toastr.success(
-          this.isEdit ? 'Driver updated successfully.' : 'Driver added successfully.'
-        );
-        this.dialogRef.close({ saved: true });
-      },
-    });
-  }
-
-  cancel(): void {
-    this.dialogRef.close({ saved: false });
   }
 }

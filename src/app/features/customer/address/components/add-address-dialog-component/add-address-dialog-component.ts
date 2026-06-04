@@ -18,8 +18,6 @@ import {
 import { AddressService } from '../../services/address.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-
-
 @Component({
   selector: 'app-add-address-dialog',
   standalone: true,
@@ -37,32 +35,54 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './add-address-dialog-component.scss',
 })
 export class AddAddressDialogComponent implements OnInit {
-
   form: FormGroup<AddressForm>;
-
   addressLineConfig: InputFieldConfig;
   landmarkConfig: InputFieldConfig;
   pincodeConfig: InputFieldConfig;
   stateConfig: SelectFieldConfig;
   cityConfig: SelectFieldConfig;
-
   cancelButtonConfig: ButtonConfig;
   saveButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
-
 
   constructor(
     private readonly statesCitiesService: AddressService,
     private readonly userAddressService: AddressService,
     private readonly dialogRef: MatDialogRef<AddAddressDialogComponent>,
-    private readonly destroyref : DestroyRef,
-
+    private readonly destroyref: DestroyRef
   ) {}
 
   ngOnInit(): void {
     this.initForm();
     this.initConfigs();
     this.loadStates();
+  }
+
+  save(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const payload: AddAddressDialogData = this.form.getRawValue();
+
+    this.userAddressService
+      .createAddress(payload)
+      .pipe(takeUntilDestroyed(this.destroyref))
+      .subscribe({
+        next: (res) => {
+          if (!res.isSuccess) {
+            return;
+          }
+          this.dialogRef.close({
+            saved: true,
+            address: res.data,
+          });
+        },
+      });
+  }
+  cancel(): void {
+    this.dialogRef.close({ saved: false } as AddAddressDialogResult);
   }
 
   private initForm(): void {
@@ -87,9 +107,11 @@ export class AddAddressDialogComponent implements OnInit {
       }),
     });
 
-    this.form.controls.stateId.valueChanges.pipe(takeUntilDestroyed(this.destroyref)).subscribe((stateId) => {
-          this.loadCities(stateId);
-    });
+    this.form.controls.stateId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyref))
+      .subscribe((stateId) => {
+        this.loadCities(stateId);
+      });
   }
 
   private initConfigs(): void {
@@ -99,7 +121,7 @@ export class AddAddressDialogComponent implements OnInit {
       placeholder: 'e.g. 123 Main Street, Apartment 4B',
       maxlength: 200,
       trimStart: true,
-      formControlName: 'addressLine'
+      formControlName: 'addressLine',
     };
 
     this.landmarkConfig = {
@@ -108,7 +130,7 @@ export class AddAddressDialogComponent implements OnInit {
       placeholder: 'e.g. Near Central Park',
       maxlength: 100,
       trimStart: true,
-      formControlName:'landmark',
+      formControlName: 'landmark',
     };
 
     this.pincodeConfig = {
@@ -116,7 +138,7 @@ export class AddAddressDialogComponent implements OnInit {
       type: 'text',
       placeholder: 'e.g. 400001',
       maxlength: 6,
-      formControlName: 'pincode'
+      formControlName: 'pincode',
     };
 
     this.stateConfig = {
@@ -176,33 +198,4 @@ export class AddAddressDialogComponent implements OnInit {
         },
       });
   }
-
-  save(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-  
-    const payload: AddAddressDialogData = this.form.getRawValue();
-    
-    this.userAddressService
-      .createAddress(payload)
-      .pipe(takeUntilDestroyed(this.destroyref))
-      .subscribe({
-        next: (res) => {
-          if (!res.isSuccess) {
-            return;
-          }
-          this.dialogRef.close({
-            saved: true,
-            address: res.data,
-          });
-        },
-  
-      });
-  }
-  cancel(): void {
-    this.dialogRef.close({ saved: false } as AddAddressDialogResult);
-  }
-
 }

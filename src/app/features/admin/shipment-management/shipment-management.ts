@@ -7,8 +7,14 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,14 +23,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { InputField } from '../../../shared/components/input-field/input-field';
 import { InputFieldConfig } from '../../../shared/components/input-field/input-field.config';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
-
 import { ShipmentService } from './services/shipment.service';
 import { Shipment } from './models/shipment.model';
 
@@ -49,24 +53,28 @@ import { Shipment } from './models/shipment.model';
   styleUrl: './shipment-management.scss',
 })
 export class ShipmentManagement implements OnInit {
-  constructor(
-    private readonly shipmentService: ShipmentService,
-    private readonly dialog: MatDialog,
-    private readonly toastr: ToastrService,
-    private readonly destroyRef: DestroyRef,
-    private readonly router: Router,
-  ) {}
+
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator;
 
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+
   readonly displayedColumns = [
-    'index', 'shipmentId', 'driverName', 'vehicleNumber',
-    'status', 'createdAt', 'actions',
+    'index',
+    'shipmentId',
+    'driverName',
+    'vehicleNumber',
+    'status',
+    'createdAt',
+    'actions',
   ];
 
   shipments: Shipment[] = [];
   totalCount = 0;
+
   page = 0;
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+
   sortBy: string | null = 'createdAt';
   sortAsc: boolean | null = false;
 
@@ -76,31 +84,17 @@ export class ShipmentManagement implements OnInit {
 
   searchConfig: InputFieldConfig;
 
-  @ViewChild(MatPaginator)
-  paginator: MatPaginator;
+  constructor(
+    private readonly shipmentService: ShipmentService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef,
+    private readonly router: Router,
+  ) { }
 
   ngOnInit(): void {
-    this.searchConfig = {
-      label: 'Search',
-      type: 'text',
-      placeholder: 'Search by Driver or Vehicle...',
-      prefixIcon: 'search',
-      icon: 'close',
-      formControlName: 'searchControl',
-      iconClick: () => this.clearSearch(),
-    };
-
-    this.searchForm.controls.searchControl.valueChanges
-      .pipe(
-        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.paginator?.firstPage();
-        this.loadShipments();
-      });
-
+    this.initializeSearchConfig();
+    this.initializeSearch();
     this.loadShipments();
   }
 
@@ -109,9 +103,9 @@ export class ShipmentManagement implements OnInit {
       .getShipments({
         page: this.page + 1,
         pageSize: this.pageSize,
-        search: this.searchForm.controls.searchControl.value ,
+        search: this.searchForm.controls.searchControl.value,
         sortBy: this.sortBy,
-        ascending: this.sortAsc ,
+        ascending: this.sortAsc,
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef)
@@ -127,13 +121,15 @@ export class ShipmentManagement implements OnInit {
   onSortChange(sort: Sort): void {
     this.sortBy = sort.direction ? sort.active : null;
     this.sortAsc = sort.direction ? sort.direction === 'asc' : null;
-    this.paginator?.firstPage();  
+
+    this.paginator?.firstPage();
     this.loadShipments();
   }
 
   onPageChange(event: PageEvent): void {
     this.page = event.pageIndex;
     this.pageSize = event.pageSize;
+
     this.loadShipments();
   }
 
@@ -146,10 +142,11 @@ export class ShipmentManagement implements OnInit {
   }
 
   viewShipment(shipment: Shipment): void {
-    this.router.navigate(['/admin/shipment-management/shipment-details', shipment.shipmentId]);
+    this.router.navigate([
+      '/admin/shipment-management/shipment-details',
+      shipment.shipmentId,
+    ]);
   }
-
-  // ── Status Helpers ────────────────────────────────
 
   isAssigned(shipment: Shipment): boolean {
     return shipment.status === 'Assigned';
@@ -171,8 +168,6 @@ export class ShipmentManagement implements OnInit {
     return !this.isDelivered(shipment) && !this.isCancelled(shipment);
   }
 
-  // ── Actions ──────────────────────────────────────────
-
   markInTransit(shipment: Shipment): void {
     this.dialog
       .open(ConfirmDialog, {
@@ -188,11 +183,24 @@ export class ShipmentManagement implements OnInit {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
         this.shipmentService
-          .updateShipmentStatus(shipment.shipmentId , 'InTransit')
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({ next: () => { this.toastr.success('Shipment marked as In Transit.'); this.loadShipments(); } });
+          .updateShipmentStatus(
+            shipment.shipmentId,
+            'InTransit'
+          )
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success('Shipment marked as In Transit.');
+              this.loadShipments();
+            },
+          });
       });
   }
 
@@ -211,11 +219,24 @@ export class ShipmentManagement implements OnInit {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
         this.shipmentService
-          .updateShipmentStatus(shipment.shipmentId , 'Delivered')
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({ next: () => { this.toastr.success('Shipment marked as Delivered.'); this.loadShipments(); } });
+          .updateShipmentStatus(
+            shipment.shipmentId,
+            'Delivered'
+          )
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success('Shipment marked as Delivered.');
+              this.loadShipments();
+            },
+          });
       });
   }
 
@@ -234,11 +255,49 @@ export class ShipmentManagement implements OnInit {
       })
       .afterClosed()
       .subscribe((confirmed) => {
-        if (!confirmed) return;
+        if (!confirmed) {
+          return;
+        }
+
         this.shipmentService
-          .updateShipmentStatus(shipment.shipmentId, 'Cancelled')
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({ next: () => { this.toastr.success('Shipment cancelled.'); this.loadShipments(); } });
+          .updateShipmentStatus(
+            shipment.shipmentId,
+            'Cancelled'
+          )
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success('Shipment cancelled.');
+              this.loadShipments();
+            },
+          });
+      });
+  }
+
+  initializeSearchConfig(): void {
+    this.searchConfig = {
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Search by Driver or Vehicle...',
+      prefixIcon: 'search',
+      icon: 'close',
+      formControlName: 'searchControl',
+      iconClick: () => this.clearSearch(),
+    };
+  }
+
+  initializeSearch(): void {
+    this.searchForm.controls.searchControl.valueChanges
+      .pipe(
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.paginator?.firstPage();
+        this.loadShipments();
       });
   }
 }

@@ -1,11 +1,13 @@
 import {
   Component,
+  DestroyRef,
   OnInit,
   ViewChild,
-  DestroyRef,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -62,15 +64,13 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
   ],
 })
 export class VehicleManagement implements OnInit {
-  constructor(
-    private readonly vehicleService: VehicleService,
-    private readonly dialog: MatDialog,
-    private readonly toastr: ToastrService,
-    private readonly destroyRef: DestroyRef
-  ) {}
+  private readonly vehicleService = inject(VehicleService);
+  private readonly dialog = inject(MatDialog);
+  private readonly toastr = inject(ToastrService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild(MatPaginator)
-  paginator: MatPaginator;
+  paginator!: MatPaginator;
 
   readonly displayedColumns = [
     'index',
@@ -87,21 +87,27 @@ export class VehicleManagement implements OnInit {
   totalCount = 0;
 
   page = 0;
-  pageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  pageSize:number= APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   sortBy: string | null = 'createdAt';
   sortAsc: boolean | null = false;
 
-  form = new FormGroup({
+  readonly form = new FormGroup({
     searchControl: new FormControl('', {
       nonNullable: true,
     }),
   });
 
-  searchInputConfig: InputFieldConfig;
-  addVehicleButtonConfig: ButtonConfig;
+  searchInputConfig!: InputFieldConfig;
+  addVehicleButtonConfig!: ButtonConfig;
 
   ngOnInit(): void {
+    this.initializeConfigs();
+    this.initializeSearch();
+    this.loadVehicles();
+  }
+
+  private initializeConfigs(): void {
     this.searchInputConfig = {
       label: 'Search',
       type: 'text',
@@ -110,7 +116,6 @@ export class VehicleManagement implements OnInit {
       icon: 'close',
       trimStart: true,
       formControlName: 'searchControl',
-
       iconClick: () => this.clearSearch(),
     };
 
@@ -119,10 +124,11 @@ export class VehicleManagement implements OnInit {
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'add',
-
       clicked: () => this.openAddDialog(),
     };
+  }
 
+  private initializeSearch(): void {
     this.form.controls.searchControl.valueChanges
       .pipe(
         debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
@@ -131,14 +137,12 @@ export class VehicleManagement implements OnInit {
       )
       .subscribe(() => {
         this.page = 0;
+        this.paginator?.firstPage();
         this.loadVehicles();
       });
-
-    this.loadVehicles();
   }
 
   loadVehicles(): void {
-
     this.vehicleService
       .getVehicles({
         page: this.page + 1,
@@ -147,9 +151,7 @@ export class VehicleManagement implements OnInit {
         sortBy: this.sortBy,
         ascending: this.sortAsc,
       })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
           this.dataSource = result.items;
@@ -167,12 +169,13 @@ export class VehicleManagement implements OnInit {
 
   onSortChange(sort: Sort): void {
     this.sortBy = sort.direction ? sort.active : null;
-
     this.sortAsc = sort.direction
       ? sort.direction === 'asc'
       : null;
 
     this.page = 0;
+    this.paginator?.firstPage();
+
     this.loadVehicles();
   }
 
@@ -185,32 +188,24 @@ export class VehicleManagement implements OnInit {
   }
 
   openAddDialog(): void {
-    this.dialog
-      .open(VehicleDialogComponent, {
-        data: {
-          mode: 'add',
-        },
-        disableClose: true,
-      })
-      .afterClosed()
-      .subscribe((result) => {
-        if (!result?.saved) {
-          return;
-        }
-
-        this.toastr.success('Vehicle added successfully.');
-        this.reload();
-      });
+    this.openVehicleDialog('add');
   }
 
   openEditDialog(vehicle: Vehicle): void {
+    this.openVehicleDialog('edit', vehicle);
+  }
+
+  private openVehicleDialog(
+    mode: 'add' | 'edit',
+    vehicle?: Vehicle
+  ): void {
     this.dialog
       .open(VehicleDialogComponent, {
+        disableClose: true,
         data: {
-          mode: 'edit',
+          mode,
           vehicle,
         },
-        disableClose: true,
       })
       .afterClosed()
       .subscribe((result) => {
@@ -218,8 +213,13 @@ export class VehicleManagement implements OnInit {
           return;
         }
 
-        this.toastr.success('Vehicle updated successfully.');
-        this.reload();
+        this.toastr.success(
+          mode === 'add'
+            ? 'Vehicle added successfully.'
+            : 'Vehicle updated successfully.'
+        );
+
+        this.loadVehicles();
       });
   }
 
@@ -254,15 +254,12 @@ export class VehicleManagement implements OnInit {
 
               if (isLastItemOnPage) {
                 this.paginator.previousPage();
-              } else {
-                this.reload();
+                return;
               }
+
+              this.loadVehicles();
             },
           });
       });
-  }
-
-  reload(): void {
-    this.loadVehicles();
   }
 }

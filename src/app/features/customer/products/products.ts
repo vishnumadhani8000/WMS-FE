@@ -49,19 +49,7 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
   ],
 })
 export class Products implements OnInit {
-  constructor(
-    private readonly productService: ProductService,
-    private readonly toastr: ToastrService,
-    private readonly destroyRef: DestroyRef
-  ) {}
-
-  readonly displayedColumns = [
-    'index',
-    'name',
-    'description',
-    'price',
-    'actions',
-  ];
+  readonly displayedColumns = ['index', 'name', 'description', 'price', 'actions'];
 
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
@@ -69,7 +57,7 @@ export class Products implements OnInit {
   readonly totalCount = signal(0);
   readonly page = signal(0);
 
-  pageSize : number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   private sortBy: string | null = null;
   private ascending: boolean | null = null;
@@ -80,58 +68,16 @@ export class Products implements OnInit {
     searchControl: new FormControl('', { nonNullable: true }),
   });
 
+  constructor(
+    private readonly productService: ProductService,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef
+  ) {}
+
   ngOnInit(): void {
     this.initializeConfigs();
     this.initializeSearch();
     this.loadProducts();
-  }
-
-  private initializeConfigs(): void {
-    this.searchConfig = {
-      label: 'Search',
-      type: 'text',
-      placeholder: 'Search products...',
-      prefixIcon: 'search',
-      icon: 'close',
-      formControlName: 'searchControl',
-      iconClick: () => this.clearSearch(),
-    };
-  }
-
-  private initializeSearch(): void {
-    this.form.controls.searchControl.valueChanges
-      .pipe(
-        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.page.set(0);
-        this.loadProducts();
-      });
-  }
-
-  loadProducts(): void {
-    this.productService
-      .getAll({
-        page: this.page() + 1,
-        pageSize: this.pageSize,
-        search: this.form.controls.searchControl.value,
-        sortBy: this.sortBy ?? undefined,
-        ascending: this.ascending ?? undefined,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          if (!response.isSuccess || !response.data) {
-            this.toastr.error('Failed to load products.');
-            return;
-          }
-
-          this.products.set(response.data.items);
-          this.totalCount.set(response.data.totalCount);
-        },
-      });
   }
 
   onPageChange(event: PageEvent): void {
@@ -154,22 +100,6 @@ export class Products implements OnInit {
     };
   }
 
-  private addToCart(product: Product): void {
-    const dto: AddToCartDto = {
-      productId: product.id,
-      quantity: 1,
-    };
-
-    this.productService
-      .addToCart(dto)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.toastr.success('Product added to cart.');
-        },
-      });
-  }
-
   onSortChange(sort: Sort): void {
     if (!sort.direction) {
       this.sortBy = null;
@@ -185,5 +115,67 @@ export class Products implements OnInit {
 
   clearSearch(): void {
     this.form.controls.searchControl.setValue('');
+  }
+
+  private initializeSearch(): void {
+    this.form.controls.searchControl.valueChanges
+      .pipe(
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.page.set(0);
+        this.loadProducts();
+      });
+  }
+  private initializeConfigs(): void {
+    this.searchConfig = {
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Search products...',
+      prefixIcon: 'search',
+      icon: 'close',
+      formControlName: 'searchControl',
+      iconClick: () => this.clearSearch(),
+    };
+  }
+  private loadProducts(): void {
+    this.productService
+      .getAll({
+        page: this.page() + 1,
+        pageSize: this.pageSize,
+        search: this.form.controls.searchControl.value,
+        sortBy: this.sortBy ?? undefined,
+        ascending: this.ascending ?? undefined,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (!response.isSuccess || !response.data) {
+            this.toastr.error('Failed to load products.');
+            return;
+          }
+
+          this.products.set(response.data.items);
+          this.totalCount.set(response.data.totalCount);
+        },
+      });
+  }
+
+  private addToCart(product: Product): void {
+    const dto: AddToCartDto = {
+      productId: product.id,
+      quantity: 1,
+    };
+
+    this.productService
+      .addToCart(dto)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Product added to cart.');
+        },
+      });
   }
 }

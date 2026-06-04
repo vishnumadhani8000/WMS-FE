@@ -62,12 +62,6 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
   ],
 })
 export class ProductManagement implements OnInit {
-  constructor(
-    private readonly productManagementService: ProductManagementService,
-    private readonly dialog: MatDialog,
-    private readonly toastr: ToastrService,
-    private readonly destroyRef: DestroyRef
-  ) {}
 
   @ViewChild(MatPaginator)
   paginator: MatPaginator;
@@ -83,11 +77,12 @@ export class ProductManagement implements OnInit {
   ];
 
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
+
   dataSource: Product[] = [];
   totalCount = 0;
 
   page = 0;
-  pageSize : number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+  pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
 
   sortBy: string | null = 'createdAt';
   sortAsc: boolean | null = false;
@@ -101,59 +96,35 @@ export class ProductManagement implements OnInit {
   searchInputConfig: InputFieldConfig;
   addProductButtonConfig: ButtonConfig;
 
+  constructor(
+    private readonly productManagementService: ProductManagementService,
+    private readonly dialog: MatDialog,
+    private readonly toastr: ToastrService,
+    private readonly destroyRef: DestroyRef
+  ) {}
+
   ngOnInit(): void {
-    this.searchInputConfig = {
-      label: 'Search',
-      type: 'text',
-      placeholder: 'Search products...',
-      prefixIcon: 'search',
-      icon: 'close',
-      trimStart: true,
-      formControlName: 'searchControl',
-
-      iconClick: () => this.clearSearch(),
-    };
-
-    this.addProductButtonConfig = {
-      label: 'Add Product',
-      variant: 'flat',
-      color: 'primary',
-      prefixIcon: 'add',
-
-      clicked: () => this.openAddDialog(),
-    };
-
-    this.form.controls.searchControl.valueChanges
-      .pipe(
-        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.page = 0;
-        this.loadProducts();
-      });
-
+    this.initializeConfigs();
+    this.initializeSearch();
     this.loadProducts();
   }
 
   loadProducts(): void {
-
     this.productManagementService
       .getProducts({
         page: this.page + 1,
         pageSize: this.pageSize,
         search: this.form.controls.searchControl.value,
-        sortBy: this.sortBy ,
-        ascending: this.sortAsc ,
+        sortBy: this.sortBy,
+        ascending: this.sortAsc,
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (result) => {
-          this.dataSource=  result.items;
-          this.totalCount =  result.totalCount;
+          this.dataSource = result.items;
+          this.totalCount = result.totalCount;
         },
       });
   }
@@ -166,7 +137,10 @@ export class ProductManagement implements OnInit {
   }
 
   onSortChange(sort: Sort): void {
-    this.sortBy = sort.direction ? sort.active : null;
+    this.sortBy = sort.direction
+      ? sort.active
+      : null;
+
     this.sortAsc = sort.direction
       ? sort.direction === 'asc'
       : null;
@@ -243,13 +217,16 @@ export class ProductManagement implements OnInit {
 
         this.productManagementService
           .deleteProduct(product.id)
-          .pipe(takeUntilDestroyed(this.destroyRef))
+          .pipe(
+            takeUntilDestroyed(this.destroyRef)
+          )
           .subscribe({
             next: () => {
               this.toastr.warning('Product deleted.');
 
               const isLastItemOnPage =
-                this.dataSource.length === 1 && this.page > 0;
+                this.dataSource.length === 1 &&
+                this.page > 0;
 
               if (isLastItemOnPage) {
                 this.paginator.previousPage();
@@ -263,5 +240,39 @@ export class ProductManagement implements OnInit {
 
   reload(): void {
     this.loadProducts();
+  }
+
+  initializeConfigs(): void {
+    this.searchInputConfig = {
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Search products...',
+      prefixIcon: 'search',
+      icon: 'close',
+      trimStart: true,
+      formControlName: 'searchControl',
+      iconClick: () => this.clearSearch(),
+    };
+
+    this.addProductButtonConfig = {
+      label: 'Add Product',
+      variant: 'flat',
+      color: 'primary',
+      prefixIcon: 'add',
+      clicked: () => this.openAddDialog(),
+    };
+  }
+
+  initializeSearch(): void {
+    this.form.controls.searchControl.valueChanges
+      .pipe(
+        debounceTime(APP_CONSTANTS.SEARCH_DEBOUNCE_MS),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.page = 0;
+        this.loadProducts();
+      });
   }
 }
