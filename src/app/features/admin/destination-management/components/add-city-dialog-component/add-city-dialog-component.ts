@@ -5,17 +5,23 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { Button } from '../../../../../shared/components/button/button';
+import { SelectField } from '../../../../../shared/components/select-field/select-field';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
-import { City, CityForm, EditCityDialogData } from '../../models/state-city.model';
+import { SelectFieldConfig } from '../../../../../shared/components/select-field/select-field.config';
+import { AddCityDialogData } from '../../models/state-city.model';
 import { CityService } from '../../services/city-service';
 
-
+interface AddCityForm {
+  name: FormControl<string>;
+  stateId: FormControl<number>;
+}
 
 @Component({
-  selector: 'app-city-dialog',
+  selector: 'app-add-city-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -24,29 +30,38 @@ import { CityService } from '../../services/city-service';
     MatDividerModule,
     InputField,
     Button,
+    SelectField,
   ],
-  templateUrl: './city-dialog-component.html',
-  styleUrl: './city-dialog-component.scss',
+  templateUrl: './add-city-dialog-component.html',
+  styleUrl: './add-city-dialog-component.scss',
 })
-export class CityDialogComponent implements OnInit {
-  private readonly cityService = inject(CityService);
-  private readonly dialogRef = inject(MatDialogRef<CityDialogComponent>);
-  private readonly toastr = inject(ToastrService);
-  private readonly destroyRef = inject(DestroyRef);
+export class AddCityDialogComponent implements OnInit {
 
-  form: FormGroup<CityForm>;
+  constructor(
+    private cityService  : CityService,
+    private dialogRef: MatDialogRef<AddCityDialogComponent>,
+    private toastr : ToastrService,
+    private destroyRef : DestroyRef,
+    @Inject(MAT_DIALOG_DATA) public data: AddCityDialogData) {}
+
+  form: FormGroup<AddCityForm>;
+
   nameConfig: InputFieldConfig;
+  stateSelectConfig: SelectFieldConfig;
   cancelButtonConfig: ButtonConfig;
   submitButtonConfig: ButtonConfig;
   closeButtonConfig: ButtonConfig;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditCityDialogData) {}
 
   ngOnInit(): void {
-    this.form = new FormGroup<CityForm>({
-      name: new FormControl(this.data.city.name, {
+    this.form = new FormGroup<AddCityForm>({
+      name: new FormControl('', {
         nonNullable: true,
         validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
+      }),
+      stateId: new FormControl<number>(this.data.selectedState.id, {
+        nonNullable: true,
+        validators: [Validators.required],
       }),
     });
 
@@ -60,6 +75,13 @@ export class CityDialogComponent implements OnInit {
       formControlName: 'name',
     };
 
+    this.stateSelectConfig = {
+      label: 'State',
+      control: this.form.controls.stateId,
+      required: true,
+      options: this.data.states.map((s) => ({ label: s.name, value: s.id })),
+    };
+
     this.cancelButtonConfig = {
       label: 'Cancel',
       variant: 'stroked',
@@ -68,7 +90,7 @@ export class CityDialogComponent implements OnInit {
     };
 
     this.submitButtonConfig = {
-      label: 'Save Changes',
+      label: 'Add City',
       variant: 'flat',
       color: 'primary',
       clicked: () => this.submit(),
@@ -81,19 +103,26 @@ export class CityDialogComponent implements OnInit {
     };
   }
 
+  get selectedStateName(): string {
+    const id = this.form.controls.stateId.value;
+    return this.data.states.find((s) => s.id === id)?.name ?? this.data.selectedState.name;
+  }
+
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
+    const { name, stateId } = this.form.getRawValue();
+
     this.cityService
-      .updateCity(this.data.city.id, this.form.getRawValue().name)
+      .createCity({ name, stateId })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.toastr.success('City updated successfully.');
-          this.dialogRef.close({ saved: true });
+          this.toastr.success('City added successfully.');
+          this.dialogRef.close({ saved: true, stateId });
         },
       });
   }

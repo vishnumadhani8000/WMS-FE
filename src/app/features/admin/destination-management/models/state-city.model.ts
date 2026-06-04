@@ -33,6 +33,7 @@ export interface State {
   export interface StateFormValue {
     name: string;
   }
+
   
   export interface CityFormValue {
     name: string;
@@ -44,14 +45,19 @@ export interface State {
     state?: State;
   }
   
-  export interface CityDialogData {
-    mode: 'add' | 'edit';
-    stateId: number;
-    stateName: string;
-    city?: City;
+  export interface EditCityDialogData {
+    city: City;
   }
 
   export interface StateForm {
     name: FormControl<string>;
   }
   
+  export interface AddCityDialogData {
+    selectedState: State;
+    states: State[];
+  }
+
+  export interface CityForm {
+    name: FormControl<string>;
+  }

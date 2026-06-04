@@ -24,6 +24,7 @@ import { StateDialogComponent } from './components/state-dialog-component/state-
 import { CityDialogComponent } from './components/city-dialog-component/city-dialog-component';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
+import { AddCityDialogComponent } from './components/add-city-dialog-component/add-city-dialog-component';
 
 @Component({
   selector: 'app-state-city-management',
@@ -328,34 +329,34 @@ export class DestinationManagement implements OnInit {
 
   openAddCityDialog(): void {
     const state = this.selectedState;
-
+   
     if (!state) {
       return;
     }
-
+   
     this.dialog
-      .open(CityDialogComponent, {
+      .open(AddCityDialogComponent, {
         width: '480px',
-
-        data: {
-          mode: 'add',
-          stateId: state.id,
-          stateName: state.name, 
-        },
         disableClose: true,
+        data: {
+          selectedState: state,
+    
+          states: this.states,
+        },
       })
-
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         if (!res?.saved) {
           return;
         }
-
-        this.loadCities();
+   
+        if (res.stateId === this.selectedState?.id) {
+          this.loadCities();
+        }
       });
   }
-
+   
   openEditCityDialog(city: City): void {
     const state = this.selectedState;
 
@@ -368,7 +369,6 @@ export class DestinationManagement implements OnInit {
         width: '480px',
 
         data: {
-          mode: 'edit',
           city,
         },
         disableClose: true,

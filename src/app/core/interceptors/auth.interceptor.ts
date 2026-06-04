@@ -35,28 +35,28 @@
         switch (error.status) {
 
           case 400:
-            toastr.error(error.error?.message || 'Bad Request');
+            toastr.error(error.error?.Message || 'Bad Request');
             break;
 
           case 401:
-            toastr.error(error.error?.message || 'Unauthorized');
+            toastr.error(error.error?.Message || 'Unauthorized');
             authService.logout();
             break;
 
           case 403:
-            toastr.error(error.error?.message || 'Access Denied');
+            toastr.error(error.error?.Message || 'Access Denied');
             break;
 
           case 404:
-            toastr.error(error.error?.message || 'Resource Not Found');
+            toastr.error(error.error?.Message || 'Resource Not Found');
             break;
 
           case 500:
-            toastr.error(error.error?.message || 'Internal Server Error');
+            toastr.error(error.error?.Message || 'Internal Server Error');
             break;
 
           default:
-            toastr.error(error.error?.message || 'Something went wrong');
+            toastr.error(error.error?.Message || 'Something went wrong');
             break;
         }
 
