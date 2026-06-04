@@ -8,7 +8,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ShipmentService } from '../../services/shipment.service';
 import { ShipmentDetail } from '../../models/shipment.model';
@@ -49,10 +48,8 @@ constructor(
   ];
 
   shipment: ShipmentDetail | null = null;
-  loading = false;
-  actionLoading = false;
 
-  // ── Button Configs ──────────────────────────────────────────
+  // ── Button Configs ─────────────────────────
   backButtonConfig: ButtonConfig;
   transitButtonConfig: ButtonConfig;
   deliveredButtonConfig: ButtonConfig;
@@ -77,8 +74,6 @@ constructor(
       prefixIcon: 'local_shipping',
       variant: 'stroked',
       color: 'primary',
-      loading: this.actionLoading,
-      disabled: this.actionLoading,
       clicked: () => this.markInTransit(),
     };
 
@@ -87,8 +82,6 @@ constructor(
       prefixIcon: 'task_alt',
       variant: 'flat',
       color: 'primary',
-      loading: this.actionLoading,
-      disabled: this.actionLoading,
       clicked: () => this.markDelivered(),
     };
 
@@ -97,18 +90,15 @@ constructor(
       prefixIcon: 'cancel',
       variant: 'stroked',
       color: 'warn',
-      loading: this.actionLoading,
-      disabled: this.actionLoading,
       clicked: () => this.cancelShipment(),
     };
   }
 
   loadShipment(id: number): void {
-    this.loading = true;
+
     this.detailService
       .getShipmentDetail(id)
       .pipe(
-        finalize(() => (this.loading = false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({ next: (data) => { this.shipment = data; } });
@@ -163,11 +153,9 @@ constructor(
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) return;
-        this.actionLoading = true;
         this.shipmentService
           .updateShipmentStatus(this.shipment.shipmentId , 'InTransit')
           .pipe(
-            finalize(() => { this.actionLoading = false; this.initializeButtons(); }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({ next: () => { this.toastr.success('Shipment is now In Transit.'); this.loadShipment(this.shipment!.shipmentId); } });
@@ -190,11 +178,9 @@ constructor(
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) return;
-        this.actionLoading = true;
         this.shipmentService
           .updateShipmentStatus(this.shipment.shipmentId,'Delivered')
           .pipe(
-            finalize(() => { this.actionLoading = false; this.initializeButtons(); }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({ next: () => { this.toastr.success('Shipment marked as Delivered.'); this.loadShipment(this.shipment!.shipmentId); } });
@@ -217,11 +203,9 @@ constructor(
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) return;
-        this.actionLoading = true;
         this.shipmentService
           .updateShipmentStatus (this.shipment.shipmentId , 'Cancelled')
           .pipe(
-            finalize(() => { this.actionLoading = false; this.initializeButtons(); }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({ next: () => { this.toastr.success('Shipment cancelled.'); this.loadShipment(this.shipment!.shipmentId); } });

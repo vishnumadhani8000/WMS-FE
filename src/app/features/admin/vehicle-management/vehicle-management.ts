@@ -85,7 +85,6 @@ export class VehicleManagement implements OnInit {
 
   dataSource: Vehicle[] = [];
   totalCount = 0;
-  loading = false;
 
   page = 0;
   pageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
@@ -139,7 +138,6 @@ export class VehicleManagement implements OnInit {
   }
 
   loadVehicles(): void {
-    this.loading = true;
 
     this.vehicleService
       .getVehicles({
@@ -150,7 +148,6 @@ export class VehicleManagement implements OnInit {
         ascending: this.sortAsc,
       })
       .pipe(
-        finalize(() => (this.loading = false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({

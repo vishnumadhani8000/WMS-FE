@@ -70,7 +70,6 @@ export class OrderManagement implements OnInit {
 
   orders: Order[] = [];
   totalCount = 0;
-  loading = false;
 
   page = 0;
   pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
@@ -115,7 +114,6 @@ export class OrderManagement implements OnInit {
   }
 
   loadOrders(): void {
-    this.loading = true;
 
     this.orderService
       .getOrders({
@@ -127,7 +125,6 @@ export class OrderManagement implements OnInit {
         onlyPending: this.activeView === 'pending' ? true : undefined,
       })
       .pipe(
-        finalize(() => (this.loading = false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({

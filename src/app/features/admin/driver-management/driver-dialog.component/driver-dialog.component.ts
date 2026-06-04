@@ -54,7 +54,7 @@ export class DriverDialogComponent implements OnInit {
     private readonly toastr : ToastrService,
     private readonly destroyRef : DestroyRef,
     @Inject(MAT_DIALOG_DATA) public data: DriverDialogData) {}
-    
+
   form: FormGroup<DriverForm>;
   nameConfig: InputFieldConfig;
   phoneConfig: InputFieldConfig;
@@ -176,10 +176,6 @@ export class DriverDialogComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.submitButtonConfig.loading = true;
-    this.submitButtonConfig.disabled = true;
-
     const value = this.form.getRawValue();
 
     const request = this.isEdit
@@ -192,10 +188,6 @@ export class DriverDialogComponent implements OnInit {
           this.isEdit ? 'Driver updated successfully.' : 'Driver added successfully.'
         );
         this.dialogRef.close({ saved: true });
-      },
-      error: () => {
-        this.submitButtonConfig.loading = false;
-        this.submitButtonConfig.disabled = false;
       },
     });
   }

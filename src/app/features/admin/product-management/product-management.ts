@@ -85,7 +85,6 @@ export class ProductManagement implements OnInit {
   readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
   dataSource: Product[] = [];
   totalCount = 0;
-  loading = false;
 
   page = 0;
   pageSize : number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
@@ -139,7 +138,6 @@ export class ProductManagement implements OnInit {
   }
 
   loadProducts(): void {
-    this.loading = true;
 
     this.productManagementService
       .getProducts({
@@ -150,7 +148,6 @@ export class ProductManagement implements OnInit {
         ascending: this.sortAsc ,
       })
       .pipe(
-        finalize(() => this.loading = false ),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
