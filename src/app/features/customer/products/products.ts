@@ -1,18 +1,20 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
-import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
-
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSort, Sort, MatSortHeader } from '@angular/material/sort';
 
 import { ToastrService } from 'ngx-toastr';
+
+import { signal } from '@angular/core';
 
 import { Button } from '../../../shared/components/button/button';
 import { InputField } from '../../../shared/components/input-field/input-field';
@@ -25,8 +27,6 @@ import { ProductService } from './services/product.service';
 import { Product, AddToCartDto } from './models/product.model';
 
 import { TruncatePipe } from '../../../shared/pipes/truncate-pipe';
-import { MatSort, Sort, MatSortHeader } from "@angular/material/sort";
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
 
 @Component({
@@ -34,7 +34,6 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
   standalone: true,
   templateUrl: './products.html',
   styleUrl: './products.scss',
-
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -46,32 +45,40 @@ import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
     InputField,
     TruncatePipe,
     MatSort,
-    MatSortHeader
+    MatSortHeader,
   ],
 })
 export class Products implements OnInit {
-
   constructor(
     private readonly productService: ProductService,
     private readonly toastr: ToastrService,
     private readonly destroyRef: DestroyRef
-  ) { }
+  ) {}
 
-  readonly displayedColumns = ['index', 'name', 'description', 'price', 'actions'];
-  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS
+  readonly displayedColumns = [
+    'index',
+    'name',
+    'description',
+    'price',
+    'actions',
+  ];
 
-  products = signal<Product[]>([]);
-  totalCount = signal(0);
-  page = signal(0);
-  sortBy = signal<string | null>(null);
-  ascending = signal<boolean | null>(null);
-  pageSize: number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
-  searchConfig: InputFieldConfig;
+  readonly pageSizeOptions = APP_CONSTANTS.PAGE_SIZE_OPTIONS;
 
-  form = new FormGroup({
+  readonly products = signal<Product[]>([]);
+  readonly totalCount = signal(0);
+  readonly page = signal(0);
+
+  pageSize : number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
+
+  private sortBy: string | null = null;
+  private ascending: boolean | null = null;
+
+  searchConfig!: InputFieldConfig;
+
+  readonly form = new FormGroup({
     searchControl: new FormControl('', { nonNullable: true }),
   });
-
 
   ngOnInit(): void {
     this.initializeConfigs();
@@ -87,10 +94,7 @@ export class Products implements OnInit {
       prefixIcon: 'search',
       icon: 'close',
       formControlName: 'searchControl',
-
-      iconClick: () => {
-        this.clearSearch();
-      },
+      iconClick: () => this.clearSearch(),
     };
   }
 
@@ -108,17 +112,15 @@ export class Products implements OnInit {
   }
 
   loadProducts(): void {
-
-    this.productService.getAll({
-      page: this.page() + 1,
-      pageSize: this.pageSize,
-      search: this.form.controls.searchControl.value,
-      sortBy: this.sortBy() ?? undefined,
-      ascending: this.ascending() ?? undefined,
-    })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef))
-
+    this.productService
+      .getAll({
+        page: this.page() + 1,
+        pageSize: this.pageSize,
+        search: this.form.controls.searchControl.value,
+        sortBy: this.sortBy ?? undefined,
+        ascending: this.ascending ?? undefined,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           if (!response.isSuccess || !response.data) {
@@ -148,10 +150,7 @@ export class Products implements OnInit {
       variant: 'flat',
       color: 'primary',
       prefixIcon: 'shopping_cart',
-
-      clicked: () => {
-        this.addToCart(product);
-      },
+      clicked: () => this.addToCart(product),
     };
   }
 
@@ -167,23 +166,23 @@ export class Products implements OnInit {
       .subscribe({
         next: () => {
           this.toastr.success('Product added to cart.');
-        }
+        },
       });
   }
-  onSortChange(sort: Sort): void {
 
+  onSortChange(sort: Sort): void {
     if (!sort.direction) {
-      this.sortBy.set(null);
-      this.ascending.set(null);
+      this.sortBy = null;
+      this.ascending = null;
     } else {
-      this.sortBy.set(sort.active);
-      this.ascending.set(sort.direction === 'asc');
+      this.sortBy = sort.active;
+      this.ascending = sort.direction === 'asc';
     }
 
     this.page.set(0);
-
     this.loadProducts();
   }
+
   clearSearch(): void {
     this.form.controls.searchControl.setValue('');
   }

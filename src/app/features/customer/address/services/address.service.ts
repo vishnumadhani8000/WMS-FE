@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { ApiResponse } from '../../../../core/models/api-responce.model';
 import { AddressData } from '../models/addresh.model';
+import { AddAddressDialogData } from '../models/addAddressDialogData.model';
 
 
 export interface StateOption {
@@ -63,7 +64,7 @@ export class AddressService {
         )
       );
   }
-  createAddress(body: any) {
+  createAddress(body: AddAddressDialogData) {
     return this.http.post<ApiResponse<AddressData>>(
       `${environment.baseUrl}/user-addresses`,
       body

@@ -95,7 +95,7 @@ export class Tracker implements OnInit {
   searchInputConfig: InputFieldConfig;
 
   form = new FormGroup({
-    searchControl: new FormControl('', { nonNullable: true }),
+    searchControl: new FormControl('' ),
     stateControl: new FormControl<number | null>(null),
     cityControl: new FormControl<number | null>({ value: null, disabled: true }),
   });

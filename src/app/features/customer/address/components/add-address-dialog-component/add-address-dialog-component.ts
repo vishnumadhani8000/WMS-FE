@@ -56,9 +56,7 @@ export class AddAddressDialogComponent implements OnInit {
     private readonly userAddressService: AddressService,
     private readonly dialogRef: MatDialogRef<AddAddressDialogComponent>,
     private readonly destroyref : DestroyRef,
-  
-    @Inject(MAT_DIALOG_DATA)
-    public data: AddAddressDialogData
+
   ) {}
 
   ngOnInit(): void {
@@ -184,18 +182,9 @@ export class AddAddressDialogComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
   
-    const formValue = this.form.getRawValue();
-  
-    const payload = {
-      addressLine: formValue.addressLine,
-      landmark: formValue.landmark,
-      stateId: formValue.stateId,
-      cityId: formValue.cityId,
-      pincode: formValue.pincode,
-    };
-  
+    const payload: AddAddressDialogData = this.form.getRawValue();
+    
     this.userAddressService
       .createAddress(payload)
       .pipe(takeUntilDestroyed(this.destroyref))
