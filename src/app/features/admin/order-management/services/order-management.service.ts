@@ -2,23 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Order, OrderFilter, OrderStatus } from '../models/order-management.model';
+import { Order, OrderFilter, OrderStatus, PagedResult } from '../models/order-management.model';
 import { environment } from '../../../../../environments/environment';
+import { ApiResponse } from '../../../../core/models/api-responce.model';
 
-export interface PagedResult<T> {
-  items: T[];
-  totalCount: number;
-  pageNumber: number;
-  pageSize: number;
-  totalPages: number;
-}
 
-interface ApiResponse<T> {
-  data: T;
-  message: string;
-  isSuccess: boolean;
-  errors: null | string[];
-}
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {

@@ -20,3 +20,18 @@ export interface OrderFilter {
   ascending?: boolean;
   onlyPending?: boolean;
 }
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+interface ApiResponse<T> {
+  data: T;
+  message: string;
+  isSuccess: boolean;
+  errors: null | string[];
+}

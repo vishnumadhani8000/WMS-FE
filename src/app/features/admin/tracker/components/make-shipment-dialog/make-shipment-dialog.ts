@@ -4,7 +4,6 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Button } from '../../../../../shared/components/button/button';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import {
   AvailableDriverDto,
@@ -25,7 +24,6 @@ import { FormDialog } from "../../../../../shared/components/form-dialog/form-di
     MatIconModule,
     MatDividerModule,
     MatTooltipModule,
-    Button,
     FormDialog
 ],
 })

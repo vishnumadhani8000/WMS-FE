@@ -14,7 +14,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
+    // gap: 60px;
 
     padding: 24px 24px 18px;
 
@@ -26,7 +26,7 @@
     }
 
     .dialog-title {
-    margin: 0;
+    margin-bottom: 16px;
     font-size: $fs-h5;
     font-weight: $fw-bold;
     color: $text-main;

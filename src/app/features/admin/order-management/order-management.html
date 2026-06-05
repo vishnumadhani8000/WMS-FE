@@ -162,15 +162,15 @@
             </button>
 
             <mat-menu #orderMenu="matMenu" class="om-action-menu">
-              @if (isAccepted(row)) {
-              <button mat-menu-item (click)="completeOrder(row)">
-                <mat-icon>task_alt</mat-icon>
-                <span>Complete</span>
-              </button>
-              } @else {
+              @if (isPending(row)) {
               <button mat-menu-item (click)="acceptOrder(row)">
                 <mat-icon>check_circle_outline</mat-icon>
                 <span>Accept Order</span>
+              </button>
+              } @else {
+              <button mat-menu-item (click)="completeOrder(row)">
+                <mat-icon>task_alt</mat-icon>
+                <span>Complete</span>
               </button>
               }
 
