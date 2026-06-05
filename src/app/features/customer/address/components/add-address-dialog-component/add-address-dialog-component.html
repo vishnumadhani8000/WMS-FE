@@ -1,56 +1,39 @@
-<div class="dialog-wrapper">
+<app-form-dialog
+  title="Add New Address"
+  subtitle="Fill in the details to save a new delivery address."
+  [closeButtonConfig]="closeButtonConfig"
+  [cancelButtonConfig]="cancelButtonConfig"
+  [submitButtonConfig]="saveButtonConfig">
 
-    <!-- Header -->
-    <div class="dialog-header">
-      <div class="dialog-header__content">
-        <div class="dialog-title-row">
-          <span class="dialog-icon">
-            <mat-icon>add_location_alt</mat-icon>
+  <form
+    [formGroup]="form"
+    (ngSubmit)="save()"
+    novalidate>
+
+    <app-common-input [config]="addressLineConfig" />
+
+    <app-common-input [config]="landmarkConfig" />
+
+    <div class="two-col">
+      <div class="select-wrapper">
+        <app-common-select [config]="stateConfig" />
+      </div>
+
+      <div class="select-wrapper">
+        <app-common-select [config]="cityConfig" />
+
+        @if (!form.controls.stateId.value) {
+          <span class="field-hint">
+            Select a state first
           </span>
-          <h2 class="dialog-title">Add New Address</h2>
-        </div>
-        <p class="dialog-subtitle">Fill in the details to save a new delivery address.</p>
+        }
       </div>
-  
-      <app-common-button [config]="closeButtonConfig" />
     </div>
-  
-    <mat-divider />
-  
-    <!-- Body -->
-    <form [formGroup]="form" class="dialog-body" (ngSubmit)="save()" novalidate>
-  
-      <app-common-input [config]="addressLineConfig" />
-  
-      <app-common-input [config]="landmarkConfig" />
-  
-      <div class="two-col">
-  
-        <div class="select-wrapper">
-          <app-common-select [config]="stateConfig" />
-        </div>
-  
-        <div class="select-wrapper">
-          <app-common-select [config]="cityConfig" />
-          @if ( !form.controls.stateId.value) {
-            <span class="field-hint">Select a state first</span>
-          }
-        </div>
-  
-      </div>
-  
-      <div class="half-col">
-        <app-common-input [config]="pincodeConfig" />
-      </div>
-  
-    </form>
-  
-    <mat-divider />
-  
-    <!-- Footer -->
-    <div class="dialog-footer">
-      <app-common-button [config]="cancelButtonConfig" />
-      <app-common-button [config]="saveButtonConfig" />
+
+    <div class="half-col">
+      <app-common-input [config]="pincodeConfig" />
     </div>
-  
-  </div>
+
+  </form>
+
+</app-form-dialog>

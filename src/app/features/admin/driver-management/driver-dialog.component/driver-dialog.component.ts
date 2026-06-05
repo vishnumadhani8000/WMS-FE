@@ -1,12 +1,9 @@
 import { Component, DestroyRef, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  AbstractControl,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -15,11 +12,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InputField } from '../../../../shared/components/input-field/input-field';
-import { Button } from '../../../../shared/components/button/button';
 import { DriverService } from '../services/driver-management.service';
 import { InputFieldConfig } from '../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../shared/components/button/button.config';
 import { DriverDialogData, DriverForm } from '../models/driver-management.model';
+import { FormDialog } from "../../../../shared/components/form-dialog/form-dialog";
 
 @Component({
   selector: 'app-driver-dialog',
@@ -31,8 +28,8 @@ import { DriverDialogData, DriverForm } from '../models/driver-management.model'
     MatDividerModule,
     MatSlideToggleModule,
     InputField,
-    Button,
-  ],
+    FormDialog
+],
   templateUrl: './driver-dialog.component.html',
   styleUrl: './driver-dialog.component.scss',
 })

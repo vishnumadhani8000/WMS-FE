@@ -14,15 +14,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
-
 import { VehicleService } from '../../services/vehicle.service';
 import { VehicleDialogData, VehicleForm } from '../../models/vehicle.model';
-
 import { InputField } from '../../../../../shared/components/input-field/input-field';
-import { Button } from '../../../../../shared/components/button/button';
-
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
+import { FormDialog } from "../../../../../shared/components/form-dialog/form-dialog";
 
 export function plateNumberValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -58,8 +55,8 @@ export function plateNumberValidator(): ValidatorFn {
     MatDividerModule,
     MatSlideToggleModule,
     InputField,
-    Button,
-  ],
+    FormDialog
+],
   templateUrl: './vehicle-dialog-component.html',
   styleUrl: './vehicle-dialog-component.scss',
 })

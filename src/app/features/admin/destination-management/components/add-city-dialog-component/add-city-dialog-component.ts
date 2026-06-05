@@ -7,13 +7,13 @@ import { ToastrService } from 'ngx-toastr';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { InputField } from '../../../../../shared/components/input-field/input-field';
-import { Button } from '../../../../../shared/components/button/button';
 import { SelectField } from '../../../../../shared/components/select-field/select-field';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import { SelectFieldConfig } from '../../../../../shared/components/select-field/select-field.config';
 import { AddCityDialogData } from '../../models/state-city.model';
 import { CityService } from '../../services/city-service';
+import { FormDialog } from "../../../../../shared/components/form-dialog/form-dialog";
 
 interface AddCityForm {
   name: FormControl<string>;
@@ -29,9 +29,9 @@ interface AddCityForm {
     MatDialogModule,
     MatDividerModule,
     InputField,
-    Button,
     SelectField,
-  ],
+    FormDialog
+],
   templateUrl: './add-city-dialog-component.html',
   styleUrl: './add-city-dialog-component.scss',
 })

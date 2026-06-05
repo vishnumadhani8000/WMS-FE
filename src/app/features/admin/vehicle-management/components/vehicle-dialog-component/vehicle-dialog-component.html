@@ -1,80 +1,53 @@
-<div class="dialog-wrapper">
-    <div class="dialog-header">
-      <div class="dialog-header__content">
-        <h2 class="dialog-title">
-          {{ title }}
-        </h2>
-  
-        <p class="dialog-subtitle">
-          @if (isEdit) { Update vehicle details and save changes. }
-          @else { Fill in the details to register a new vehicle. }
-        </p>
-      </div>
 
-      <app-common-button
-        [config]="closeButtonConfig"/>
-    </div>
-  
-    <mat-divider></mat-divider>
-  
-    <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-  
-      <!-- Vehicle Name -->
-      <div class="field-group">
-        <app-common-input
-        [config]="vehicleNameConfig"
-        >
-        </app-common-input>
-      </div>
-  
-      <!-- Plate Number -->
-      <div class="field-group">
-        <app-common-input
-        [config]="plateNumberConfig"/>
-      </div>
-  
-      <!-- Capacity -->
-      <div class="field-group">
-        <app-common-input
-        [config]="capacityConfig"/>
-      </div>
-  
-      <!-- Availability Toggle -->
-      <div class="field-group toggle-group">
-        <div class="toggle-label-wrap">
-          <span class="toggle-label">Availability</span>
-          <span class="toggle-hint">
-            Mark whether this vehicle is currently available for dispatch.
-          </span>
+    <app-form-dialog
+    [title]="title" 
+    [subtitle]="isEdit
+      ? 'Update vehicle details and save changes.'
+      : 'Fill in the details to register a new vehicle.'"
+    [closeButtonConfig]="closeButtonConfig"
+    [cancelButtonConfig]="cancelButtonConfig"
+    [submitButtonConfig]="submitButtonConfig">
+
+      <form [formGroup]="form" class="dialog-body" novalidate>
+
+        <!-- Vehicle Name -->
+        <div class="field-group">
+          <app-common-input
+          [config]="vehicleNameConfig"
+          >
+          </app-common-input>
         </div>
-  
-        <mat-slide-toggle
-          formControlName="isAvailable"
-          color="primary"
-          class="availability-toggle"
-        >
-          <span class="toggle-value-label">
-            {{ form.get('isAvailable')?.value ? 'Available' : 'Unavailable' }}
-          </span>
-        </mat-slide-toggle>
-      </div>
-  
-    </form>
-  
-    <mat-divider></mat-divider>
-  
-    <div class="dialog-footer">
-  
-      <!-- Cancel -->
-      <app-common-button
-        [config]="cancelButtonConfig"
-      />
+    
+        <!-- Plate Number -->
+        <div class="field-group">
+          <app-common-input
+          [config]="plateNumberConfig"/>
+        </div>
+    
+        <!-- Capacity -->
+        <div class="field-group">
+          <app-common-input
+          [config]="capacityConfig"/>
+        </div>
+    
+        <!-- Availability Toggle -->
+        <div class="field-group toggle-group">
+          <div class="toggle-label-wrap">
+            <span class="toggle-label">Availability</span>
+            <span class="toggle-hint">
+              Mark whether this vehicle is currently available for dispatch.
+            </span>
+          </div>
+    
+          <mat-slide-toggle
+            formControlName="isAvailable"
+            color="primary"
+            class="availability-toggle"
+          >
+            <span class="toggle-value-label">
+              {{ form.get('isAvailable')?.value ? 'Available' : 'Unavailable' }}
+            </span>
+          </mat-slide-toggle>
+        </div>
 
-  
-      <!-- Submit -->
-      <app-common-button
-        [config]="submitButtonConfig"
-      />
-  
-    </div>
-  </div>
+      </form>

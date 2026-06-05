@@ -24,6 +24,7 @@ import { StateDialogComponent } from './components/state-dialog-component/state-
 import { CityDialogComponent } from './components/city-dialog-component/city-dialog-component';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
+import { AddCityDialogComponent } from './components/add-city-dialog-component/add-city-dialog-component';
 
 @Component({
   selector: 'app-state-city-management',
@@ -58,17 +59,16 @@ export class DestinationManagement implements OnInit {
 
   stateColumns = ['index', 'name', 'actions'];
   cityColumns = ['index', 'name', 'actions'];
-
-  states = signal<State[]>([]);
-  stateTotalCount = signal(0);
-
-  cities = signal<City[]>([]);
-  cityTotalCount = signal(0);
-
-  selectedState = signal<State | null>(null);
-
-  statePage = signal(0);
-  cityPage = signal(0);
+  states: State[] = [];
+  stateTotalCount = 0;
+  
+  cities: City[] = [];
+  cityTotalCount = 0;
+  
+  selectedState: State | null = null;
+  
+  statePage = 0;
+  cityPage = 0;
 
   statePageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
   cityPageSize:number = APP_CONSTANTS.DEFAULT_PAGE_SIZE;
@@ -176,7 +176,7 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.statePage.set(0);
+        this.statePage = 0;
         this.loadStates();
       });
 
@@ -188,7 +188,7 @@ export class DestinationManagement implements OnInit {
       )
 
       .subscribe(() => {
-        this.cityPage.set(0);
+        this.cityPage = 0;
         this.loadCities();
       });
   }
@@ -196,7 +196,7 @@ export class DestinationManagement implements OnInit {
   loadStates(): void {
     this.stateService
       .getStates({
-        page: this.statePage() + 1,
+        page: this.statePage + 1,
         pageSize: this.statePageSize,
         search: this.stateForm.controls.stateSearchControl.value,
         sortBy: this.stateSortBy ?? undefined,
@@ -207,14 +207,14 @@ export class DestinationManagement implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          this.states.set(res.items);
-          this.stateTotalCount.set(res.totalCount);
+          this.states = res.items;
+          this.stateTotalCount = res.totalCount;
         },
       });
   }
 
   loadCities(): void {
-    const state = this.selectedState();
+    const state = this.selectedState;
   
     if (!state) {
       return;
@@ -224,7 +224,7 @@ export class DestinationManagement implements OnInit {
     this.cityService
       .getCities({
         stateId: state.id,
-        page: this.cityPage() + 1,
+        page: this.cityPage + 1,
         pageSize: this.cityPageSize,
         search: this.cityForm.controls.citySearchControl.value,
         sortBy: this.citySortBy ?? undefined,
@@ -237,8 +237,8 @@ export class DestinationManagement implements OnInit {
   
       .subscribe({
         next: (res) => {
-          this.cities.set(res.items);
-          this.cityTotalCount.set(res.totalCount);
+          this.cities = res.items;
+          this.cityTotalCount =  res.totalCount;
         },
       });
   }
@@ -251,7 +251,7 @@ export class DestinationManagement implements OnInit {
       this.stateSortAsc = sort.direction === 'asc';
     }
 
-    this.statePage.set(0);
+    this.statePage = 0;
     this.loadStates();
   }
 
@@ -264,38 +264,38 @@ export class DestinationManagement implements OnInit {
       this.citySortAsc = sort.direction === 'asc';
     }
 
-    this.cityPage.set(0);
+    this.cityPage = 0;
 
     this.loadCities();
   }
 
   onStatePageChange(event: PageEvent): void {
-    this.statePage.set(event.pageIndex);
+    this.statePage = event.pageIndex;
     this.statePageSize = event.pageSize;
 
     this.loadStates();
   }
 
   onCityPageChange(event: PageEvent): void {
-    this.cityPage.set(event.pageIndex);
+    this.cityPage = event.pageIndex;
     this.cityPageSize = event.pageSize;
     this.loadCities();
   }
 
   selectState(state: State): void {
-    this.selectedState.set(state);
-    this.cityPage.set(0);
+    this.selectedState = state;
+    this.cityPage = 0;
     this.addCityButtonConfig.disabled = false;
     this.cityForm.controls.citySearchControl.setValue('');
     this.loadCities();
   }
 
   stateRowIndex(index: number): number {
-    return this.statePage() * this.statePageSize + index + 1;
+    return this.statePage * this.statePageSize + index + 1;
   }
 
   cityRowIndex(index: number): number {
-    return this.cityPage() * this.cityPageSize + index + 1;
+    return this.cityPage * this.cityPageSize + index + 1;
   }
 
   openAddStateDialog(): void {
@@ -345,23 +345,20 @@ export class DestinationManagement implements OnInit {
   }
 
   openAddCityDialog(): void {
-    const state = this.selectedState();
+    const state = this.selectedState;
 
     if (!state) {
       return;
     }
 
-    this.dialog
-      .open(CityDialogComponent, {
-        width: '480px',
-
-        data: {
-          mode: 'add',
-          stateId: state.id,
-          stateName: state.name, 
-        },
-        disableClose: true,
-      })
+    this.dialog.open(AddCityDialogComponent, {
+      width: '480px',
+      data: {
+        selectedState: state,
+        states: this.states,
+      },
+      disableClose: true,
+    })
 
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -375,7 +372,7 @@ export class DestinationManagement implements OnInit {
   }
 
   openEditCityDialog(city: City): void {
-    const state = this.selectedState();
+    const state = this.selectedState;
 
     if (!state) {
       return;
@@ -429,9 +426,9 @@ export class DestinationManagement implements OnInit {
             next: () => {
               this.toastr.success('State deleted.');
 
-              if (this.selectedState()?.id === state.id) {
-                this.selectedState.set(null);
-                this.cities.set([]);
+              if (this.selectedState?.id === state.id) {
+                this.selectedState = null;
+                this.cities = [];
               }
 
               this.loadStates();

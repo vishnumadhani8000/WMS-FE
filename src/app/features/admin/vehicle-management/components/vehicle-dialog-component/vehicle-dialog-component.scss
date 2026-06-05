@@ -1,92 +1,36 @@
 @use 'styles/variables' as *;
 
-// ── Wrapper ────────────────────────────────────────────────
-.dialog-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 480px;
-  max-width: 100%;
-  background: $white;
-  border-radius: 18px;
-  overflow: hidden;
-}
-
-// ── Header ─────────────────────────────────────────────────
-.dialog-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-
-  padding: 24px 24px 18px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(69, 64, 225, 0.06),
-      rgba(69, 64, 225, 0.02)
-    );
-} 
-
-.dialog-title {
-  margin: 0;
-  font-size: $fs-h5;
-  font-weight: $fw-bold;
-  color: $text-main;
-  letter-spacing: -0.02em;
-}
-
-.dialog-subtitle {
-  margin: 0;
-  font-size: $fs-body2;
-  color: $text-muted;
-}
-
-.close-btn {
-  flex-shrink: 0;
-  margin-top: -4px;
-  color: $text-muted;
-
-  &:hover {
-    color: $text-main;
-  }
-}
-
-// ── Body ───────────────────────────────────────────────────
-.dialog-body {
+form {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px;
 }
 
-// ── Field Group ────────────────────────────────────────────
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  app-common-input {
-    width: 100%;
-  }
+app-common-input {
+  width: 100%;
 }
 
-// ── Toggle Group ───────────────────────────────────────────
 .toggle-group {
-  flex-direction: row;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px 18px;
+
+  gap: 24px;
+
+  padding: 18px;
+
   border: 1px solid $border;
   border-radius: 12px;
+
   background: $surface-soft;
 }
 
 .toggle-label-wrap {
+  flex: 1;
+
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .toggle-label {
@@ -97,27 +41,31 @@
 
 .toggle-hint {
   font-size: $fs-caption;
+  line-height: 1.5;
   color: $text-muted;
-  max-width: 260px;
-  line-height: 1.4;
 }
 
 .availability-toggle {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
 .toggle-value-label {
+  margin-left: 8px;
+
   font-size: $fs-body2;
   font-weight: $fw-medium;
   color: $text-main;
-  margin-left: 4px;
 }
 
-// ── Footer ─────────────────────────────────────────────────
-.dialog-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px;
+@media (max-width: 640px) {
+  .toggle-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .availability-toggle {
+    width: 100%;
+  }
 }

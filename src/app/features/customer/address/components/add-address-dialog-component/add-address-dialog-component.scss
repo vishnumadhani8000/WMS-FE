@@ -1,88 +1,11 @@
 @use 'styles/variables' as *;
 
-.dialog-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-//   max-width: 540px;
-
-  background: $surface;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: $shadow-md;
-}
-
-// ── Header ───────────────────────────────────────────────
-.dialog-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 24px 24px 18px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(69, 64, 225, 0.06),
-    rgba(69, 64, 225, 0.02)
-  );
-}
-
-.dialog-header__content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.dialog-title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dialog-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(69, 64, 225, 0.1);
-  color: $primary;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-}
-
-.dialog-title {
-  margin: 0;
-  font-size: $fs-h6;
-  font-weight: $fw-semibold;
-  line-height: 1.2;
-  color: $text-main;
-  letter-spacing: -0.02em;
-}
-
-.dialog-subtitle {
-  margin: 0;
-  padding-left: 40px;
-  font-size: $fs-body2;
-  font-weight: $fw-regular;
-  color: $text-muted;
-  line-height: 1.5;
-}
-
-// ── Body ─────────────────────────────────────────────────
-.dialog-body {
+form {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 24px;
 }
 
-// ── Layout helpers ───────────────────────────────────────
 .two-col {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -98,83 +21,21 @@
   }
 }
 
-// ── Select wrapper ───────────────────────────────────────
 .select-wrapper {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-// ── Loading / hint ───────────────────────────────────────
-.field-loading {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: $primary;
-  padding-left: 2px;
-}
-
 .field-hint {
+  padding-left: 2px;
   font-size: 11px;
   color: $text-muted;
-  padding-left: 2px;
 }
 
-.spin {
-  font-size: 13px;
-  width: 13px;
-  height: 13px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-// ── Footer ───────────────────────────────────────────────
-.dialog-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 24px 24px;
-  background: $surface-soft;
-}
-
-mat-divider {
-  border-top-color: rgba(0, 0, 0, 0.06);
-}
-
-// ── Responsive ───────────────────────────────────────────
 @media (max-width: 640px) {
-  .dialog-wrapper {
-    max-width: 100%;
-    border-radius: 16px;
-  }
-
-  .dialog-header {
-    padding: 20px 20px 16px;
-  }
-
-  .dialog-body {
-    padding: 20px;
-    gap: 16px;
-  }
-
-  .dialog-footer {
-    padding: 16px 20px 20px;
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-
   .two-col,
   .half-col {
     grid-template-columns: 1fr;
-  }
-
-  .dialog-subtitle {
-    padding-left: 0;
   }
 }

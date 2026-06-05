@@ -9,21 +9,20 @@ import {
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonConfig } from '../../../shared/components/button/button.config';
-import { Button } from '../../../shared/components/button/button';
 import {
   SelectAddressDialogData,
   SelectAddressDialogResult,
 } from './models/SelectAddressDialogData.model';
 import { AddressData } from './models/addresh.model';
-import { CartService } from '../cart/Services/cart.service';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { AddressService } from './services/address.service';
+import { FormDialog } from "../../../shared/components/form-dialog/form-dialog";
 
 @Component({
   selector: 'app-select-address-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatDividerModule, MatIconModule, Button],
+  imports: [CommonModule, MatDialogModule, MatDividerModule, MatIconModule, FormDialog],
   templateUrl: './select-address-dialog.html',
   styleUrl: './select-address-dialog.scss',
 })

@@ -1,0 +1,53 @@
+    @use 'styles/variables' as *;
+
+    .dialog-wrapper {
+    display: flex;
+    flex-direction: column;
+    // width: 480px;
+    max-width: 100%;
+    background: $white;
+    border-radius: 18px;
+    overflow: hidden;
+    }
+
+    .dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 24px 24px 18px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(69, 64, 225, 0.06),
+        rgba(69, 64, 225, 0.02)
+    );
+    }
+
+    .dialog-title {
+    margin: 0;
+    font-size: $fs-h5;
+    font-weight: $fw-bold;
+    color: $text-main;
+    }
+
+    .dialog-subtitle {
+    margin: 0;
+    font-size: $fs-body2;
+    color: $text-muted;
+    }
+
+    .dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+    }
+
+    .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    }

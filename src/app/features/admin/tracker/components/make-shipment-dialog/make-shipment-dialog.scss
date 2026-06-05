@@ -1,102 +1,51 @@
 @use 'styles/variables' as *;
 
-.msd-wrap {
+.msd-body {
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
-  overflow: hidden;
+  gap: 24px;
+
+  max-height: 500px;
+  overflow-y: auto;
 }
 
-// ── Header ────────────────────────────────────────────────────────────────────
-.msd-header {
+.msd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.msd-section__title {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 24px 24px 20px;
+  gap: 8px;
 
-  &__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: $primary-light;
-    flex-shrink: 0;
+  margin: 0;
 
-    mat-icon {
-      color: $primary;
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
-    }
-  }
-
-  &__title {
-    margin: 0 0 2px;
-    font-size: $fs-h5;
-    font-weight: $fw-bold;
-    color: $text-main;
-    letter-spacing: -0.02em;
-  }
-
-  &__sub {
-    margin: 0;
-    font-size: $fs-body2;
-    color: $text-muted;
-    font-weight: $fw-medium;
-  }
+  font-size: $fs-caption;
+  font-weight: $fw-bold;
+  color: $text-muted;
+  text-transform: uppercase;
 }
 
-// ── Body ──────────────────────────────────────────────────────────────────────
-.msd-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0;
-}
-
-// ── Section ───────────────────────────────────────────────────────────────────
-.msd-section {
-  padding: 20px 24px;
-
-  &__title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 14px;
-    font-size: $fs-caption;
-    font-weight: $fw-bold;
-    color: $text-muted;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-  }
-}
-
-// ── List ──────────────────────────────────────────────────────────────────────
 .msd-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-// ── Card ──────────────────────────────────────────────────────────────────────
 .msd-card {
   display: flex;
   align-items: center;
   gap: 12px;
+
   padding: 12px 14px;
-  border: 1.5px solid $border;
+
+  border: 1px solid $border;
   border-radius: 12px;
-  cursor: pointer;
+
   background: $white;
-  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-  user-select: none;
+  cursor: pointer;
 
   &:hover {
     border-color: $primary;
@@ -106,107 +55,72 @@
   &--selected {
     border-color: $primary;
     background: $primary-light;
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12);
-
-    .msd-card__check mat-icon {
-      color: $primary;
-    }
   }
+}
 
-  &__check {
-    flex-shrink: 0;
-
-    mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: $text-muted;
-      transition: color 0.18s ease;
-    }
-  }
-
-  &__avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: $surface-soft;
-    flex-shrink: 0;
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: $text-muted;
-    }
-
-    &--vehicle {
-      border-radius: 10px;
-    }
-  }
-
-  &__info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__name {
-    font-size: $fs-body2;
-    font-weight: $fw-semibold;
-    color: $text-main;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__sub {
-    font-size: $fs-caption;
-    color: $text-muted;
-    font-weight: $fw-medium;
-  }
-
-  &__capacity {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: $surface-soft;
-    border: 1px solid $border;
-    font-size: $fs-caption;
-    font-weight: $fw-semibold;
+.msd-card__check {
+  mat-icon {
     color: $text-muted;
   }
 }
 
-// ── Empty ─────────────────────────────────────────────────────────────────────
+.msd-card--selected .msd-card__check mat-icon {
+  color: $primary;
+}
+
+.msd-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+  background: $surface-soft;
+
+  &--vehicle {
+    border-radius: 10px;
+  }
+}
+
+.msd-card__info {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.msd-card__name {
+  font-size: $fs-body2;
+  font-weight: $fw-semibold;
+  color: $text-main;
+}
+
+.msd-card__sub {
+  font-size: $fs-caption;
+  color: $text-muted;
+}
+
+.msd-card__capacity {
+  padding: 4px 10px;
+
+  border: 1px solid $border;
+  border-radius: 999px;
+
+  background: $surface-soft;
+
+  font-size: $fs-caption;
+  color: $text-muted;
+}
+
 .msd-empty {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 16px;
+
+  padding: 12px;
+
   color: $text-muted;
-  font-size: $fs-body2;
-  font-weight: $fw-medium;
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    opacity: 0.6;
-  }
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────────
-.msd-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px;
 }

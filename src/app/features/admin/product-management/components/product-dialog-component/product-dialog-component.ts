@@ -1,4 +1,4 @@
-import { Component, DestroyRef, Inject, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -6,13 +6,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ProductManagementService } from '../../services/product-management.service';
 import { ProductDialogData, ProductForm } from '../../models/product-management.model';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
-import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import { TextareaField } from '../../../../../shared/components/textarea-field/textarea-field';
 import { TextareaFieldConfig } from '../../../../../shared/components/textarea-field/textearea-field.config';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormDialog } from "../../../../../shared/components/form-dialog/form-dialog";
+
 
 
 
@@ -26,9 +27,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatDialogModule,
     MatDividerModule,
     InputField,
-    Button,
     TextareaField,
-  ],
+    FormDialog,
+],
 
   templateUrl: './product-dialog-component.html',
   styleUrl: './product-dialog-component.scss',

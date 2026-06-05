@@ -12,6 +12,7 @@ import {
   MakeShipmentDialogData,
   MakeShipmentDialogResult,
 } from '../../models/tracker.model';
+import { FormDialog } from "../../../../../shared/components/form-dialog/form-dialog";
 
 @Component({
   selector: 'app-make-shipment-dialog',
@@ -25,7 +26,8 @@ import {
     MatDividerModule,
     MatTooltipModule,
     Button,
-  ],
+    FormDialog
+],
 })
 export class MakeShipmentDialog implements OnInit {
   selectedDriverId = signal<number | null>(null);
@@ -37,6 +39,7 @@ export class MakeShipmentDialog implements OnInit {
 
   confirmButtonConfig: Signal<ButtonConfig>;
   cancelButtonConfig: ButtonConfig;
+  closeButtonConfig: ButtonConfig;
 
   constructor(
     private readonly dialogRef: MatDialogRef<MakeShipmentDialog, MakeShipmentDialogResult>,
@@ -88,6 +91,13 @@ export class MakeShipmentDialog implements OnInit {
       label: 'Cancel',
       variant: 'stroked',
       color: 'default',
+      clicked: () => this.cancel(),
+    };
+
+    this.closeButtonConfig = {
+      ariaLabel: 'Close',
+      prefixIcon: 'close',
+      variant: 'stroked',
       clicked: () => this.cancel(),
     };
   }

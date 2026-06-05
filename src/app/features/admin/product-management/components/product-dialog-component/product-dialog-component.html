@@ -1,42 +1,35 @@
-<div class="dialog-wrapper">
-  <div class="dialog-header">
-    <div class="dialog-header__content">
-      <h2 class="dialog-title">
-        {{ title }}
-      </h2>
+  <app-form-dialog
+    [title]="title"
+    [subtitle]="isEdit
+      ? 'Update product details and save changes.'
+      : 'Fill in the details to create a new product.'"
+    [closeButtonConfig]="closeButtonConfig"
+    [cancelButtonConfig]="cancelButtonConfig"
+    [submitButtonConfig]="submitButtonConfig">
 
-      <p class="dialog-subtitle">
-        @if (isEdit) { Update product details and save changes. } @else { Fill in the details to
-        create a new product. }
-      </p>
-    </div>
+    <form
+      [formGroup]="form"
+      novalidate>
 
-    <app-common-button [config]="closeButtonConfig" />
-  </div>
+      <div class="two-col">
+        <app-common-input
+          [config]="productNameConfig" />
 
-  <mat-divider></mat-divider>
+        <app-common-input
+          [config]="productPriceConfig" />
+      </div>
 
-  <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-    <div class="two-col">
-    <app-common-input [config]="productNameConfig" />
-    <app-common-input [config]="productPriceConfig"/>
-  </div>
+      <div class="two-col">
+        <app-common-input
+          [config]="weightConfig" />
 
-    <div class="two-col">
-      <app-common-input [config]="weightConfig" />
+        <app-common-input
+          [config]="stockConfig" />
+      </div>
 
-      <app-common-input [config]="stockConfig" />
-    </div>
+      <app-common-textarea
+        [config]="descriptionConfig" />
 
-    <app-common-textarea [config]="descriptionConfig"> </app-common-textarea>
-  </form>
-  <mat-divider></mat-divider> 
+    </form>
 
-  <div class="dialog-footer">
-    <!-- Cancel -->
-    <app-common-button [config]="cancelButtonConfig" />
-
-    <!-- Submit -->
-    <app-common-button [config]="submitButtonConfig" />
-  </div>
-</div>
+  </app-form-dialog>

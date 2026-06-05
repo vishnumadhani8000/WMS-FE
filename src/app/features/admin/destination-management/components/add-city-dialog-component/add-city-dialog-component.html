@@ -1,36 +1,23 @@
-<div class="dialog-wrapper">
-    <!-- Header -->
-    <div class="dialog-header">
-      <div class="dialog-header__content">
-        <h2 class="dialog-title">Add City</h2>
-        <p class="dialog-subtitle">
-          Fill in the details to add a new city to
-          <strong>{{ selectedStateName }}</strong>.
-        </p>
-      </div>
-      <app-common-button [config]="closeButtonConfig" />
+<app-form-dialog
+  title="Add City"
+  [subtitle]="'Fill in the details to add a new city to ' + selectedStateName + '.'"
+  [closeButtonConfig]="closeButtonConfig"
+  [cancelButtonConfig]="cancelButtonConfig"
+  [submitButtonConfig]="submitButtonConfig">
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate>
+
+    <div class="field-group">
+      <app-common-input [config]="nameConfig" />
     </div>
-  
-    <mat-divider />
-  
-    <!-- Body -->
-    <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-      <!-- City name -->
-      <div class="field-group">
-        <app-common-input [config]="nameConfig" />
-      </div>
-  
-      <!-- State dropdown -->
-      <div class="field-group">
-        <app-common-select [config]="stateSelectConfig" />
-      </div>
-    </form>
-  
-    <mat-divider />
-  
-    <!-- Footer -->
-    <div class="dialog-footer">
-      <app-common-button [config]="cancelButtonConfig" />
-      <app-common-button [config]="submitButtonConfig" />
+
+    <div class="field-group">
+      <app-common-select [config]="stateSelectConfig" />
     </div>
-  </div>
+
+  </form>
+
+</app-form-dialog>

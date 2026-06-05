@@ -5,7 +5,6 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
-import { Button } from '../../../../../shared/components/button/button';
 import { SelectField } from '../../../../../shared/components/select-field/select-field';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
@@ -17,6 +16,7 @@ import {
 } from '../../models/addAddressDialogData.model';
 import { AddressService } from '../../services/address.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormDialog } from "../../../../../shared/components/form-dialog/form-dialog";
 
 @Component({
   selector: 'app-add-address-dialog',
@@ -28,9 +28,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatDividerModule,
     MatIconModule,
     InputField,
-    Button,
     SelectField,
-  ],
+    FormDialog
+],
   templateUrl: './add-address-dialog-component.html',
   styleUrl: './add-address-dialog-component.scss',
 })

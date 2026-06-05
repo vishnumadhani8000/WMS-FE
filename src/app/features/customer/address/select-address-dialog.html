@@ -1,79 +1,71 @@
-<div class="dialog-wrapper">
-  <!-- Header -->
-  <div class="dialog-header">
-    <div class="dialog-header__content">
-      <div class="dialog-title-row">
-        <span class="dialog-icon">
-          <mat-icon>location_on</mat-icon>
-        </span>
-        <h2 class="dialog-title">Select Delivery Address</h2>
-      </div>
-      <p class="dialog-subtitle">Choose a saved address for this delivery.</p>
-    </div>
+<app-form-dialog
+  title="Select Delivery Address"
+  subtitle="Choose a saved address for this delivery."
+  [closeButtonConfig]="closeButtonConfig"
+  [cancelButtonConfig]="cancelButtonConfig"
+  [submitButtonConfig]="continueButtonConfig">
 
-    <app-common-button [config]="closeButtonConfig" />
-  </div>
+  <div class="address-list">
 
-  <mat-divider />
-
-  <!-- Body -->
-  <div class="dialog-body">
-    <div class="address-list">
-      @for (address of addresses; track address.addressId) {
+    @for (address of addresses; track address.addressId) {
       <button
         type="button"
         class="address-card"
         [class.address-card--selected]="selectedAddressId === address.addressId"
-        (click)="selectAddress(address.addressId)"
-      >
+        (click)="selectAddress(address.addressId)">
+
         <span class="radio-outer">
           @if (selectedAddressId === address.addressId) {
-          <span class="radio-inner"></span>
+            <span class="radio-inner"></span>
           }
         </span>
 
         <div class="address-card__content">
           <span class="address-card__body">
+
             <span class="address-card__line">
               {{ address.addressLine }}
             </span>
 
             @if (address.landmark) {
-            <span class="address-card__line address-card__line--muted">
-              Landmark: {{ address.landmark }}
-            </span>
+              <span class="address-card__line address-card__line--muted">
+                Landmark: {{ address.landmark }}
+              </span>
             }
 
             <span class="address-card__line address-card__line--muted">
               {{ address.cityName }}, {{ address.stateName }} – {{ address.pincode }}
             </span>
+
           </span>
 
-          <button type="button" class="delete-btn" (click)="deleteAddress($event, address)">
-            <mat-icon> delete </mat-icon>
+          <button
+            type="button"
+            class="delete-btn"
+            (click)="deleteAddress($event, address)">
+            <mat-icon>delete</mat-icon>
           </button>
         </div>
+
       </button>
-      } @if (!addresses.length) {
+    }
+
+    @if (!addresses.length) {
       <div class="empty-state">
         <mat-icon>location_off</mat-icon>
         <p>No saved addresses yet.</p>
         <span>Add one below to get started.</span>
       </div>
-      }
-    </div>
+    }
 
-    <button type="button" class="add-address-btn" (click)="openAddAddress()">
-      <mat-icon>add</mat-icon>
-      Add New Address
-    </button>
   </div>
 
-  <mat-divider />
+  <button
+    type="button"
+    class="add-address-btn"
+    (click)="openAddAddress()">
+    <mat-icon>add</mat-icon>
+    Add New Address
+  </button>
 
-  <!-- Footer -->
-  <div class="dialog-footer">
-    <app-common-button [config]="cancelButtonConfig" />
-    <app-common-button [config]="continueButtonConfig" />
-  </div>
-</div>
+</app-form-dialog>

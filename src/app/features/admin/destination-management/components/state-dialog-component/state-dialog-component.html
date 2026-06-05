@@ -1,28 +1,18 @@
-<div class="dialog-wrapper">
-    <div class="dialog-header">
-      <div class="dialog-header__content">
-        <h2 class="dialog-title">{{ title }}</h2>
-        <p class="dialog-subtitle">
-          @if (isEdit) { Update state details and save changes. }
-          @else { Fill in the details to add a new state. }
-        </p>
-      </div>
-      <app-common-button
-        [config]="closeButtonConfig"/>
-    </div>
-  
-    <mat-divider></mat-divider>
-  
-    <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
-      <div class="field-group">
-        <app-common-input [config]="nameConfig" />
-      </div>
+
+  <app-form-dialog
+    [title]="title"
+    [subtitle]="isEdit
+      ? 'Update state details and save changes.'
+      : 'Fill in the details to add a new state.'"
+    [closeButtonConfig]="closeButtonConfig"
+    [cancelButtonConfig]="cancelButtonConfig"
+    [submitButtonConfig]="submitButtonConfig">
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate>
+
+      <app-common-input [config]="nameConfig" />
+
     </form>
-  
-    <mat-divider></mat-divider>
-  
-    <div class="dialog-footer">
-      <app-common-button [config]="cancelButtonConfig" />
-      <app-common-button [config]="submitButtonConfig" />
-    </div>
-  </div>

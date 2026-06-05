@@ -1,0 +1,39 @@
+<div class="dialog-wrapper">
+
+  <div class="dialog-header">
+    <div class="dialog-header__content">
+      <h2 class="dialog-title">
+        {{ title }}
+      </h2>
+
+      <p class="dialog-subtitle">
+        {{ subtitle }}
+      </p>
+    </div>
+
+    <app-common-button
+      [config]="closeButtonConfig">
+    </app-common-button>
+  </div>
+
+  <mat-divider />
+
+  <div class="dialog-body">
+    <ng-content></ng-content>
+  </div>
+
+  <mat-divider />
+
+  <div class="dialog-footer">
+
+    <app-common-button
+      [config]="cancelButtonConfig">
+    </app-common-button>
+
+    <app-common-button
+      [config]="submitButtonConfig">
+    </app-common-button>
+
+  </div>
+
+</div>

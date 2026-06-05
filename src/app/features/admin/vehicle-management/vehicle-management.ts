@@ -1,4 +1,4 @@
-import {
+  import {
   Component,
   DestroyRef,
   OnInit,
@@ -212,13 +212,6 @@ export class VehicleManagement implements OnInit {
         if (!result?.saved) {
           return;
         }
-
-        this.toastr.success(
-          mode === 'add'
-            ? 'Vehicle added successfully.'
-            : 'Vehicle updated successfully.'
-        );
-
         this.loadVehicles();
       });
   }

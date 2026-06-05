@@ -1,24 +1,19 @@
-<div class="dialog-wrapper">
-  <div class="dialog-header">
-    <div class="dialog-header__content">
-      <h2 class="dialog-title">Edit City</h2>
-      <p class="dialog-subtitle">Update city details and save changes.</p>
-    </div>
-    <app-common-button [config]="closeButtonConfig" />
-  </div>
 
-  <mat-divider />
+<app-form-dialog
+  title="Edit City"
+  subtitle="Update city details and save changes."
+  [closeButtonConfig]="closeButtonConfig"
+  [cancelButtonConfig]="cancelButtonConfig"
+  [submitButtonConfig]="submitButtonConfig">
 
-  <form [formGroup]="form" class="dialog-body" (ngSubmit)="submit()" novalidate>
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate>
+
     <div class="field-group">
       <app-common-input [config]="nameConfig" />
     </div>
+
   </form>
-
-  <mat-divider />
-
-  <div class="dialog-footer">
-    <app-common-button [config]="cancelButtonConfig" />
-    <app-common-button [config]="submitButtonConfig" />
-  </div>
-</div>
+</app-form-dialog>

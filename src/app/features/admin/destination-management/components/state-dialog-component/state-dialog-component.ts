@@ -7,11 +7,11 @@ import { ToastrService } from 'ngx-toastr';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { InputField } from '../../../../../shared/components/input-field/input-field';
-import { Button } from '../../../../../shared/components/button/button';
 import { InputFieldConfig } from '../../../../../shared/components/input-field/input-field.config';
 import { ButtonConfig } from '../../../../../shared/components/button/button.config';
 import { StateDialogData, StateForm } from '../../models/state-city.model';
 import { StateService } from '../../services/state-service';
+import { FormDialog } from "../../../../../shared/components/form-dialog/form-dialog";
 
 @Component({
   selector: 'app-state-dialog',
@@ -22,8 +22,8 @@ import { StateService } from '../../services/state-service';
     MatDialogModule,
     MatDividerModule,
     InputField,
-    Button,
-  ],
+    FormDialog
+],
   templateUrl: './state-dialog-component.html',
   styleUrl: './state-dialog-component.scss',
 })
